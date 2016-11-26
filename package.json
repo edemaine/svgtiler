@@ -14,6 +14,7 @@
   "dependencies": {
     "coffee-script": "^1.11.1",
     "csv-parse": "^1.1.7",
+    "prettify-xml": "^1.0.0",
     "xmldom": "^0.1.22"
   }
 }
