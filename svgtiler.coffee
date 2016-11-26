@@ -1,10 +1,22 @@
 path = require 'path'
 fs = require 'fs'
 csvParse = require 'csv-parse'
+xmldom = require 'xmldom'
+DOMParser = xmldom.DOMParser
+domImplementation = new xmldom.DOMImplementation()
+XMLSerializer = xmldom.XMLSerializer
+
+SVGNS = 'http://www.w3.org/2000/svg'
 
 splitIntoLines = (data) ->
   data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+
+class Symbol
+  constructor: (@key, @svg) ->
+    @xml = new DOMParser().parseFromString @svg
+  @parse: (key, text) ->
+    new @ key, text
 
 class Input
   @encoding: 'utf8'
@@ -32,7 +44,7 @@ class ASCIIMapping extends Mapping
         key = line[0]  ## Whitespace at beginning means defining whitespace
       else
         key = line[...separator.index]
-      value = line[separator.index + separator[0].length..]
+      value = Symbol.parse key, line[separator.index + separator[0].length..]
       map[key] = value
     map
 
@@ -52,9 +64,21 @@ class Drawing extends Input
     console.log '->', filename
     fs.writeFileSync filename, @renderSVG mappings
   renderSVG: (mappings) ->
+    doc = domImplementation.createDocument SVGNS, 'svg'
+    doc.appendChild defs = doc.createElementNS SVGNS, 'defs'
+    symbols = {}
     for row, i in @data
       for cell, j in row
-        console.log i, j, cell, mappings.lookup cell
+        symbol = mappings.lookup cell
+        continue unless symbol?
+        symbols[symbol.key] = symbol
+        #console.log i, j, cell, symbol
+    for key, symbol of symbols
+      defs.appendChild node = doc.createElementNS SVGNS, 'symbol'
+      node.setAttribute 'id', key
+      node.appendChild symbol.xml
+    console.log doc.firstChild
+    new XMLSerializer().serializeToString doc
 
 class Mappings
   constructor: (@maps = []) ->
