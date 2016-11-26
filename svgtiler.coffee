@@ -1,5 +1,6 @@
 path = require 'path'
 fs = require 'fs'
+CoffeeScript = require 'coffee-script'
 csvParse = require 'csv-parse'
 xmldom = require 'xmldom'
 DOMParser = xmldom.DOMParser
@@ -42,10 +43,16 @@ class Input
       throw new UserException "svgtiler: unrecognized extension in filename #{filename}"
 
 class Mapping extends Input
+  constructor: (data) ->
+    if data?
+      for own key, value of data
+        unless value instanceof Symbol
+          value = Symbol.parse key, value
+        @[key] = value
 
 class ASCIIMapping extends Mapping
   @parse: (data) ->
-    map = new @
+    map = {}
     for line in splitIntoLines data
       separator = whitespace.exec line
       continue unless separator?
@@ -55,9 +62,15 @@ class ASCIIMapping extends Mapping
         key = line[...separator.index]
       value = Symbol.parse key, line[separator.index + separator[0].length..]
       map[key] = value
-    map
+    new @ map
+
+class JSMapping extends Mapping
+  @parse: (data) ->
+    new @ eval data
 
 class CoffeeMapping extends Mapping
+  @parse: (data) ->
+    new @ CoffeeScript.eval data
 
 class Drawing extends Input
   tileWidth: 50
@@ -151,6 +164,7 @@ class TSVDrawing extends DSVDrawing
 
 extension_map =
   '.txt': ASCIIMapping
+  '.js': JSMapping
   '.coffee': CoffeeMapping
   '.asc': ASCIIDrawing
   '.ssv': SSVDrawing
