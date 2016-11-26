@@ -1,0 +1,18 @@
+{
+  "name": "svg-tiler",
+  "description": "Tool for drawing diagrams on a grid, combining grids of SVGs into a big SVG figure",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edemaine/svg-tiler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/edemaine/svg-tiler/issues"
+  },
+  "homepage": "https://github.com/edemaine/svg-tiler#readme",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^1.1.7",
+    "xmldom": "^0.1.22"
+  }
+}
