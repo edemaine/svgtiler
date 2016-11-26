@@ -65,7 +65,7 @@ class Drawing extends Input
     fs.writeFileSync filename, @renderSVG mappings
   renderSVG: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
-    doc.appendChild defs = doc.createElementNS SVGNS, 'defs'
+    doc.documentElement.appendChild defs = doc.createElementNS SVGNS, 'defs'
     symbols = {}
     for row, i in @data
       for cell, j in row
@@ -77,7 +77,6 @@ class Drawing extends Input
       defs.appendChild node = doc.createElementNS SVGNS, 'symbol'
       node.setAttribute 'id', key
       node.appendChild symbol.xml
-    console.log doc.firstChild
     new XMLSerializer().serializeToString doc
 
 class Mappings
