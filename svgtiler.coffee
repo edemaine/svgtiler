@@ -7,6 +7,7 @@ domImplementation = new xmldom.DOMImplementation()
 XMLSerializer = xmldom.XMLSerializer
 
 SVGNS = 'http://www.w3.org/2000/svg'
+XLINKNS = 'http://www.w3.org/1999/xlink'
 
 splitIntoLines = (data) ->
   data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
@@ -51,6 +52,8 @@ class ASCIIMapping extends Mapping
 class CoffeeMapping extends Mapping
 
 class Drawing extends Input
+  tileWidth: 50
+  tileHeight: 50
   constructor: (@data) ->
   writeSVG: (mappings, filename) ->
     ## Default filename is the input filename with extension replaced by .svg
@@ -66,12 +69,18 @@ class Drawing extends Input
   renderSVG: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
     doc.documentElement.appendChild defs = doc.createElementNS SVGNS, 'defs'
-    symbols = {}
-    for row, i in @data
-      for cell, j in row
+    symbols = {}  ## dictionary of used symbols
+    for row, y in @data
+      for cell, x in row
         symbol = mappings.lookup cell
         continue unless symbol?
         symbols[symbol.key] = symbol
+        doc.documentElement.appendChild use = doc.createElementNS SVGNS, 'use'
+        use.setAttributeNS XLINKNS, 'href', '#' + symbol.key
+        use.setAttributeNS null, 'x', x * @tileWidth
+        use.setAttributeNS null, 'y', y * @tileHeight
+        use.setAttributeNS null, 'width', @tileWidth
+        use.setAttributeNS null, 'height', @tileHeight
         #console.log i, j, cell, symbol
     for key, symbol of symbols
       defs.appendChild node = doc.createElementNS SVGNS, 'symbol'
