@@ -1,2 +1,3 @@
-# svg-tiler
-Tool for drawing diagrams on a grid, combining grids of SVGs into a big SVG figure
+# svgtiler
+SVG Tiler is a tool for drawing diagrams on a grid using text or spreadsheets,
+and then substituting SVG symbols to make a big SVG figure.
