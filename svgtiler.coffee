@@ -7,6 +7,7 @@ DOMParser = xmldom.DOMParser
 domImplementation = new xmldom.DOMImplementation()
 XMLSerializer = xmldom.XMLSerializer
 prettyXML = require('prettify-xml')
+argparse = require('argparse')
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -257,9 +258,21 @@ extension_map =
   '.csv': CSVDrawing
   '.tsv': TSVDrawing
 
+argparser = argparse.ArgumentParser()
+argparser.addArgument ['-tw', '--tile-width'],
+  help: 'Force all symbol tiles to have specified width'
+  nargs: 1
+argparser.addArgument ['-th', '--tile-height'],
+  help: 'Force all symbol tiles to have specified height'
+  nargs: 1
+argparser.addArgument 'filenames',
+  nargs: argparse.REMAINDER
+
 main = ->
   mappings = new Mappings
-  for filename in process.argv[2..]
+  #args = argparser.parseArgs process.argv[2..]
+  #for filename in args.filenames
+  for filename in args.filenames
     console.log '*', filename
     input = Input.load filename
     if input instanceof Mapping

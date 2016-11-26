@@ -12,6 +12,7 @@
   "homepage": "https://github.com/edemaine/svg-tiler#readme",
   "license": "MIT",
   "dependencies": {
+    "argparse": "^1.0.9",
     "coffee-script": "^1.11.1",
     "csv-parse": "^1.1.7",
     "prettify-xml": "^1.0.0",
