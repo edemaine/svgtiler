@@ -18,6 +18,14 @@ class Symbol
     @xml = new DOMParser().parseFromString @svg
   @parse: (key, text) ->
     new @ key, text
+  id: ->
+    ## Valid Name characters: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Name
+    ## Removed colon to avoid potential conflict with hex expansion.
+    ## Also prepend 's' to avoid bad starting characters.
+    's' +
+      @key.replace /[^-\w.\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\xB7\u0300-\u036F\u203F-\u2040]/,
+      (m) -> ':' + m.charCodeAt(0).toString 16
+#[\u10000-\uEFFFF]
 
 class Input
   @encoding: 'utf8'
@@ -68,25 +76,49 @@ class Drawing extends Input
     fs.writeFileSync filename, @renderSVG mappings
   renderSVG: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
-    doc.documentElement.appendChild defs = doc.createElementNS SVGNS, 'defs'
-    symbols = {}  ## dictionary of used symbols
+    svg = doc.documentElement
+    svg.setAttributeNS null, 'xmlns', SVGNS
+    svg.setAttributeNS null, 'xmlns:xlink', XLINKNS
+    svg.setAttributeNS null, 'version', '1.1'
+    #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
+    ## Find which symbols are actually used.
+    symbols = {}
+    for row, y in @data
+      for cell, x in row
+        symbol = mappings.lookup cell
+        #continue unless symbol?
+        symbols[symbol.key] = symbol
+    ## Include the symbols
+    for key, symbol of symbols
+      svg.appendChild node = doc.createElementNS SVGNS, 'symbol'
+      node.setAttribute 'id', symbol.id()
+      node.appendChild symbol.xml
+    ## Use the symbols according to the drawing
+    width = 0
     for row, y in @data
       for cell, x in row
         symbol = mappings.lookup cell
         continue unless symbol?
-        symbols[symbol.key] = symbol
-        doc.documentElement.appendChild use = doc.createElementNS SVGNS, 'use'
-        use.setAttributeNS XLINKNS, 'href', '#' + symbol.key
+        svg.appendChild use = doc.createElementNS SVGNS, 'use'
+        use.setAttributeNS XLINKNS, 'xlink:href', '#' + symbol.id()
         use.setAttributeNS null, 'x', x * @tileWidth
         use.setAttributeNS null, 'y', y * @tileHeight
         use.setAttributeNS null, 'width', @tileWidth
         use.setAttributeNS null, 'height', @tileHeight
         #console.log i, j, cell, symbol
-    for key, symbol of symbols
-      defs.appendChild node = doc.createElementNS SVGNS, 'symbol'
-      node.setAttribute 'id', key
-      node.appendChild symbol.xml
-    new XMLSerializer().serializeToString doc
+        if (x+1) * @tileWidth > width
+          width = (x+1) * @tileWidth
+    height = @data.length * @tileHeight
+    svg.setAttributeNS null, 'viewBox', "0 0 #{width} #{height}"
+    svg.setAttributeNS null, 'width', width
+    svg.setAttributeNS null, 'height', height
+    svg.setAttributeNS null, 'preserveAspectRatio', 'xMinYMin meet'
+    '''
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+''' +
+      new XMLSerializer().serializeToString doc
 
 class Mappings
   constructor: (@maps = []) ->

@@ -9,4 +9,4 @@ B <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">B<
 C <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">C</text>
 ( <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">(</text>
 ) <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">)</text>
-  <rect/>
+  <rect width="0" height="0"/>
