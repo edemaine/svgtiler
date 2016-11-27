@@ -82,6 +82,27 @@ svgBBox = (xml) ->
       viewBox
 
 class Symbol
+  @parse: (key, data) ->
+    if typeof data == 'function'
+      new DynamicSymbol key, data
+    else if data.function?
+      new DynamicSymbol key, data.function
+    else
+      new StaticSymbol key,
+        if typeof data == 'string'
+          if data.indexOf('<') < 0  ## No <'s -> interpret as filename
+            filename: data
+            svg: fs.readFileSync filename,
+                   encoding: @encoding
+          else
+            svg: data
+        else
+          data
+  includes: (substring) ->
+    @key.indexOf(substring) >= 0
+    ## ECMA6: @key.includes substring
+
+class StaticSymbol extends Symbol
   constructor: (@key, options) ->
     for own key, value of options
       @[key] = value
@@ -91,10 +112,10 @@ class Symbol
     if @viewBox?
       @width = @viewBox[2]
       @height = @viewBox[3]
-    if @constructor.forceWidth?
-      @width = @constructor.forceWidth
-    if @constructor.forceHeight?
-      @height = @constructor.forceHeight
+    if Symbol.forceWidth?
+      @width = Symbol.forceWidth
+    if Symbol.forceHeight?
+      @height = Symbol.forceHeight
     warnings = []
     unless @width?
       warnings.push 'width'
@@ -104,15 +125,6 @@ class Symbol
       @height = 0 unless @height?
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
-  @parse: (key, text) ->
-    new @ key,
-      if typeof text == 'string'
-        if text.indexOf('<') < 0  ## No <'s -> interpret as filename
-          filename: text
-          svg: fs.readFileSync filename,
-                 encoding: @encoding
-        else
-          svg: text
   id: ->
     ## Valid Name characters: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Name
     ## Couldn't represent the range [\u10000-\uEFFFF]
@@ -121,6 +133,18 @@ class Symbol
     's' +
       @key.replace /[^-\w.\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\xB7\u0300-\u036F\u203F-\u2040]/,
       (m) -> ':' + m.charCodeAt(0).toString 16
+  #use: -> @  ## do nothing for static symbol
+
+class DynamicSymbol extends Symbol
+  constructor: (@key, @func) ->
+    @versions = {}
+    @nversions = 0
+  use: (context) ->
+    result = @func.call context
+    if result of @versions
+      @versions[result]
+    else
+      @versions[result] = Symbol.parse "#{@key}-v#{@nversions++}", result
 
 class Input
   @encoding: 'utf8'
@@ -171,6 +195,17 @@ class CoffeeMapping extends Mapping
   @parse: (data) ->
     new @ CoffeeScript.eval data
 
+class Mappings
+  constructor: (@maps = []) ->
+  push: (map) ->
+    @maps.push map
+  lookup: (key) ->
+    for i in [@maps.length-1..0]
+      map = @maps[i]
+      if key of map
+        return map[key]
+    null
+
 class Drawing extends Input
   constructor: (@data) ->
   writeSVG: (mappings, filename) ->
@@ -191,15 +226,22 @@ class Drawing extends Input
     svg.setAttributeNS null, 'xmlns:xlink', XLINKNS
     svg.setAttributeNS null, 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
-    ## Find which symbols are actually used.
-    symbols = {}
-    for row, y in @data
-      for cell, x in row
-        symbol = mappings.lookup cell
-        #continue unless symbol?
-        symbols[symbol.key] = symbol
-    ## Include the symbols
-    for key, symbol of symbols
+    ## Look up all symbols in the drawing.
+    symbols =
+      for row in @data
+        for cell in row
+          mappings.lookup cell
+    ## Instantiate (.use) all (dynamic) symbols in the drawing.
+    symbolsByKey = {}
+    symbols =
+      for row, i in symbols
+        for symbol, j in row
+          if symbol?.use?
+            symbol = symbol.use new Context symbols, i, j
+          symbolsByKey[symbol?.key] = symbol
+    ## Include all used symbols in SVG
+    for key, symbol of symbolsByKey
+      continue unless symbol?
       svg.appendChild node = doc.createElementNS SVGNS, 'symbol'
       node.setAttribute 'id', symbol.id()
       if symbol.viewBox?
@@ -213,17 +255,15 @@ class Drawing extends Input
           node.appendChild child.cloneNode true
       else
         node.appendChild symbol.xml.documentElement.cloneNode true
-    ## Use the symbols according to the drawing
+    ## Lay out the symbols in the drawing via SVG <use>.
     width = 0
     y = 0
-    for row in @data
+    for row, i in symbols
       rowHeight = 0
       x = 0
-      for cell in row
-        symbol = mappings.lookup cell
+      for symbol, j in row
         continue unless symbol?
         svg.appendChild use = doc.createElementNS SVGNS, 'use'
-        #console.log i, j, cell, symbol
         use.setAttributeNS XLINKNS, 'xlink:href', '#' + symbol.id()
         use.setAttributeNS null, 'x', x
         use.setAttributeNS null, 'y', y
@@ -247,17 +287,6 @@ class Drawing extends Input
 ''' +
       prettyXML new XMLSerializer().serializeToString doc
 
-class Mappings
-  constructor: (@maps = []) ->
-  push: (map) ->
-    @maps.push map
-  lookup: (key) ->
-    for i in [@maps.length-1..0]
-      map = @maps[i]
-      if key of map
-        return map[key]
-    null
-
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
   @parse: (data) ->
@@ -279,6 +308,15 @@ class CSVDrawing extends DSVDrawing
 class TSVDrawing extends DSVDrawing
   @title: "Tab-separated drawing (spreadsheet export)"
   @delimeter: '\t'
+
+class Context
+  constructor: (@symbols, @i, @j) ->
+    @symbol = @symbols[@i]?[@j]
+    @key = @symbol?.key
+  includes: (args...) ->
+    @symbol? and @symbol.includes args...
+  neighbor: (dj, di) ->
+    new Context @symbols, @i + di, @j + dj
 
 extension_map =
   '.txt': ASCIIMapping
