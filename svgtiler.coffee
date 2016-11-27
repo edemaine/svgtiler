@@ -27,7 +27,7 @@ svgBBox = (xml) ->
   ##   - paths
   ##   - text
   if xml.documentElement.hasAttribute 'viewBox'
-    xml.documentElement.getAttribute('viewBox').split /\s+/
+    xml.documentElement.getAttribute('viewBox').split /\s*,?\s+/
     .map parseFloat
   else
     recurse = (node) ->
@@ -207,7 +207,8 @@ class Drawing extends Input
       if symbol.xml.documentElement.tagName in ['svg', 'symbol']
         ## Remove a layer of indirection for <svg> and <symbol>
         for attribute in symbol.xml.documentElement.attributes
-          node.setAttribute attribute.name, attribute.value
+          unless attribute in ['version'] or attribute[...5] == 'xmlns'
+            node.setAttribute attribute.name, attribute.value
         for child in symbol.xml.documentElement.childNodes
           node.appendChild child.cloneNode true
       else
