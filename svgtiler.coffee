@@ -16,6 +16,11 @@ splitIntoLines = (data) ->
   data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
 
+class SVGTilerException
+  constructor: (@message) ->
+  toString: ->
+    "svgtiler: #{@message}"
+
 svgBBox = (xml) ->
   ## xxx Many unsupported features!
   ##   - transformations
@@ -82,12 +87,23 @@ class Symbol
       @[key] = value
     @xml = new DOMParser().parseFromString @svg
     @viewBox = svgBBox @xml
+    @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
       @height = @viewBox[3]
-    else
-      console.warn "Failed to detect width/height of SVG for symbol '#{@key}'"
-      @width = @height = 0
+    if @constructor.forceWidth?
+      @width = @constructor.forceWidth
+    if @constructor.forceHeight?
+      @height = @constructor.forceHeight
+    warnings = []
+    unless @width?
+      warnings.push 'width'
+      @width = 0 unless @width?
+    unless @height?
+      warnings.push 'height'
+      @height = 0 unless @height?
+    if warnings.length > 0
+      console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
   @parse: (key, text) ->
     new @ key,
       if typeof text == 'string'
@@ -118,7 +134,7 @@ class Input
     if extension of extension_map
       extension_map[extension].parseFile filename
     else
-      throw new UserException "svgtiler: unrecognized extension in filename #{filename}"
+      throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
 class Mapping extends Input
   constructor: (data) ->
@@ -129,6 +145,8 @@ class Mapping extends Input
         @[key] = value
 
 class ASCIIMapping extends Mapping
+  @title: "ASCII mapping file"
+  @help: "Each line is <symbol-name><space><raw SVG or filename.svg>"
   @parse: (data) ->
     map = {}
     for line in splitIntoLines data
@@ -138,21 +156,22 @@ class ASCIIMapping extends Mapping
         key = line[0]  ## Whitespace at beginning means defining whitespace
       else
         key = line[...separator.index]
-      value = Symbol.parse key, line[separator.index + separator[0].length..]
-      map[key] = value
+      map[key] = line[separator.index + separator[0].length..]
     new @ map
 
 class JSMapping extends Mapping
+  @title: "JavaScript mapping file"
+  @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   @parse: (data) ->
     new @ eval data
 
 class CoffeeMapping extends Mapping
+  @title: "CoffeeScript mapping file"
+  @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   @parse: (data) ->
     new @ CoffeeScript.eval data
 
 class Drawing extends Input
-  tileWidth: 50
-  tileHeight: 50
   constructor: (@data) ->
   writeSVG: (mappings, filename) ->
     ## Default filename is the input filename with extension replaced by .svg
@@ -195,19 +214,27 @@ class Drawing extends Input
         node.appendChild symbol.xml.documentElement.cloneNode true
     ## Use the symbols according to the drawing
     width = 0
-    for row, y in @data
-      for cell, x in row
+    y = 0
+    for row in @data
+      rowHeight = 0
+      x = 0
+      for cell in row
         symbol = mappings.lookup cell
         continue unless symbol?
         svg.appendChild use = doc.createElementNS SVGNS, 'use'
-        use.setAttributeNS XLINKNS, 'xlink:href', '#' + symbol.id()
-        use.setAttributeNS null, 'x', x * @tileWidth
-        use.setAttributeNS null, 'y', y * @tileHeight
-        use.setAttributeNS null, 'width', @tileWidth
-        use.setAttributeNS null, 'height', @tileHeight
         #console.log i, j, cell, symbol
-        if (x+1) * @tileWidth > width
-          width = (x+1) * @tileWidth
+        use.setAttributeNS XLINKNS, 'xlink:href', '#' + symbol.id()
+        use.setAttributeNS null, 'x', x
+        use.setAttributeNS null, 'y', y
+        use.setAttributeNS null, 'width', symbol.width
+        use.setAttributeNS null, 'height', symbol.height
+        x += symbol.width
+        if symbol.height > rowHeight
+          rowHeight = symbol.height
+      if x > width
+        width = x
+      y += rowHeight
+    height = y
     height = @data.length * @tileHeight
     svg.setAttributeNS null, 'viewBox', "0 0 #{width} #{height}"
     svg.setAttributeNS null, 'width', width
@@ -232,6 +259,7 @@ class Mappings
     null
 
 class ASCIIDrawing extends Drawing
+  @title: "ASCII drawing (one character per symbol)"
   @parse: (data) ->
     new @ splitIntoLines data
 
@@ -241,12 +269,15 @@ class DSVDrawing extends Drawing
       delimeter: @delimeter
 
 class SSVDrawing extends DSVDrawing
+  @title: "Space-delimeter drawing (one word per symbol)"
   @delimeter: ' '
 
 class CSVDrawing extends DSVDrawing
+  @title: "Comma-separated drawing (spreadsheet export)"
   @delimeter: ','
 
 class TSVDrawing extends DSVDrawing
+  @title: "Tab-separated drawing (spreadsheet export)"
   @delimeter: '\t'
 
 extension_map =
@@ -265,20 +296,70 @@ argparser.addArgument ['-tw', '--tile-width'],
 argparser.addArgument ['-th', '--tile-height'],
   help: 'Force all symbol tiles to have specified height'
   nargs: 1
-argparser.addArgument 'filenames',
-  nargs: argparse.REMAINDER
+argparser.addArgument ['filenames'],
+  nargs: argparse.Const.REMAINDER
+
+help = ->
+  console.log """
+Usage: #{process.argv[0]} #{process.argv[1]} (...options and filenames...)
+--help [-h] [-tw TILE_WIDTH] [-th TILE_HEIGHT] ...
+
+Optional arguments:
+  --help                Show this help message and exit.
+  --tw TILE_WIDTH / --tile-width TILE_WIDTH
+                        Force all symbol tiles to have specified width
+                        (default: null, which means read width from SVG)
+  --th TILE_HEIGHT / --tile-height TILE_HEIGHT
+                        Force all symbol tiles to have specified height
+                        (default: null, which means read height from SVG)
+
+Filename arguments:  (mappings before drawings!)
+
+"""
+  for extension, klass of extension_map
+    if extension.length < 10
+      extension += ' '.repeat 10 - extension.length
+    console.log "  *#{extension}  #{klass.title}"
+    console.log "               #{klass.help}" if klass.help?
+  console.log """
+
+SYMBOL specifiers:
+
+  'filename.svg':   load SVG from specifies file
+  '<svg>...</svg>': raw SVG
+  (context) -> ...: function computing SVG
+"""
+  #object with one or more attributes
+  process.exit()
 
 main = ->
   mappings = new Mappings
-  #args = argparser.parseArgs process.argv[2..]
-  #for filename in args.filenames
-  for filename in args.filenames
-    console.log '*', filename
-    input = Input.load filename
-    if input instanceof Mapping
-      mappings.push input
-    else if input instanceof Drawing
-      input.writeSVG mappings
+  args = process.argv[2..]
+  files = skip = 0
+  for arg, i in args
+    if skip
+      skip--
+      continue
+    switch arg
+      when '-h', '--help'
+        help()
+      when '--tw', '--tile-width'
+        Symbol.forceWidth = parseFloat args[i+1]
+        skip = 1
+      when '--th', '--tile-height'
+        Symbol.forceHeight = parseFloat args[i+1]
+        skip = 1
+      else
+        files++
+        console.log '*', arg
+        input = Input.load arg
+        if input instanceof Mapping
+          mappings.push input
+        else if input instanceof Drawing
+          input.writeSVG mappings
+  unless files
+    console.log 'Not enough filename arguments'
+    help()
 
 unless window?
   main()
