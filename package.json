@@ -9,12 +9,31 @@
   "bugs": {
     "url": "https://github.com/edemaine/svg-tiler/issues"
   },
-  "homepage": "https://github.com/edemaine/svg-tiler#readme",
+  "homepage": "https://github.com/edemaine/svg-tiler",
+  "author": {
+    "name": "Erik Demaine",
+    "email": "edemaine@mit.edu",
+    "url": "http://erikdemaine.org/"
+  },
   "license": "MIT",
+  "directories": {
+    "lib": "lib"
+  },
+  "main": "lib/svgtiler.js",
+  "bin": {
+    "svgtiler": "lib/svgtiler.js"
+  },
+  "preferGlobal": true,
+  "scripts": {
+    "prepublish": "node_modules/coffee-script/bin/coffee --no-header --bare -o lib -c src/svgtiler.coffee"
+  },
   "dependencies": {
     "coffee-script": "^1.11.1",
     "csv-parse": "^1.1.7",
     "prettify-xml": "^1.0.0",
     "xmldom": "^0.1.22"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.11.1"
   }
 }

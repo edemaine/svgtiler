@@ -1,3 +1,6 @@
+#!/usr/bin/env coffee
+`#!/usr/bin/env node
+`
 path = require 'path'
 fs = require 'fs'
 CoffeeScript = require 'coffee-script'
