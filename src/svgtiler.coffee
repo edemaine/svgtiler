@@ -376,7 +376,7 @@ SYMBOL specifiers:
 
   'filename.svg':   load SVG from specifies file
   '<svg>...</svg>': raw SVG
-  (context) -> ...: function computing SVG
+  -> ...:           function computing SVG, with context available as this/@
 """
   #object with one or more attributes
   process.exit()
