@@ -1,7 +1,7 @@
 path = require 'path'
 fs = require 'fs'
 CoffeeScript = require 'coffee-script'
-csvParse = require 'csv-parse'
+csvParse = require 'csv-parse/lib/sync'
 xmldom = require 'xmldom'
 DOMParser = xmldom.DOMParser
 domImplementation = new xmldom.DOMImplementation()
@@ -294,20 +294,30 @@ class ASCIIDrawing extends Drawing
 
 class DSVDrawing extends Drawing
   @parse: (data) ->
+    ## Remove trailing newline / final blank line.
+    if data[-2..] == '\r\n'
+      data = data[...-2]
+    else if data[-1..] in ['\r', '\n']
+      data = data[...-1]
+    ## CSV parser.
     new @ csvParse data,
-      delimeter: @delimeter
+      delimiter: @delimiter
+      relax_column_count: true
 
 class SSVDrawing extends DSVDrawing
-  @title: "Space-delimeter drawing (one word per symbol)"
-  @delimeter: ' '
+  @title: "Space-delimiter drawing (one word per symbol)"
+  @delimiter: ' '
+  @parse: (data) ->
+    ## Coallesce non-newline whitespace into single space
+    super data.replace /[ \t\f\v]+/g, ' '
 
 class CSVDrawing extends DSVDrawing
   @title: "Comma-separated drawing (spreadsheet export)"
-  @delimeter: ','
+  @delimiter: ','
 
 class TSVDrawing extends DSVDrawing
   @title: "Tab-separated drawing (spreadsheet export)"
-  @delimeter: '\t'
+  @delimiter: '\t'
 
 class Context
   constructor: (@symbols, @i, @j) ->
