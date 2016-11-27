@@ -7,7 +7,6 @@ DOMParser = xmldom.DOMParser
 domImplementation = new xmldom.DOMImplementation()
 XMLSerializer = xmldom.XMLSerializer
 prettyXML = require('prettify-xml')
-argparse = require('argparse')
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -288,16 +287,6 @@ extension_map =
   '.ssv': SSVDrawing
   '.csv': CSVDrawing
   '.tsv': TSVDrawing
-
-argparser = argparse.ArgumentParser()
-argparser.addArgument ['-tw', '--tile-width'],
-  help: 'Force all symbol tiles to have specified width'
-  nargs: 1
-argparser.addArgument ['-th', '--tile-height'],
-  help: 'Force all symbol tiles to have specified height'
-  nargs: 1
-argparser.addArgument ['filenames'],
-  nargs: argparse.Const.REMAINDER
 
 help = ->
   console.log """
