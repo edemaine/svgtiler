@@ -78,12 +78,12 @@ pathColor = '#d3ac0d'
   <symbol viewBox="0 0 80 80"/>
 """
 ## SQUARES
-'rs': """
+'rq': """
   <symbol viewBox="0 0 80 80">
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="red"/>
   </symbol>
 """
-'bs': """
+'bq': """
   <symbol viewBox="0 0 80 80">
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="blue"/>
   </symbol>
