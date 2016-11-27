@@ -236,7 +236,6 @@ class Drawing extends Input
         width = x
       y += rowHeight
     height = y
-    height = @data.length * @tileHeight
     svg.setAttributeNS null, 'viewBox', "0 0 #{width} #{height}"
     svg.setAttributeNS null, 'width', width
     svg.setAttributeNS null, 'height', height
