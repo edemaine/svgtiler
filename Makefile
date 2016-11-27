@@ -1,2 +1,4 @@
-examples:
-	coffee svgtiler.coffee --tw 50 --th 50 examples/tilt/{*.txt,*.asc}
+examples: ALWAYS
+	coffee svgtiler.coffee --tw 50 --th 50 examples/tilt/*.txt examples/tilt/*.asc
+
+ALWAYS:
