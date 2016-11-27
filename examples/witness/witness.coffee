@@ -1,28 +1,14 @@
-square1: '<g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="black" stroke="black"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g>'
-star1: '<g id="star1"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="black" stroke="black"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square2"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="white" stroke="white"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star2"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="white" stroke="white"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square3"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="cyan" stroke="cyan"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star3"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="cyan" stroke="cyan"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square4"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="magenta" stroke="magenta"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star4"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="magenta" stroke="magenta"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square5"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="yellow" stroke="yellow"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star5"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="yellow" stroke="yellow"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square6"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="red" stroke="red"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star6"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="red" stroke="red"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square7"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="green" stroke="green"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star7"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="green" stroke="green"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square8"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="blue" stroke="blue"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star8"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="blue" stroke="blue"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="square9"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30,30)" fill="orange" stroke="orange"><rect width="40px" height="40px" rx="15px" ry="15px" /></g></g></g>
-<g id="star9"><g transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(35,35)" fill="orange" stroke="orange"><rect width="30px" height="30px" /><rect width="30px" height="30px" transform="rotate(45 15 15)" /></g></g></g>
-<g id="tetris" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30.5,30.5)" fill="yellow" stroke="none"><g transform="scale(1)"><rect width="18px" height="18px" rx="2" ry="2" x="0" y="0" /><rect width="18px" height="18px" rx="2" ry="2" x="21" y="0" /><rect width="18px" height="18px" rx="2" ry="2" x="0" y="21" /><rect width="18px" height="18px" rx="2" ry="2" x="21" y="21" /></g></g></g>
-<g id="negative" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(30.5,30.5)" fill="none" stroke="blue" stroke-width="4"><g transform="scale(1)"><rect width="14px" height="14px" rx="0" ry="0" x="2" y="2" /><rect width="14px" height="14px" rx="0" ry="0" x="23" y="2" /><rect width="14px" height="14px" rx="0" ry="0" x="2" y="23" /><rect width="14px" height="14px" rx="0" ry="0" x="23" y="23" /></g></g></g>
-<g id="error" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(50,50)" fill="white" stroke="white"><rect width="15px" height="8px" transform="rotate(-90 0 4)" /><rect width="15px" height="8px" transform="rotate(30 0 4)" /><rect width="15px" height="8px" transform="rotate(150 0 4)" /></g></g>
-<g id="triangle0" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(50,50)" fill="white" stroke="white"><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(0,0)" /></g></g>
-<g id="triangle1" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(50,50)" fill="white" stroke="white"><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(-10,0)" /><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(10,0)" /></g></g>
-<g id="triangle2" transform="scale(1.5) translate(-16.66, -16.66)"><g transform="translate(50,50)" fill="white" stroke="white"><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(-20,0)" /><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(0,0)" /><polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(20,0)" /></g></g>
-<g id="start" transform="translate(50, 50) scale(1.5)" stroke="black" fill="black"><g transform="translate(-6, 0)"><circle cx="0" cy="0" r="25" /></g><line x1="0" y1="0" x2="100" y2="0" stroke-width="20"stroke-linecap="round" /></g>
-<g id="end" transform="translate(40, 50) scale(1.5)" stroke="black"><line x1="0" y1="0" x2="20" y2="0" stroke-width="20" stroke-linecap="round" /><line x1="0" y1="0" x2="10" y2="0" stroke-width="20" stroke-linecap="square" /></g>
-<g id="disjoint" transform="translate(-25, 50) scale(1.5)" stroke="black"><line x1="0" y1="0" x2="100" y2="0" stroke-width="20"stroke-dasharray="30,40,30"stroke-linecap="round" /><g stroke="none"><rect width="20" height="20" x="20" y="-10" /><rect width="20" height="20" x="60" y="-10" /></g></g>
-<g id="hexagon" transform="translate(-25, 50) scale(1.5)" stroke="black"><line x1="0" y1="0" x2="100" y2="0" stroke-width="20"stroke-linecap="round" /><g transform="translate(50, 0)"><polygon fill="gray" stroke="gray" points="-8,0 -4,-6.9282 4,-6.9282 8,0 4,6.9282 -4,6.9282" transform="translate(0,0)" /></g></g></defs></svg>
+'-': '''
+  <symbol viewBox="10 -10 80 20">
+    <line x1="10" x2="90" y1="0" y2="0" stroke-width="20" stroke="black"/>
+  </symbol>'''
+'|': '''
+  <symbol viewBox="-10 10 20 80">
+    <line y1="10" y2="90" x1="0" x2="0" stroke-width="20" stroke="black"/>
+  </symbol>'''
+'.': '''
+  <symbol viewBox="-10 -10 20 20">
+    <circle x="0" y="0" r="20" fill="black"/>
+  </symbol>'''
+' ': '''
+  <symbol viewBox="0 0 80 80"/>'''
