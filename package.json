@@ -1,5 +1,5 @@
 {
-  "name": "svg-tiler",
+  "name": "svgtiler",
   "description": "Tool for drawing diagrams on a grid, combining grids of SVGs into a big SVG figure",
   "version": "1.0.0",
   "repository": {
