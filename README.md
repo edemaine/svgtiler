@@ -11,8 +11,7 @@ you can install this tool via
 ## Usage
 
 ```
-Usage: /usr/bin/nodejs /usr/bin/svgtiler (...options and filenames...)
---help [-h] [-tw TILE_WIDTH] [-th TILE_HEIGHT] ...
+Usage: svgtiler (...options and filenames...)
 
 Optional arguments:
   --help                Show this help message and exit.

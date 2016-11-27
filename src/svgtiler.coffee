@@ -1,4 +1,4 @@
-#!/usr/bin/env coffee
+#!/usr/bin/coffee --bare
 `#!/usr/bin/env node
 `
 path = require 'path'
@@ -350,8 +350,7 @@ extension_map =
 
 help = ->
   console.log """
-Usage: #{process.argv[0]} #{process.argv[1]} (...options and filenames...)
---help [-h] [-tw TILE_WIDTH] [-th TILE_HEIGHT] ...
+Usage: #{process.argv[1]} (...options and filenames...)
 
 Optional arguments:
   --help                Show this help message and exit.
