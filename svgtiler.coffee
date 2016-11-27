@@ -200,6 +200,7 @@ class Mappings
   push: (map) ->
     @maps.push map
   lookup: (key) ->
+    return unless @maps.length
     for i in [@maps.length-1..0]
       map = @maps[i]
       if key of map
@@ -227,10 +228,17 @@ class Drawing extends Input
     svg.setAttributeNS null, 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## Look up all symbols in the drawing.
+    missing = {}
     symbols =
       for row in @data
         for cell in row
-          mappings.lookup cell
+          symbol = mappings.lookup cell
+          unless symbol?
+            missing[cell] = true
+          symbol
+    missing =("'#{key}'" for own key of missing)
+    if missing.length
+      console.warn "Failed to recognize symbols:", missing.join ', '
     ## Instantiate (.use) all (dynamic) symbols in the drawing.
     symbolsByKey = {}
     symbols =
