@@ -28,6 +28,7 @@ svgBBox = (xml) ->
   ##   - text
   if xml.documentElement.hasAttribute 'viewBox'
     xml.documentElement.getAttribute('viewBox').split /\s+/
+    .map parseFloat
   else
     recurse = (node) ->
       if node.nodeType != node.ELEMENT_NODE or
