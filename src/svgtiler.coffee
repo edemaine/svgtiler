@@ -165,11 +165,23 @@ class Input
 
 class Mapping extends Input
   constructor: (data) ->
-    if data?
-      for own key, value of data
-        unless value instanceof Symbol
-          value = Symbol.parse key, value
-        @[key] = value
+    @map = {}
+    if typeof data == 'function'
+      @function = data
+    else
+      @merge data
+  merge: (data) ->
+    for own key, value of data
+      unless value instanceof Symbol
+        value = Symbol.parse key, value
+      @map[key] = value
+  lookup: (key) ->
+    if key of @map
+      @map[key]
+    else if @function?
+      @function key
+    else
+      undefined
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -205,10 +217,9 @@ class Mappings
   lookup: (key) ->
     return unless @maps.length
     for i in [@maps.length-1..0]
-      map = @maps[i]
-      if key of map
-        return map[key]
-    null
+      value = @maps[i].lookup key
+      return value if value?
+    undefined
 
 class Drawing extends Input
   constructor: (@data) ->
