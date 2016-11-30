@@ -88,3 +88,15 @@ pathColor = '#d3ac0d'
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="blue"/>
   </symbol>
 """
+'rs': """
+  <symbol viewBox="-25 -25 80 80">
+    <rect width="30px" height="30px" fill="red" />
+    <rect width="30px" height="30px" transform="rotate(45 15 15)" fill="red" />
+  </symbol>
+"""
+'bs': """
+  <symbol viewBox="-25 -25 80 80">
+    <rect width="30px" height="30px" fill="blue" />
+    <rect width="30px" height="30px" transform="rotate(45 15 15)" fill="blue" />
+  </symbol>
+"""
