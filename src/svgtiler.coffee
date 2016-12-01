@@ -179,7 +179,10 @@ class Mapping extends Input
     if key of @map
       @map[key]
     else if @function?
-      @function key
+      ## Cache return value of function so that only one Symbol generated
+      ## for each key.  It still may be a DynamicSymbol, which will allow
+      ## it to make multiple versions, but keep track of which are the same.
+      @map[key] = Symbol.parse key, @function key
     else
       undefined
 
