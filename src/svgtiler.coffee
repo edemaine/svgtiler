@@ -237,9 +237,8 @@ class Drawing extends Input
   renderSVG: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
-    svg.setAttributeNS null, 'xmlns', SVGNS
-    svg.setAttributeNS null, 'xmlns:xlink', XLINKNS
-    svg.setAttributeNS null, 'version', '1.1'
+    svg.setAttribute 'xmlns:xlink', XLINKNS
+    svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## Look up all symbols in the drawing.
     missing = {}
@@ -286,11 +285,11 @@ class Drawing extends Input
       for symbol, j in row
         continue unless symbol?
         svg.appendChild use = doc.createElementNS SVGNS, 'use'
-        use.setAttributeNS XLINKNS, 'xlink:href', '#' + symbol.id()
-        use.setAttributeNS null, 'x', x
-        use.setAttributeNS null, 'y', y
-        use.setAttributeNS null, 'width', symbol.width
-        use.setAttributeNS null, 'height', symbol.height
+        use.setAttribute 'xlink:href', '#' + symbol.id()
+        use.setAttributeNS SVGNS, 'x', x
+        use.setAttributeNS SVGNS, 'y', y
+        use.setAttributeNS SVGNS, 'width', symbol.width
+        use.setAttributeNS SVGNS, 'height', symbol.height
         x += symbol.width
         if symbol.height > rowHeight
           rowHeight = symbol.height
@@ -298,10 +297,10 @@ class Drawing extends Input
         width = x
       y += rowHeight
     height = y
-    svg.setAttributeNS null, 'viewBox', "0 0 #{width} #{height}"
-    svg.setAttributeNS null, 'width', width
-    svg.setAttributeNS null, 'height', height
-    svg.setAttributeNS null, 'preserveAspectRatio', 'xMinYMin meet'
+    svg.setAttributeNS SVGNS, 'viewBox', "0 0 #{width} #{height}"
+    svg.setAttributeNS SVGNS, 'width', width
+    svg.setAttributeNS SVGNS, 'height', height
+    svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
     '''
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
