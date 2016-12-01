@@ -61,6 +61,19 @@ star = """
     <rect x="25" y="25" width="30px" height="30px" transform="rotate(45 40 40)" fill="COLOR" stroke="COLOR" />
   </symbol>
 """
+triangle = (k) ->
+  r = 8
+  addl = r*2 + 4
+  h = r*1.73205/2
+  xTransform = (k-1)*addl
+  svg = """<symbol viewBox="-40 -40 80 80">"""
+  for i in [0...k]
+    svg += """
+      <polygon fill="orange" stroke="none"
+               points="0,#{-h} #{r},#{h} #{-r},#{h}"
+               transform="translate(#{i*addl-xTransform/2},0)" />
+    """
+  svg + "</symbol>"
 
 map =
   '-': horizontal.replace /COLOR/g, gridColor
@@ -71,6 +84,10 @@ map =
   ' ': blank
   '.': dot false
   '.s': dot true
+  '1': triangle 1
+  '2': triangle 2
+  '3': triangle 3
+
 colorMap =
   r: 'red'
   g: 'green'
