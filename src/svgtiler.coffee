@@ -86,7 +86,9 @@ svgBBox = (xml) ->
 
 class Symbol
   @parse: (key, data) ->
-    if typeof data == 'function'
+    unless data?
+      throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
+    else if typeof data == 'function'
       new DynamicSymbol key, data
     else if data.function?
       new DynamicSymbol key, data.function
