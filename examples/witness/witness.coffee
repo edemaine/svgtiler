@@ -4,17 +4,18 @@ pathColor = '#d3ac0d'
 ## Design and coordinates based on thefifthmatt's Windmill SVG design.  See
 ## https://github.com/thefifthmatt/windmill-client/blob/master/src/windmill.soy
 
-## GRID + SOLUTION PATH
 horizontal = """
   <symbol viewBox="10 -10 80 20">
     <line x1="10" x2="90" y1="0" y2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
+
 vertical = """
   <symbol viewBox="-10 10 20 80">
     <line y1="10" y2="90" x1="0" x2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
+
 dot = (solution) -> -> ## dynamic symbol
   s = '<symbol viewBox="-10 -10 20 20">'
   #console.log @neighbor(-1,0).includes('-'), @neighbor(+1,0).includes('-'),
@@ -47,20 +48,33 @@ dot = (solution) -> -> ## dynamic symbol
       if @neighbor(0,+1).includes '|s'
         s += """<rect x="-10" y="0" width="20" height="10" fill="#{pathColor}"/>"""
   s + '</symbol>'
-blank = """
-  <symbol viewBox="0 0 80 80"/>
-"""
+
+blank = ->
+  if @i % 2 == 1
+    h = 80
+  else
+    h = 20
+  if @j % 2 == 1
+    w = 80
+  else
+    w = 20
+  """
+    <symbol viewBox="0 0 #{w} #{h}"/>
+  """
+
 square = """
   <symbol viewBox="0 0 80 80">
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="COLOR" stroke="COLOR"/>
   </symbol>
 """
+
 star = """
   <symbol viewBox="0 0 80 80">
     <rect x="25" y="25" width="30px" height="30px" fill="COLOR" stroke="COLOR" />
     <rect x="25" y="25" width="30px" height="30px" transform="rotate(45 40 40)" fill="COLOR" stroke="COLOR" />
   </symbol>
 """
+
 triangle = (k) ->
   r = 8
   addl = r*2 + 4
