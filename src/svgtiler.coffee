@@ -226,8 +226,39 @@ class Mappings
       return value if value?
     undefined
 
+allBlank = (list) ->
+  for x in list
+    if x
+      return false
+  true
+
 class Drawing extends Input
   constructor: (@data) ->
+  @load: (data) ->
+    ## Turn strings into arrays
+    data = for row in data
+             for cell in row
+               cell
+    unless Drawing.keepMargins
+      ## Top margin
+      while data.length > 0 and allBlank data[0]
+        data.shift()
+      ## Bottom margin
+      while data.length > 0 and allBlank data[data.length-1]
+        data.pop()
+      if data.length > 0
+        ## Left margin
+        while allBlank (row[0] for row in data)
+          for row in data
+            row.shift()
+        ## Right margin
+        j = Math.max (row.length for row in data)...
+        while j >= 0 and allBlank (row[j] for row in data)
+          for row in data
+            if j < row.length
+              row.pop()
+          j--
+    new @ data
   writeSVG: (mappings, filename) ->
     ## Default filename is the input filename with extension replaced by .svg
     unless filename?
@@ -316,7 +347,7 @@ class Drawing extends Input
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
   @parse: (data) ->
-    new @ splitIntoLines data
+    @load splitIntoLines data
 
 class DSVDrawing extends Drawing
   @parse: (data) ->
@@ -326,7 +357,7 @@ class DSVDrawing extends Drawing
     else if data[-1..] in ['\r', '\n']
       data = data[...-1]
     ## CSV parser.
-    new @ csvParse data,
+    @load csvParse data,
       delimiter: @delimiter
       relax_column_count: true
 
@@ -369,6 +400,7 @@ Usage: #{process.argv[1]} (...options and filenames...)
 
 Optional arguments:
   --help                Show this help message and exit.
+  -m / --margin         Don't delete blank extreme rows/columns
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
                         (default: null, which means read width from SVG)
@@ -406,6 +438,8 @@ main = ->
     switch arg
       when '-h', '--help'
         help()
+      when '-m', '--margin'
+        Drawing.keepMargins = true
       when '--tw', '--tile-width'
         Symbol.forceWidth = parseFloat args[i+1]
         skip = 1
