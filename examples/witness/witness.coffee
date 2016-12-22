@@ -5,14 +5,14 @@ pathColor = '#d3ac0d'
 ## https://github.com/thefifthmatt/windmill-client/blob/master/src/windmill.soy
 
 horizontal = """
-  <symbol viewBox="10 -10 80 20" style="z-index: ZZZ">
-    <line x1="10" x2="90" y1="0" y2="0" stroke-width="20" stroke="COLOR"/>
+  <symbol viewBox="10 -10 80 20" style="overflow: visible; z-index: ZZZ">
+    <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
 vertical = """
-  <symbol viewBox="-10 10 20 80" style="z-index: ZZZ">
-    <line y1="10" y2="90" x1="0" x2="0" stroke-width="20" stroke="COLOR"/>
+  <symbol viewBox="-10 10 20 80" style="overflow: visible; z-index: ZZZ">
+    <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
@@ -36,7 +36,7 @@ dot = (solution) -> -> ## dynamic symbol
   if @neighbor(-1,0).includes('-s') or @neighbor(+1,0).includes('-s') or
      @neighbor(0,-1).includes('|s') or @neighbor(0,+1).includes('|s') or
      solution
-    s = s.replace /ZZZ/, 2
+    s = s.replace /ZZZ/, 3
     if (@neighbor(-1,0).includes('-s') and @neighbor(+1,0).includes('-s')) or
        (@neighbor(0,-1).includes('|s') and @neighbor(0,+1).includes('|s'))
       s += """<rect x="-10" y="-10" width="20" height="20" fill="#{pathColor}"/>"""
@@ -69,7 +69,7 @@ blank = ->
 
 start = (solution) -> ->
   s = """
-    <symbol viewBox="-10 -10 20 20" overflowBox="-25 -25 50 50" style="overflow: visible; z-index: 1">
+    <symbol viewBox="-10 -10 20 20" overflowBox="-25 -25 50 50" style="overflow: visible; z-index: 2">
       <circle cx="0" cy="0" r="25" fill="COLOR" />
   """
   if @neighbor(-1,0).includes('-s') + @neighbor(+1,0).includes('-s') +
@@ -124,10 +124,10 @@ triangle = (k) ->
   svg + "</symbol>"
 
 map =
-  '-': horizontal.replace(/COLOR/g, gridColor).replace(/ZZZ/, 0)
-  '-s': horizontal.replace(/COLOR/g, pathColor).replace(/ZZZ/, 2)
-  '|': vertical.replace(/COLOR/g, gridColor).replace(/ZZZ/, 0)
-  '|s': vertical.replace(/COLOR/g, pathColor).replace(/ZZZ/, 2)
+  '-': horizontal.replace(/COLOR/g, gridColor).replace(/ZZZ/, 1)
+  '-s': horizontal.replace(/COLOR/g, pathColor).replace(/ZZZ/, 4)
+  '|': vertical.replace(/COLOR/g, gridColor).replace(/ZZZ/, 1)
+  '|s': vertical.replace(/COLOR/g, pathColor).replace(/ZZZ/, 4)
   '': blank
   ' ': blank
   '.': dot false
