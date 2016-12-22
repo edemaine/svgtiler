@@ -1,4 +1,4 @@
-# svgtiler
+# SVG Tiler
 **SVG Tiler** is a tool for drawing diagrams on a grid using text or
 spreadsheets, and then substituting SVG symbols to make a big SVG figure.
 
@@ -10,7 +10,7 @@ To use SVG Tiler, you combine two types of files
    Mapping files can be specified in a simple ASCII format, or
    as a dynamic mapping defined by JavaScript or CoffeeScript code.
    
-2. A **drawing file** specifies a grid of symbols (strings) which,
+2. A **drawing file** specifies a grid of symbol names (strings) which,
    combined with one or more mapping files to define the SVG associated
    with each symbol, compile to a single (tiled) SVG.
    Drawing files can be specified as ASCII art (where each symbol is
@@ -38,23 +38,24 @@ In the **.js / .coffee formats**, the file consists of JavaScript /
 CoffeeScript code, the last line of which should evaluate to either
 
 1. an *object* whose keys are symbol names, or
-2. a *function* taking a symbol name (string) as input
-   (allowing you to parse symbol names how you want, or check an object
-    for a match but use a default value otherwise, etc.).
+2. a *function* in one argument, a symbol name (string).
+   (This feature allows you to parse symbol names how you want; or check an
+    object for a matching key but use a default value otherwise; etc.).
 
 The object or function should map a symbol name to either
 
-1. a string of SVG code (detected by the presense of a `<` character),
+1. a string of SVG code (detected by the presence of a `<` character),
 2. a filename containing SVG code, or
 3. a function returning one of the above.
 
-In the last case, the function is called for *each occurrence of the symbol*,
+In the last case, the function is called *for each occurrence of the symbol*,
 and has `this` bound to a manufactured `Context` object, giving you access to
 the following properties:
 
-* `this.key` is the symbol name, or `null` if the `Context` is out of bounds;
-* `this.includes(substring)` computes whether `this.key` includes `substring`
-  as a substring (as would `this.key.includes(substring)` in ECMAScript 2015).
+* `this.key` is the symbol name, or `null` if the `Context` is out of bounds
+  of the drawing;
+* `this.includes(substring)` computes whether `this.key` contains the given
+  `substring` (as would `this.key.includes(substring)` in ECMAScript 2015).
 * `this.i` is the row number of the cell of this symbol occurrence (starting
   at 0);
 * `this.j` is the column number of the cell of this symbol occurrence
@@ -63,8 +64,8 @@ the following properties:
   column `j + dj`.  (Note the reversal of coordinates, so that the order
   passed to `neighbor` corresponds to *x* then *y* coordinate.)
   If there is no symbol at that position, you will still get a `Context`
-  supporting `includes`, but the `key` value will be `null`.
-* In particular, it's really useful to check e.g.
+  whose `key` value is `null` and whose `includes()` always returns `false`.
+* In particular, it's really useful to call e.g.
   `this.neighbor(1, 0).includes('-')` to check for adjacent symbols that
   change how this symbol should be rendered.
 
@@ -73,60 +74,81 @@ the following properties:
 The **.asc format** for drawing files represents traditional ASCII art:
 each non-newline character represents a one-character symbol name.
 For example, here is a simple 5 &times; 5 ASCII drawing using symbols
-`X` and ` ` (space):
+`O` and ` ` (space):
 
 ```
- XXX
-X X X
-XXXXX
-X   X
- XXX
+ OOO
+O O O
+OOOOO
+O   O
+ OOO
 ```
 
 The **.ssv, .csv, and .tsv formats** use
-[delimeter-separated values (DSV)](https://en.wikipedia.org/wiki/Delimiter-separated_values)
+[delimiter-separated values (DSV)](https://en.wikipedia.org/wiki/Delimiter-separated_values)
 to specify an array of symbol names.  In particular,
 [.csv (comma-separated)](https://en.wikipedia.org/wiki/Comma-separated_values)
 and
 [.tsv (tab-separated)](https://en.wikipedia.org/wiki/Tab-separated_values)
 formats are exactly those exported by spreadsheet software such as
-Google Drive or Excel, enabling drawing in that software.
-The .ssv format is similar, but where the delimeter between symbol names
+Google Drive or Excel, enabling you to draw in that software.
+The .ssv format is similar, but where the delimiter between symbol names
 is an arbitrary string of whitespace.
-(Compare this behavior with .csv which treats every comma as a delimeter.)
-This format is nice to work with in a text editor, lining up the columns
-by padding symbol names with extra spaces.
+(Contrast this behavior with .csv which treats every comma as a delimiter.)
+This format is nice to work with in a text editor, allowing you to line up
+the columns by padding symbol names with extra spaces.
 
-All three formats support quoting according to the usual rules:
-any symbol name (in particular, if it has a delimeter or double quote in it)
+All three formats support quoting according to the usual DSV rules:
+any symbol name (in particular, if it has a delimiter or double quote in it)
 can be put in double quotes, and double quotes can be produced in the
 symbol name by putting `""` (two double quotes) within the quoted string.
 Thus, the one-character symbol name `"` would be represented by `""""`.
 
+## Layout Algorithm
 
+Given one or more mapping files and a drawing file, SVG Tiler follows a fairly
+simple layout algorithm to place the SVG expansions of the symbols into a
+single SVG output.  Each symbol has a bounding box, either specified by
+the `viewBox` of the parent element, or automatically computed.
+The algorithm places symbols in a single row to align their top edges,
+with no horizontal space between them.
+The algorithm places rows to align their left edges so that their bounding
+boxes touch, with the bottom of one row's bounding box equalling the top of
+the next row's bounding box.
 
+This layout algorithm works well if each row has a uniform height and each
+column has a uniform width, even if different rows have different heights
+and different columns have different widths.  But it probably isn't what you
+want if symbols have wildly differing widths or heights, so you should set
+your `viewBox`es accordingly.
 
 ## Additional Features
 
-* Re-uses repeated symbols in the drawing via SVG's `<symbol>` and `<use>`,
-  leading to relatively small and efficient SVG outputs.
+* Each unique symbols gets defined just once (via SVG's `<symbol>`) and
+  then instantiated (via SVG's `<use>`) many times,
+  resulting in relatively small and efficient SVG outputs.
 
-* z-index support on symbols defined by mapping files, even though
-  output is SVG 1.1: symbols get re-ordered to implement z order.
-  `<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" style="overflow: visible; z-index: 2">`
+* [z-index](https://svgwg.org/svg2-draft/render.html#ZIndexProperty)
+  support on symbols defined by mapping files, even though output is
+  SVG 1.1 (which does not support z-index): symbol uses get re-ordered to
+  simulate the correct z order.  For example,
+  `<symbol viewBox="0 0 10 10" style="z-index: 2">`
+  will be rendered on top of (later than) all symbols without a
+  `style="z-index:..."` specification (which default to a z-index of 0).
 
-* Symbols can draw beyond their `viewBox`, and overall `viewBox` of the
-  output drawing can still be set correctly (larger than the bounding box
+* Symbols can draw beyond their `viewBox` via `style="overflow: visible"`
+  (as in normal SVG).  Furthermore, the `viewBox` of the overall output
+  drawing can still be computed correctly (larger than the bounding box
   of the symbol `viewBox`es) via a special `overflowBox` attribute.
   For example,
   `<symbol viewBox="0 0 10 10" overflowBox="-10 -5 30 20" style="overflow: visible">...</symbol>`
   defines a symbol that gets laid out as if it occupies the [0, 10] &times;
-  [0, 10] square, but can draw outside that square, and the overall drawing
-  bounding box will be set as if the symbol occupies the [&minus;10, 20]
-  &times; [&minus;5, 15] rectangle.
+  [0, 10] square, but the symbol can draw outside that square, and the overall
+  drawing bounding box will be set as if the symbol occupies the
+  [&minus;10, 20] &times; [&minus;5, 15] rectangle.
 
 * Very limited automatic `viewBox` setting via bounding box computation
-  (but see code for many SVG features not supported).
+  (but see the code for many SVG features not supported).
   For example, the SVG
   `<rect x="-5" y="-5" width="10" height="10"/>`
   will create a symbol with `viewBox="-5 -5 10 10"`.
@@ -137,7 +159,13 @@ you can install this tool via
 
     npm install -g svgtiler
 
-## Usage
+## Command-Line Usage
+
+The command-line arguments consist mostly of mapping and/or drawing files.
+The files and other arguments are processed *in order*, so for example a
+drawing can use all mapping files specified *before* it on the command line.
+
+Here is the output of `svgtiler --help`:
 
 ```
 Usage: svgtiler (...options and filenames...)
