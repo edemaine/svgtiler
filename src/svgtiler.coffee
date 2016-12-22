@@ -23,6 +23,13 @@ class SVGTilerException
   toString: ->
     "svgtiler: #{@message}"
 
+overflowBox = (xml) ->
+  if xml.documentElement.hasAttribute 'overflowBox'
+    xml.documentElement.getAttribute('overflowBox').split /\s*,?\s+/
+    .map parseFloat
+  else
+    null
+
 svgBBox = (xml) ->
   ## xxx Many unsupported features!
   ##   - transformations
@@ -121,6 +128,7 @@ class StaticSymbol extends Symbol
       @[key] = value
     @xml = new DOMParser().parseFromString @svg
     @viewBox = svgBBox @xml
+    @overflowBox = overflowBox @xml
     @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
@@ -322,8 +330,8 @@ class Drawing extends Input
       else
         node.appendChild symbol.xml.documentElement.cloneNode true
     ## Lay out the symbols in the drawing via SVG <use>.
+    viewBox = [0, 0, 0, 0]
     levels = {}
-    width = 0
     y = 0
     for row, i in symbols
       rowHeight = 0
@@ -337,21 +345,29 @@ class Drawing extends Input
         use.setAttributeNS SVGNS, 'y', y
         use.setAttributeNS SVGNS, 'width', symbol.width
         use.setAttributeNS SVGNS, 'height', symbol.height
+        if symbol.overflowBox?
+          viewBox[0] = Math.min viewBox[0],
+            x + symbol.overflowBox[0] - symbol.viewBox[0]
+          viewBox[1] = Math.min viewBox[1],
+            y + symbol.overflowBox[1] - symbol.viewBox[1]
+          viewBox[2] = Math.max viewBox[2],
+            x + symbol.overflowBox[2]
+          viewBox[3] = Math.max viewBox[3],
+            y + symbol.overflowBox[3]
         x += symbol.width
+        viewBox[2] = Math.max viewBox[2], x
         if symbol.height > rowHeight
           rowHeight = symbol.height
-      if x > width
-        width = x
       y += rowHeight
-    height = y
+      viewBox[3] = Math.max viewBox[3], y
     ## Sort by level
     levelOrder = (level for level of levels).sort (x, y) -> x-y
     for level in levelOrder
       for node in levels[level]
         svg.appendChild node
-    svg.setAttributeNS SVGNS, 'viewBox', "0 0 #{width} #{height}"
-    svg.setAttributeNS SVGNS, 'width', width
-    svg.setAttributeNS SVGNS, 'height', height
+    svg.setAttributeNS SVGNS, 'viewBox', viewBox.join ' '
+    svg.setAttributeNS SVGNS, 'width', viewBox[2]
+    svg.setAttributeNS SVGNS, 'height', viewBox[3]
     svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
     '''
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>

@@ -69,7 +69,7 @@ blank = ->
 
 start = (solution) -> ->
   s = """
-    <symbol viewBox="-10 -10 20 20" style="overflow: visible; z-index: 1">
+    <symbol viewBox="-10 -10 20 20" overflowBox="-25 -25 50 50" style="overflow: visible; z-index: 1">
       <circle cx="0" cy="0" r="25" fill="COLOR" />
   """
   if @neighbor(-1,0).includes('-s') + @neighbor(+1,0).includes('-s') +
