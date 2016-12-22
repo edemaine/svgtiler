@@ -62,6 +62,19 @@ blank = ->
     <symbol viewBox="0 0 #{w} #{h}"/>
   """
 
+start = (solution) -> ->
+  s = """
+    <symbol viewBox="-10 -10 20 20" style="overflow: visible; z-index: 1">
+      <circle cx="0" cy="0" r="25" fill="COLOR" />
+    </symbol>
+  """
+  if @neighbor(-1,0).includes('-s') + @neighbor(+1,0).includes('-s') +
+     @neighbor(0,-1).includes('|s') + @neighbor(0,+1).includes('|s') == 1 or
+     solution
+    s.replace /COLOR/g, pathColor
+  else
+    s.replace /COLOR/g, gridColor
+
 square = """
   <symbol viewBox="0 0 80 80">
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="COLOR" stroke="COLOR"/>
@@ -98,6 +111,8 @@ map =
   ' ': blank
   '.': dot false
   '.s': dot true
+  start: start false
+  starts: start true
   '1': triangle 1
   '2': triangle 2
   '3': triangle 3

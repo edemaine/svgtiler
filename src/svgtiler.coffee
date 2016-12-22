@@ -29,6 +29,7 @@ svgBBox = (xml) ->
   ##   - used symbols/defs
   ##   - paths
   ##   - text
+  ##   - line widths which extend bounding box
   if xml.documentElement.hasAttribute 'viewBox'
     xml.documentElement.getAttribute('viewBox').split /\s*,?\s+/
     .map parseFloat
@@ -84,6 +85,13 @@ svgBBox = (xml) ->
     else
       viewBox
 
+zIndex = (node) ->
+  style = node.getAttribute 'style'
+  return 0 unless style
+  match = /(?:^|\W)z-index\s*:\s*([-\d]+)/i.exec style
+  return 0 unless match?
+  parseInt match[1]
+
 class Symbol
   @parse: (key, data) ->
     unless data?
@@ -130,6 +138,7 @@ class StaticSymbol extends Symbol
       @height = 0 unless @height?
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
+    @zIndex = zIndex @xml.documentElement
   id: ->
     ## Valid Name characters: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Name
     ## Couldn't represent the range [\u10000-\uEFFFF]
@@ -313,6 +322,7 @@ class Drawing extends Input
       else
         node.appendChild symbol.xml.documentElement.cloneNode true
     ## Lay out the symbols in the drawing via SVG <use>.
+    levels = {}
     width = 0
     y = 0
     for row, i in symbols
@@ -320,7 +330,8 @@ class Drawing extends Input
       x = 0
       for symbol, j in row
         continue unless symbol?
-        svg.appendChild use = doc.createElementNS SVGNS, 'use'
+        levels[symbol.zIndex] ?= []
+        levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
         use.setAttribute 'xlink:href', '#' + symbol.id()
         use.setAttributeNS SVGNS, 'x', x
         use.setAttributeNS SVGNS, 'y', y
@@ -333,6 +344,11 @@ class Drawing extends Input
         width = x
       y += rowHeight
     height = y
+    ## Sort by level
+    levelOrder = (level for level of levels).sort (x, y) -> x-y
+    for level in levelOrder
+      for node in levels[level]
+        svg.appendChild node
     svg.setAttributeNS SVGNS, 'viewBox', "0 0 #{width} #{height}"
     svg.setAttributeNS SVGNS, 'width', width
     svg.setAttributeNS SVGNS, 'height', height
