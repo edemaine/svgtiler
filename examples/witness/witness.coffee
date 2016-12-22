@@ -5,19 +5,19 @@ pathColor = '#d3ac0d'
 ## https://github.com/thefifthmatt/windmill-client/blob/master/src/windmill.soy
 
 horizontal = """
-  <symbol viewBox="10 -10 80 20">
+  <symbol viewBox="10 -10 80 20" style="z-index: ZZZ">
     <line x1="10" x2="90" y1="0" y2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
 vertical = """
-  <symbol viewBox="-10 10 20 80">
+  <symbol viewBox="-10 10 20 80" style="z-index: ZZZ">
     <line y1="10" y2="90" x1="0" x2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
 dot = (solution) -> -> ## dynamic symbol
-  s = '<symbol viewBox="-10 -10 20 20">'
+  s = '<symbol viewBox="-10 -10 20 20" style="z-index: ZZZ">'
   #console.log @neighbor(-1,0).includes('-'), @neighbor(+1,0).includes('-'),
   #            @neighbor(0,-1).includes('|'), @neighbor(0,+1).includes('|')
   if (@neighbor(-1,0).includes('-') and @neighbor(+1,0).includes('-')) or
@@ -33,7 +33,10 @@ dot = (solution) -> -> ## dynamic symbol
       s += """<rect x="-10" y="-10" width="20" height="10" fill="#{gridColor}"/>"""
     if @neighbor(0,+1).includes '|'
       s += """<rect x="-10" y="0" width="20" height="10" fill="#{gridColor}"/>"""
-  if solution
+  if @neighbor(-1,0).includes('-s') or @neighbor(+1,0).includes('-s') or
+     @neighbor(0,-1).includes('|s') or @neighbor(0,+1).includes('|s') or
+     solution
+    s = s.replace /ZZZ/, 2
     if (@neighbor(-1,0).includes('-s') and @neighbor(+1,0).includes('-s')) or
        (@neighbor(0,-1).includes('|s') and @neighbor(0,+1).includes('|s'))
       s += """<rect x="-10" y="-10" width="20" height="20" fill="#{pathColor}"/>"""
@@ -47,6 +50,8 @@ dot = (solution) -> -> ## dynamic symbol
         s += """<rect x="-10" y="-10" width="20" height="10" fill="#{pathColor}"/>"""
       if @neighbor(0,+1).includes '|s'
         s += """<rect x="-10" y="0" width="20" height="10" fill="#{pathColor}"/>"""
+  else
+    s = s.replace /ZZZ/, 0
   s + '</symbol>'
 
 blank = ->
@@ -66,14 +71,30 @@ start = (solution) -> ->
   s = """
     <symbol viewBox="-10 -10 20 20" style="overflow: visible; z-index: 1">
       <circle cx="0" cy="0" r="25" fill="COLOR" />
-    </symbol>
   """
   if @neighbor(-1,0).includes('-s') + @neighbor(+1,0).includes('-s') +
      @neighbor(0,-1).includes('|s') + @neighbor(0,+1).includes('|s') == 1 or
      solution
-    s.replace /COLOR/g, pathColor
+    s = s.replace /COLOR/g, pathColor
   else
-    s.replace /COLOR/g, gridColor
+    s = s.replace /COLOR/g, gridColor
+    if @neighbor(-1,0).includes('-s') or @neighbor(+1,0).includes('-s') or
+       @neighbor(0,-1).includes('|s') or @neighbor(0,+1).includes('|s')
+      ## copied from dot (solved) above...
+      if (@neighbor(-1,0).includes('-s') and @neighbor(+1,0).includes('-s')) or
+         (@neighbor(0,-1).includes('|s') and @neighbor(0,+1).includes('|s'))
+        s += """<rect x="-10" y="-10" width="20" height="20" fill="#{pathColor}"/>"""
+      else
+        s += """<circle x="0" y="0" r="10" fill="#{pathColor}"/>"""
+        if @neighbor(-1,0).includes '-s'
+          s += """<rect x="-10" y="-10" width="10" height="20" fill="#{pathColor}"/>"""
+        if @neighbor(+1,0).includes '-s'
+          s += """<rect x="0" y="-10" width="10" height="20" fill="#{pathColor}"/>"""
+        if @neighbor(0,-1).includes '|s'
+          s += """<rect x="-10" y="-10" width="20" height="10" fill="#{pathColor}"/>"""
+        if @neighbor(0,+1).includes '|s'
+          s += """<rect x="-10" y="0" width="20" height="10" fill="#{pathColor}"/>"""
+  s + '</symbol>'
 
 square = """
   <symbol viewBox="0 0 80 80">
@@ -103,10 +124,10 @@ triangle = (k) ->
   svg + "</symbol>"
 
 map =
-  '-': horizontal.replace /COLOR/g, gridColor
-  '-s': horizontal.replace /COLOR/g, pathColor
-  '|': vertical.replace /COLOR/g, gridColor
-  '|s': vertical.replace /COLOR/g, pathColor
+  '-': horizontal.replace(/COLOR/g, gridColor).replace(/ZZZ/, 0)
+  '-s': horizontal.replace(/COLOR/g, pathColor).replace(/ZZZ/, 2)
+  '|': vertical.replace(/COLOR/g, gridColor).replace(/ZZZ/, 0)
+  '|s': vertical.replace(/COLOR/g, pathColor).replace(/ZZZ/, 2)
   '': blank
   ' ': blank
   '.': dot false
