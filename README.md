@@ -109,10 +109,10 @@ Thus, the one-character symbol name `"` would be represented by `""""`.
 Given one or more mapping files and a drawing file, SVG Tiler follows a fairly
 simple layout algorithm to place the SVG expansions of the symbols into a
 single SVG output.  Each symbol has a bounding box, either specified by
-the `viewBox` of the parent element, or automatically computed.
+the `viewBox` of the root element, or automatically computed.
 The algorithm places symbols in a single row to align their top edges,
 with no horizontal space between them.
-The algorithm places rows to align their left edges so that their bounding
+The algorithm places rows to align their left edges so that the rows' bounding
 boxes touch, with the bottom of one row's bounding box equalling the top of
 the next row's bounding box.
 
@@ -132,7 +132,7 @@ your `viewBox`es accordingly.
   support on symbols defined by mapping files, even though output is
   SVG 1.1 (which does not support z-index): symbol uses get re-ordered to
   simulate the correct z order.  For example,
-  `<symbol viewBox="0 0 10 10" style="z-index: 2">`
+  `<symbol viewBox="0 0 10 10" style="z-index: 2">...</symbol>`
   will be rendered on top of (later than) all symbols without a
   `style="z-index:..."` specification (which default to a z-index of 0).
 
@@ -141,11 +141,11 @@ your `viewBox`es accordingly.
   drawing can still be computed correctly (larger than the bounding box
   of the symbol `viewBox`es) via a special `overflowBox` attribute.
   For example,
-  `<symbol viewBox="0 0 10 10" overflowBox="-10 -5 30 20" style="overflow: visible">...</symbol>`
+  `<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" style="overflow: visible">...</symbol>`
   defines a symbol that gets laid out as if it occupies the [0, 10] &times;
   [0, 10] square, but the symbol can draw outside that square, and the overall
   drawing bounding box will be set as if the symbol occupies the
-  [&minus;10, 20] &times; [&minus;5, 15] rectangle.
+  [&minus;5, 15] &times; [&minus;5, 15] square.
 
 * Very limited automatic `viewBox` setting via bounding box computation
   (but see the code for many SVG features not supported).
@@ -164,6 +164,8 @@ you can install this tool via
 The command-line arguments consist mostly of mapping and/or drawing files.
 The files and other arguments are processed *in order*, so for example a
 drawing can use all mapping files specified *before* it on the command line.
+In the same symbol is defined by multiple mapping files, later mappings take
+precedence (overwriting previous mappings).
 
 Here is the output of `svgtiler --help`:
 
