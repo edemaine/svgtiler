@@ -429,6 +429,7 @@ extension_map =
 help = ->
   console.log """
 Usage: #{process.argv[1]} (...options and filenames...)
+Documentation: https://github.com/edemaine/svgtiler#svg-tiler
 
 Optional arguments:
   --help                Show this help message and exit.
@@ -454,7 +455,9 @@ SYMBOL specifiers:
 
   'filename.svg':   load SVG from specifies file
   '<svg>...</svg>': raw SVG
-  -> ...:           function computing SVG, with context available as this/@
+  -> ...@key...:    function computing SVG, with `this` bound to Context with
+                    `key` set to symbol name, `i` and `j` set to coordinates,
+                    and supporting `neighbor` and `includes` methods.
 """
   #object with one or more attributes
   process.exit()

@@ -164,7 +164,7 @@ you can install this tool via
 The command-line arguments consist mostly of mapping and/or drawing files.
 The files and other arguments are processed *in order*, so for example a
 drawing can use all mapping files specified *before* it on the command line.
-In the same symbol is defined by multiple mapping files, later mappings take
+If the same symbol is defined by multiple mapping files, later mappings take
 precedence (overwriting previous mappings).
 
 Here is the output of `svgtiler --help`:
@@ -198,7 +198,9 @@ SYMBOL specifiers:
 
   'filename.svg':   load SVG from specifies file
   '<svg>...</svg>': raw SVG
-  (context) -> ...: function computing SVG
+  -> ...@key...:    function computing SVG, with `this` bound to Context with
+                    `key` set to symbol name, `i` and `j` set to coordinates,
+                    and supporting `neighbor` and `includes` methods.
 ```
 
 ## About
