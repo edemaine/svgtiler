@@ -5,11 +5,12 @@ path = require 'path'
 fs = require 'fs'
 CoffeeScript = require 'coffee-script'
 csvParse = require 'csv-parse/lib/sync'
+xlsx = require 'xlsx'
 xmldom = require 'xmldom'
 DOMParser = xmldom.DOMParser
 domImplementation = new xmldom.DOMImplementation()
 XMLSerializer = xmldom.XMLSerializer
-prettyXML = require('prettify-xml')
+prettyXML = require 'prettify-xml'
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -408,6 +409,18 @@ class TSVDrawing extends DSVDrawing
   @title: "Tab-separated drawing (spreadsheet export)"
   @delimiter: '\t'
 
+class Inputs extends Input
+
+class Drawings extends Inputs
+  ## xxx writeSVG should do for loop over worksheets
+
+class ExcelDrawings extends Drawings
+  @title: "Spreadsheet drawings (Excel/OpenDocument/Lotus)"
+  @parse: (data) ->
+    xlsx.read data, type: 'binary'
+    ## xxx need to convert to array of worksheets, each array of arrays
+    ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
+
 class Context
   constructor: (@symbols, @i, @j) ->
     @symbol = @symbols[@i]?[@j]
@@ -487,7 +500,7 @@ main = ->
         input = Input.load arg
         if input instanceof Mapping
           mappings.push input
-        else if input instanceof Drawing
+        else if input instanceof Drawing or input instanceof Drawings
           input.writeSVG mappings
   unless files
     console.log 'Not enough filename arguments'
