@@ -18,9 +18,17 @@ To use SVG Tiler, you combine two types of files
    (where symbols are separated by whitespace), or standard CSV/TSV
    formats such as those exported by Google Sheets or Excel.
 
+These input files are listed on the `svgtiler` command line,
+with mapping files typically before drawing files.
 File types and formats are distinguished automatically by their extension.
+For example:
 
-## Mapping Files
+    svgtiler map.txt map.coffee drawing.asc drawings.xls
+
+will generate drawing.svg using the mappings in `map.txt` and `map.coffee`,
+and will generate `drawings_<sheet>.svg` for each sheet in `drawings.xlsx`.
+
+## Mapping Files: .txt, .js, .coffee
 
 In the **.txt format** for mapping files, each line consists of a symbol name
 (either having no spaces, or consisting entirely of a single space),
@@ -76,7 +84,7 @@ the following properties:
   `this.neighbor(1, 0).includes('-')` to check for adjacent symbols that
   change how this symbol should be rendered.
 
-## Drawing Files
+## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
 The **.asc format** for drawing files represents traditional ASCII art:
 each non-newline character represents a one-character symbol name.
