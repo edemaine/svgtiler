@@ -101,6 +101,7 @@ zIndex = (node) ->
   parseInt match[1]
 
 class Symbol
+  @svgEncoding: 'utf8'
   @parse: (key, data) ->
     unless data?
       throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
@@ -113,8 +114,8 @@ class Symbol
         if typeof data == 'string'
           if data.indexOf('<') < 0  ## No <'s -> interpret as filename
             filename: data
-            svg: fs.readFileSync filename,
-                   encoding: @encoding
+            svg: fs.readFileSync data,
+                   encoding: @svgEncoding
           else
             svg: data
         else

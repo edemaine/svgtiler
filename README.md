@@ -34,6 +34,13 @@ O <symbol viewBox="0 0 50 50"><rect width="50" height="50"/></symbol>
   <symbol viewBox="0 0 50 50"></symbol>
 ```
 
+Here is a mapping of the same symbols to external files:
+
+```
+O O.svg
+  blank.svg
+```
+
 In the **.js / .coffee formats**, the file consists of JavaScript /
 CoffeeScript code, the last line of which should evaluate to either
 
