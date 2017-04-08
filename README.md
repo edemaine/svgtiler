@@ -97,12 +97,18 @@ is an arbitrary string of whitespace.
 (Contrast this behavior with .csv which treats every comma as a delimiter.)
 This format is nice to work with in a text editor, allowing you to line up
 the columns by padding symbol names with extra spaces.
-
 All three formats support quoting according to the usual DSV rules:
 any symbol name (in particular, if it has a delimiter or double quote in it)
 can be put in double quotes, and double quotes can be produced in the
 symbol name by putting `""` (two double quotes) within the quoted string.
 Thus, the one-character symbol name `"` would be represented by `""""`.
+
+The **.xlsx, .xlsm, .xlsb, .xls** (Microsoft Excel),
+**.ods, .fods** (OpenDocument), **.dif** (Data Interchange Format),
+**.prn** (Lotus), and **.dbf** (dBASE/FoxPro) formats support data straight
+from spreadsheet software.  This format is special in that it supports
+multiple sheets in one file.  In this case, the output SVG files have
+filenames distinguished by an underscore followed by the sheet name.
 
 ## Layout Algorithm
 
@@ -193,6 +199,15 @@ Filename arguments:  (mappings before drawings!)
   *.ssv        Space-delimiter drawing (one word per symbol)
   *.csv        Comma-separated drawing (spreadsheet export)
   *.tsv        Tab-separated drawing (spreadsheet export)
+  *.xlsx       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.xlsm       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.xlsb       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.xls        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.ods        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.fods       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.dif        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.prn        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.dbf        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
 
 SYMBOL specifiers:
 

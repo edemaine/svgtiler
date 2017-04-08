@@ -438,7 +438,7 @@ class Drawings extends Input
 
 class XLSXDrawings extends Drawings
   @encoding: 'binary'
-  @title: "Spreadsheet drawings (Excel/OpenDocument/Lotus)"
+  @title: "Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)"
   @parse: (data) ->
     workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
