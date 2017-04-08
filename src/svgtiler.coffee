@@ -409,10 +409,26 @@ class TSVDrawing extends DSVDrawing
   @title: "Tab-separated drawing (spreadsheet export)"
   @delimiter: '\t'
 
-class Inputs extends Input
-
 class Drawings extends Inputs
-  ## xxx writeSVG should do for loop over worksheets
+  @filenameSeparator = '_'
+  constructor: (@drawings) ->
+  @load: (datas) ->
+    new @ for data in datas
+      drawing = Drawing.load data
+      filename = path.parse @filename
+      filename.base += @filenameSeparator + data.subname
+      drawing.filename = path.format filename
+      drawing.subname = data.subname
+      drawing
+  writeSVG: (mappings, filename) ->
+    for drawing in drawings
+      drawing.writeSVG mappings,
+        if drawings.length > 1 and filename?
+          filename2 = path.parse filename
+          filename2.base += @constructor.filenameSeparator + drawing.subname
+          path.format filename2
+        else
+          filename
 
 class ExcelDrawings extends Drawings
   @title: "Spreadsheet drawings (Excel/OpenDocument/Lotus)"
