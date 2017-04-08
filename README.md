@@ -93,7 +93,7 @@ and
 formats are exactly those exported by spreadsheet software such as
 Google Drive or Excel, enabling you to draw in that software.
 The .ssv format is similar, but where the delimiter between symbol names
-is an arbitrary string of whitespace.
+is arbitrary whitespace.
 (Contrast this behavior with .csv which treats every comma as a delimiter.)
 This format is nice to work with in a text editor, allowing you to line up
 the columns by padding symbol names with extra spaces.
