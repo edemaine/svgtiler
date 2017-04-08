@@ -23,9 +23,9 @@ with mapping files typically before drawing files.
 File types and formats are distinguished automatically by their extension.
 For example:
 
-    svgtiler map.txt map.coffee drawing.asc drawings.xls
+    svgtiler map1.txt map2.coffee drawing.asc drawings.xls
 
-will generate drawing.svg using the mappings in `map.txt` and `map.coffee`,
+will generate drawing.svg using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each sheet in `drawings.xlsx`.
 
 ## Mapping Files: .txt, .js, .coffee
