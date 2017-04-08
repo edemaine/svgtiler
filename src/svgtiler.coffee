@@ -447,6 +447,7 @@ class XLSXDrawings extends Drawings
         sheet = workbook.Sheets[subname]
         rows = xlsx.utils.sheet_to_json sheet,
           header: 1
+          defval: ''
         rows.subname = subname
         rows
     )
