@@ -409,33 +409,43 @@ class TSVDrawing extends DSVDrawing
   @title: "Tab-separated drawing (spreadsheet export)"
   @delimiter: '\t'
 
-class Drawings extends Inputs
+class Drawings extends Input
   @filenameSeparator = '_'
   constructor: (@drawings) ->
   @load: (datas) ->
-    new @ for data in datas
-      drawing = Drawing.load data
-      filename = path.parse @filename
-      filename.base += @filenameSeparator + data.subname
-      drawing.filename = path.format filename
-      drawing.subname = data.subname
-      drawing
+    new @ (
+      for data in datas
+        drawing = Drawing.load data
+        drawing.subname = data.subname
+        drawing
+    )
   writeSVG: (mappings, filename) ->
-    for drawing in drawings
+    for drawing in @drawings
       drawing.writeSVG mappings,
-        if drawings.length > 1 and filename?
-          filename2 = path.parse filename
+        if @drawings.length > 1
+          filename2 = path.parse filename ? @filename
+          filename2.base = filename2.base[...-filename2.ext.length]
           filename2.base += @constructor.filenameSeparator + drawing.subname
+          filename2.base += '.svg'
           path.format filename2
         else
+          drawing.filename = @filename  ## use Drawing default if not filename?
           filename
 
-class ExcelDrawings extends Drawings
+class XLSXDrawings extends Drawings
+  @encoding: 'binary'
   @title: "Spreadsheet drawings (Excel/OpenDocument/Lotus)"
   @parse: (data) ->
-    xlsx.read data, type: 'binary'
-    ## xxx need to convert to array of worksheets, each array of arrays
+    workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
+    @load (
+      for subname in workbook.SheetNames
+        sheet = workbook.Sheets[subname]
+        rows = xlsx.utils.sheet_to_json sheet,
+          header: 1
+        rows.subname = subname
+        rows
+    )
 
 class Context
   constructor: (@symbols, @i, @j) ->
@@ -454,6 +464,16 @@ extension_map =
   '.ssv': SSVDrawing
   '.csv': CSVDrawing
   '.tsv': TSVDrawing
+  ## Parsable by xlsx package:
+  '.xlsx': XLSXDrawings  ## Excel 2007+ XML Format
+  '.xlsm': XLSXDrawings  ## Excel 2007+ Macro XML Format
+  '.xlsb': XLSXDrawings  ## Excel 2007+ Binary Format
+  '.xls': XLSXDrawings   ## Excel 2.0 or 2003-2004 (SpreadsheetML)
+  '.ods': XLSXDrawings   ## OpenDocument Spreadsheet
+  '.fods': XLSXDrawings  ## Flat OpenDocument Spreadsheet
+  '.dif': XLSXDrawings   ## Data Interchange Format (DIF)
+  '.prn': XLSXDrawings   ## Lotus Formatted Text
+  '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
 
 help = ->
   console.log """
