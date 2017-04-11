@@ -37,11 +37,13 @@ In the **.txt format** for mapping files, each line consists of a symbol name
 followed by whitespace, followed by either a block of SVG code
 (such as `<symbol viewBox="...">...</symbol>`) or a filename containing
 such a block.  For example, here is a mapping of `O` to black squares
-and ` ` (space) to blank squares, both dimensioned 50 &times; 50:
+and both ` ` (space) and empty string to blank squares, all dimensioned
+50 &times; 50:
 
 ```
 O <symbol viewBox="0 0 50 50"><rect width="50" height="50"/></symbol>
   <symbol viewBox="0 0 50 50"></symbol>
+ <symbol viewBox="0 0 50 50"></symbol>
 ```
 
 Here is a mapping of the same symbols to external files:
@@ -49,6 +51,7 @@ Here is a mapping of the same symbols to external files:
 ```
 O O.svg
   blank.svg
+ blank.svg
 ```
 
 In the **.js / .coffee formats**, the file consists of JavaScript /

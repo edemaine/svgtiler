@@ -220,7 +220,12 @@ class ASCIIMapping extends Mapping
       separator = whitespace.exec line
       continue unless separator?
       if separator.index == 0
-        key = line[0]  ## Whitespace at beginning means defining whitespace
+        if separator[0].length == 1
+          ## Single whitespace character at beginning defines blank character
+          key = ''
+        else
+          ## Multiple whitespace at beginning defines first whitespace character
+          key = line[0]
       else
         key = line[...separator.index]
       map[key] = line[separator.index + separator[0].length..]
