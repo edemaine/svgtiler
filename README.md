@@ -1,6 +1,7 @@
 # SVG Tiler
 **SVG Tiler** is a tool for drawing diagrams on a grid using text or
-spreadsheets, and then substituting SVG symbols to make a big SVG figure.
+spreadsheets, and then substituting SVG symbols to make a big SVG figure,
+and optionally convert it to PDF.
 
 To use SVG Tiler, you combine two types of files
 (possibly multiple of each type):
@@ -179,6 +180,10 @@ your `viewBox`es accordingly.
   `<rect x="-5" y="-5" width="10" height="10"/>`
   will create a symbol with `viewBox="-5 -5 10 10"`.
 
+* You can automatically convert all exported SVG files into PDF if you have
+  Inkscape installed, via the `-p` or `--pdf` command-line option.
+  For example: `svgtiler -p map.coffee drawings.xls`
+
 ## Installation
 After [installing Node](https://nodejs.org/en/download/),
 you can install this tool via
@@ -206,6 +211,7 @@ Optional arguments:
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
                         (default: null, which means read height from SVG)
+  -p / --pdf            Convert output SVG files to PDF via Inkscape
 
 Filename arguments:  (mappings before drawings!)
 

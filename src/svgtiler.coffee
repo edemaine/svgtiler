@@ -3,6 +3,7 @@
 `
 path = require 'path'
 fs = require 'fs'
+child_process = require 'child_process'
 CoffeeScript = require 'coffee-script'
 csvParse = require 'csv-parse/lib/sync'
 xlsx = require 'xlsx'
@@ -298,6 +299,7 @@ class Drawing extends Input
       filename = path.format filename
     console.log '->', filename
     fs.writeFileSync filename, @renderSVG mappings
+    filename
   renderSVG: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
@@ -486,6 +488,20 @@ extension_map =
   '.prn': XLSXDrawings   ## Lotus Formatted Text
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
 
+svg2pdf = (svg) ->
+  filename = path.parse svg
+  if filename.ext == '.pdf'
+    filename.base += '.pdf'
+  else
+    filename.base = filename.base[...-filename.ext.length] + '.pdf'
+  pdf = path.format filename
+  console.log '=>', pdf
+  child_process.spawnSync 'inkscape', [
+    '-z'
+    "--file=#{svg}"
+    "--export-pdf=#{pdf}"
+  ]
+
 help = ->
   console.log """
 Usage: #{process.argv[1]} (...options and filenames...)
@@ -500,6 +516,7 @@ Optional arguments:
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
                         (default: null, which means read height from SVG)
+  -p / --pdf            Convert output SVG files to PDF via Inkscape
 
 Filename arguments:  (mappings before drawings!)
 
@@ -526,6 +543,7 @@ main = ->
   mappings = new Mappings
   args = process.argv[2..]
   files = skip = 0
+  do_svg2pdf = false
   for arg, i in args
     if skip
       skip--
@@ -541,6 +559,8 @@ main = ->
       when '--th', '--tile-height'
         Symbol.forceHeight = parseFloat args[i+1]
         skip = 1
+      when '-p', '--pdf'
+        do_svg2pdf = true
       else
         files++
         console.log '*', arg
@@ -548,7 +568,13 @@ main = ->
         if input instanceof Mapping
           mappings.push input
         else if input instanceof Drawing or input instanceof Drawings
-          input.writeSVG mappings
+          filenames = input.writeSVG mappings
+          if do_svg2pdf
+            if filenames.length?
+              for filename in filenames
+                svg2pdf filename
+            else
+              svg2pdf filenames
   unless files
     console.log 'Not enough filename arguments'
     help()
