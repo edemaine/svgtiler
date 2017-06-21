@@ -125,6 +125,8 @@ class Symbol
     @key.indexOf(substring) >= 0
     ## ECMA6: @key.includes substring
 
+zeroWidthReplacement = 1
+
 class StaticSymbol extends Symbol
   constructor: (@key, options) ->
     for own key, value of options
@@ -136,6 +138,15 @@ class StaticSymbol extends Symbol
     if @viewBox?
       @width = @viewBox[2]
       @height = @viewBox[3]
+      ###
+      SVG's viewBox has a special rule that "A value of zero [in <width>
+      or <height>] disables rendering of the element."  Avoid this.
+      [https://www.w3.org/TR/SVG11/coords.html#ViewBoxAttribute]
+      ###
+      if @width == @height == 0 and
+         @xml.documentElement.hasAttribute('style') and
+         /overflow\s*:\s*visible/.test @xml.documentElement.getAttribute('style')
+        @viewBox[2] = @viewBox[3] = zeroWidthReplacement
     if Symbol.forceWidth?
       @width = Symbol.forceWidth
     if Symbol.forceHeight?
@@ -331,8 +342,6 @@ class Drawing extends Input
       continue unless symbol?
       svg.appendChild node = doc.createElementNS SVGNS, 'symbol'
       node.setAttribute 'id', symbol.id()
-      if symbol.viewBox?
-        node.setAttribute 'viewBox', symbol.viewBox
       if symbol.xml.documentElement.tagName in ['svg', 'symbol']
         ## Remove a layer of indirection for <svg> and <symbol>
         for attribute in symbol.xml.documentElement.attributes
@@ -342,6 +351,10 @@ class Drawing extends Input
           node.appendChild child.cloneNode true
       else
         node.appendChild symbol.xml.documentElement.cloneNode true
+      ## Set/overwrite any viewbox attribute with one from symbol.
+      if symbol.viewBox?
+        console.log 'setting viewbox', symbol.viewBox
+        node.setAttribute 'viewBox', symbol.viewBox
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]
     levels = {}
