@@ -25,7 +25,7 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "prepublish": "node_modules/coffee-script/bin/coffee --no-header --bare -o lib -c src/svgtiler.coffee"
+    "prepublish": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
   },
   "dependencies": {
     "coffee-script": "^1.11.1",
