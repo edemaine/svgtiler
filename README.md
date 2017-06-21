@@ -173,6 +173,8 @@ your `viewBox`es accordingly.
   [0, 10] square, but the symbol can draw outside that square, and the overall
   drawing bounding box will be set as if the symbol occupies the
   [&minus;5, 15] &times; [&minus;5, 15] square.
+  Even zero-width and zero-height symbols will get rendered when
+  `style="overflow: visible"` is specified, by overriding `viewBox`.
 
 * Very limited automatic `viewBox` setting via bounding box computation
   (but see the code for many SVG features not supported).
