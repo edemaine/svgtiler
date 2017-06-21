@@ -353,7 +353,6 @@ class Drawing extends Input
         node.appendChild symbol.xml.documentElement.cloneNode true
       ## Set/overwrite any viewbox attribute with one from symbol.
       if symbol.viewBox?
-        console.log 'setting viewbox', symbol.viewBox
         node.setAttribute 'viewBox', symbol.viewBox
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]
