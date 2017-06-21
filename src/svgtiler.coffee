@@ -125,7 +125,7 @@ class Symbol
     @key.indexOf(substring) >= 0
     ## ECMA6: @key.includes substring
 
-zeroWidthReplacement = 1
+zeroSizeReplacement = 1
 
 class StaticSymbol extends Symbol
   constructor: (@key, options) ->
@@ -143,10 +143,12 @@ class StaticSymbol extends Symbol
       or <height>] disables rendering of the element."  Avoid this.
       [https://www.w3.org/TR/SVG11/coords.html#ViewBoxAttribute]
       ###
-      if @width == @height == 0 and
-         @xml.documentElement.hasAttribute('style') and
+      if @xml.documentElement.hasAttribute('style') and
          /overflow\s*:\s*visible/.test @xml.documentElement.getAttribute('style')
-        @viewBox[2] = @viewBox[3] = zeroWidthReplacement
+        if @width == 0
+          @viewBox[2] = zeroSizeReplacement
+        if @height == 0
+          @viewBox[3] = zeroSizeReplacement
     if Symbol.forceWidth?
       @width = Symbol.forceWidth
     if Symbol.forceHeight?
@@ -368,8 +370,8 @@ class Drawing extends Input
         use.setAttribute 'xlink:href', '#' + symbol.id()
         use.setAttributeNS SVGNS, 'x', x
         use.setAttributeNS SVGNS, 'y', y
-        use.setAttributeNS SVGNS, 'width', symbol.width
-        use.setAttributeNS SVGNS, 'height', symbol.height
+        use.setAttributeNS SVGNS, 'width', symbol.viewBox?[2] ? symbol.width
+        use.setAttributeNS SVGNS, 'height', symbol.viewBox?[3] ? symbol.height
         if symbol.overflowBox?
           viewBox[0] = Math.min viewBox[0],
             x + symbol.overflowBox[0] - symbol.viewBox[0]
