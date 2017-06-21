@@ -508,11 +508,13 @@ svg2pdf = (svg) ->
     filename.base = filename.base[...-filename.ext.length] + '.pdf'
   pdf = path.format filename
   console.log '=>', pdf
-  child_process.spawnSync 'inkscape', [
+  output = child_process.spawnSync 'inkscape', [
     '-z'
     "--file=#{svg}"
     "--export-pdf=#{pdf}"
   ]
+  if output.error
+    console.error output.error
 
 help = ->
   console.log """
