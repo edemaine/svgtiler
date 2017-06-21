@@ -582,11 +582,11 @@ main = ->
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings
           if do_svg2pdf
-            if filenames.length?
+            if typeof filenames == 'string'
+              svg2pdf filenames
+            else
               for filename in filenames
                 svg2pdf filename
-            else
-              svg2pdf filenames
   unless files
     console.log 'Not enough filename arguments'
     help()
