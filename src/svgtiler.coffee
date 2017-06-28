@@ -478,10 +478,18 @@ class Context
   constructor: (@symbols, @i, @j) ->
     @symbol = @symbols[@i]?[@j]
     @key = @symbol?.key
-  includes: (args...) ->
-    @symbol? and @symbol.includes args...
   neighbor: (dj, di) ->
     new Context @symbols, @i + di, @j + dj
+  includes: (args...) ->
+    @symbol? and @symbol.includes args...
+  row: (di = 0) ->
+    i = @i + di
+    for symbol, j in @symbols[i] ? []
+      new Context @symbols, i, j
+  column: (dj = 0) ->
+    j = @j + dj
+    for row, i in @symbols
+      new Context @symbols, i, j
 
 extension_map =
   '.txt': ASCIIMapping

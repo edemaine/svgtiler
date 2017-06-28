@@ -89,6 +89,12 @@ the following properties:
 * In particular, it's really useful to call e.g.
   `this.neighbor(1, 0).includes('-')` to check for adjacent symbols that
   change how this symbol should be rendered.
+* `this.row(di = 0)` returns an array of `Context` objects, one for each
+  symbol in row `i + di` (in particular, including `this` if `di` is the
+  default of `0`).  For example, you can use the `some` or `every` methods
+  on this array to do bulk tests on the row.
+* `this.column(dj = 0)` returns an array of `Context` objects, one for each
+  symbol in column `j + dj`.
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
