@@ -28,10 +28,10 @@
     "prepublish": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
   },
   "dependencies": {
-    "coffee-script": "^1.11.1",
-    "csv-parse": "^1.1.7",
-    "prettify-xml": "^1.0.0",
-    "xlsx": "^0.9.9",
+    "coffee-script": "^1.12.6",
+    "csv-parse": "^1.2.0",
+    "prettify-xml": "^1.2.0",
+    "xlsx": "^0.10.6",
     "xmldom": "^0.1.22"
   },
   "devDependencies": {}
