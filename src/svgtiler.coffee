@@ -268,9 +268,13 @@ class Mappings
       return value if value?
     undefined
 
+blankCells =
+  '': true
+  ' ': true  ## for ASCII art in particular
+
 allBlank = (list) ->
   for x in list
-    if x
+    if x? and x not of blankCells
       return false
   true
 
