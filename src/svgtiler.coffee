@@ -361,7 +361,7 @@ class Drawing extends Input
       if symbol.viewBox?
         node.setAttribute 'viewBox', symbol.viewBox
     ## Lay out the symbols in the drawing via SVG <use>.
-    viewBox = [0, 0, 0, 0]
+    viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
     levels = {}
     y = 0
     for row, i in symbols
@@ -377,20 +377,21 @@ class Drawing extends Input
         use.setAttributeNS SVGNS, 'width', symbol.viewBox?[2] ? symbol.width
         use.setAttributeNS SVGNS, 'height', symbol.viewBox?[3] ? symbol.height
         if symbol.overflowBox?
-          viewBox[0] = Math.min viewBox[0],
-            x + symbol.overflowBox[0] - symbol.viewBox[0]
-          viewBox[1] = Math.min viewBox[1],
-            y + symbol.overflowBox[1] - symbol.viewBox[1]
-          viewBox[2] = Math.max viewBox[2],
-            x + symbol.overflowBox[2]
-          viewBox[3] = Math.max viewBox[3],
-            y + symbol.overflowBox[3]
+          dx = symbol.overflowBox[0] - symbol.viewBox[0]
+          dy = symbol.overflowBox[1] - symbol.viewBox[1]
+          viewBox[0] = Math.min viewBox[0], x + dx
+          viewBox[1] = Math.min viewBox[1], y + dy
+          viewBox[2] = Math.max viewBox[2], x + dx + symbol.overflowBox[2]
+          viewBox[3] = Math.max viewBox[3], y + dy + symbol.overflowBox[3]
         x += symbol.width
         viewBox[2] = Math.max viewBox[2], x
         if symbol.height > rowHeight
           rowHeight = symbol.height
       y += rowHeight
       viewBox[3] = Math.max viewBox[3], y
+    ## Change from x-min, y-min, x-max, y-max to x-min, y-min, width, height
+    viewBox[2] = viewBox[2] - viewBox[0]
+    viewBox[3] = viewBox[3] - viewBox[1]
     ## Sort by level
     levelOrder = (level for level of levels).sort (x, y) -> x-y
     for level in levelOrder
