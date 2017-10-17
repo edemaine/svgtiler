@@ -472,6 +472,8 @@ class XLSXDrawings extends Drawings
     @load (
       for subname in workbook.SheetNames
         sheet = workbook.Sheets[subname]
+        if subname.length == 31
+          console.warn "Warning: Sheet '#{subname}' has length exactly 31, which may be caused by Google Sheets export truncation"
         rows = xlsx.utils.sheet_to_json sheet,
           header: 1
           defval: ''
