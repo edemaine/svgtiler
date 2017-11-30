@@ -164,13 +164,24 @@ class StaticSymbol extends Symbol
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
     @zIndex = zIndex @xml.documentElement
   id: ->
-    ## Valid Name characters: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-Name
-    ## Couldn't represent the range [\u10000-\uEFFFF]
-    ## Removed colon (:) to avoid potential conflict with hex expansion.
-    ## Also prepend 's' to avoid bad starting characters.
-    's' +
-      @key.replace /[^-\w.\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\xB7\u0300-\u036F\u203F-\u2040]/,
-      (m) -> ':' + m.charCodeAt(0).toString 16
+    ## id/href follows the IRI spec [https://tools.ietf.org/html/rfc3987]:
+    ##   ifragment      = *( ipchar / "/" / "?" )
+    ##   ipchar         = iunreserved / pct-encoded / sub-delims / ":" / "@"
+    ##   iunreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~" / ucschar
+    ##   pct-encoded    = "%" HEXDIG HEXDIG
+    ##   sub-delims     = "!" / "$" / "&" / "'" / "(" / ")"
+    ##                  / "*" / "+" / "," / ";" / "="
+    ##   ucschar        = %xA0-D7FF / %xF900-FDCF / #%xFDF0-FFEF
+    ##                  / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD
+    ##                  / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD
+    ##                  / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD
+    ##                  / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD
+    ##                  / %xD0000-DFFFD / %xE1000-EFFFD
+    ## We also want to escape colon (:) which seems to cause trouble.
+    ## We use encodeURIComponent which escapes everything except
+    ##   A-Z a-z 0-9 - _ . ! ~ * ' ( )
+    ## [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent]
+    encodeURIComponent @key
   #use: -> @  ## do nothing for static symbol
 
 class DynamicSymbol extends Symbol
