@@ -2,6 +2,6 @@
 
 Sprites ![](NES_level7_empty.png) ![](NES_level7_filled.png) ![](NES_level7_other.png) thanks to [The Spriters Resource](https://www.spriters-resource.com/nes/tetris/sheet/32943/).
 
-## Example SVG output
+## Example PNG output
 
-![](example.svg)
+![](example.png)

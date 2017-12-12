@@ -1,2 +1,2 @@
 all:
-	svgtiler NES_level7.txt example.asc
+	svgtiler -P NES_level7.txt example.asc

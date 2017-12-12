@@ -227,8 +227,8 @@ class Input
     input
   @load: (filename) ->
     extension = extensionOf filename
-    if extension of extension_map
-      extension_map[extension].parseFile filename
+    if extension of extensionMap
+      extensionMap[extension].parseFile filename
     else
       throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
@@ -536,7 +536,7 @@ class Context
     for row, i in @symbols
       new Context @symbols, i, j
 
-extension_map =
+extensionMap =
   '.txt': ASCIIMapping
   '.js': JSMapping
   '.coffee': CoffeeMapping
@@ -555,18 +555,18 @@ extension_map =
   '.prn': XLSXDrawings   ## Lotus Formatted Text
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
 
-svg2pdf = (svg) ->
+svg2 = (format, svg) ->
   filename = path.parse svg
-  if filename.ext == '.pdf'
-    filename.base += '.pdf'
+  if filename.ext == ".#{format}"
+    filename.base += ".#{format}"
   else
-    filename.base = filename.base[...-filename.ext.length] + '.pdf'
-  pdf = path.format filename
-  console.log '=>', pdf
+    filename.base = "#{filename.base[...-filename.ext.length]}.#{format}"
+  output = path.format filename
+  console.log '=>', output
   output = require('child_process').spawnSync 'inkscape', [
     '-z'
     "--file=#{svg}"
-    "--export-pdf=#{pdf}"
+    "--export-#{format}=#{output}"
   ]
   if output.error
     console.error output.error
@@ -584,11 +584,12 @@ Optional arguments:
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
+  -P / --png            Convert output SVG files to PNG via Inkscape
 
 Filename arguments:  (mappings before drawings!)
 
 """
-  for extension, klass of extension_map
+  for extension, klass of extensionMap
     if extension.length < 10
       extension += ' '.repeat 10 - extension.length
     console.log "  *#{extension}  #{klass.title}"
@@ -612,7 +613,7 @@ main = ->
   mappings = new Mappings
   args = process.argv[2..]
   files = skip = 0
-  do_svg2pdf = false
+  formats = []
   for arg, i in args
     if skip
       skip--
@@ -629,7 +630,9 @@ main = ->
         Symbol.forceHeight = parseFloat args[i+1]
         skip = 1
       when '-p', '--pdf'
-        do_svg2pdf = true
+        formats.push 'pdf'
+      when '-P', '--png'
+        formats.push 'png'
       else
         files++
         console.log '*', arg
@@ -638,12 +641,12 @@ main = ->
           mappings.push input
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings
-          if do_svg2pdf
+          for format in formats
             if typeof filenames == 'string'
-              svg2pdf filenames
+              svg2 format, filenames
             else
               for filename in filenames
-                svg2pdf filename
+                svg2 format, filename
   unless files
     console.log 'Not enough filename arguments'
     help()
