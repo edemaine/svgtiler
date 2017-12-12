@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" preserveAspectRatio="xMinYMin meet">
+  <symbol id="X" viewBox="0,0,50,50">
+    <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
+  </symbol>
+  <symbol id="">
+    <g/>
+  </symbol>
+  <symbol id="%20">
+    <g/>
+  </symbol>
+  <symbol id="O" viewBox="1,1,48,48">
+    <g>
+      <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
+      <circle cx="25" cy="25" r="24" fill="#9bcf51"/>
+      <circle cx="25" cy="25" r="17" fill="#9ecd50" stroke="#5c8f23" stroke-width="4"/>
+    </g>
+  </symbol>
+  <use xlink:href="#X" x="0" y="0" width="50" height="50"/>
+  <use xlink:href="#" x="50" y="0" width="50" height="50"/>
+  <use xlink:href="#%20" x="100" y="0" width="50" height="50"/>
+  <use xlink:href="#O" x="150" y="0" width="48" height="48"/>
+</svg>
