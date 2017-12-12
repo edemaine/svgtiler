@@ -48,7 +48,7 @@ svgBBox = (xml) ->
          node.tagName in ['defs', 'symbol', 'use']
         return [null, null, null, null]
       switch node.tagName
-        when 'rect'
+        when 'rect', 'image'
           [parseFloat node.getAttribute('x') or 0
            parseFloat node.getAttribute('y') or 0
            parseFloat node.getAttribute('width') or '100%'
@@ -62,7 +62,7 @@ svgBBox = (xml) ->
           cx = parseFloat node.getAttribute('cx') or 0
           cy = parseFloat node.getAttribute('cy') or 0
           rx = parseFloat node.getAttribute('rx') or 0
-          ry = parseFloat node.getAttribute('rx') or 0
+          ry = parseFloat node.getAttribute('ry') or 0
           [cx - rx, cy - ry, 2*rx, 2*ry]
         when 'line'
           x1 = parseFloat node.getAttribute('x1') or 0
