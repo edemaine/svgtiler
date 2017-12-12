@@ -3,10 +3,6 @@
 `
 path = require 'path'
 fs = require 'fs'
-child_process = require 'child_process'
-CoffeeScript = require 'coffee-script'
-csvParse = require 'csv-parse/lib/sync'
-xlsx = require 'xlsx'
 xmldom = require 'xmldom'
 DOMParser = xmldom.DOMParser
 domImplementation = new xmldom.DOMImplementation()
@@ -266,7 +262,7 @@ class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   @parse: (data) ->
-    new @ CoffeeScript.eval data
+    new @ require('coffee-script').eval data
 
 class Mappings
   constructor: (@maps = []) ->
@@ -432,7 +428,7 @@ class DSVDrawing extends Drawing
     else if data[-1..] in ['\r', '\n']
       data = data[...-1]
     ## CSV parser.
-    @load csvParse data,
+    @load require('csv-parse/lib/sync') data,
       delimiter: @delimiter
       relax_column_count: true
 
@@ -478,6 +474,7 @@ class XLSXDrawings extends Drawings
   @encoding: 'binary'
   @title: "Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)"
   @parse: (data) ->
+    xlsx = require 'xlsx'
     workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
     @load (
@@ -536,7 +533,7 @@ svg2pdf = (svg) ->
     filename.base = filename.base[...-filename.ext.length] + '.pdf'
   pdf = path.format filename
   console.log '=>', pdf
-  output = child_process.spawnSync 'inkscape', [
+  output = require('child_process').spawnSync 'inkscape', [
     '-z'
     "--file=#{svg}"
     "--export-pdf=#{pdf}"
