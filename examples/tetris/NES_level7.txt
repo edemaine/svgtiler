@@ -1,0 +1,8 @@
+T NES_level7_empty.png
+O NES_level7_empty.png
+I NES_level7_empty.png
+J NES_level7_filled.png
+S NES_level7_filled.png
+L NES_level7_other.png
+Z NES_level7_other.png
+  <rect fill="black" width="8" height="8"/>

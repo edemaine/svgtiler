@@ -16,6 +16,8 @@ splitIntoLines = (data) ->
   data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
 
+extensionOf = (filename) -> path.extname(filename).toLowerCase()
+
 class SVGTilerException
   constructor: (@message) ->
   toString: ->
@@ -101,6 +103,16 @@ class Symbol
   @svgEncoding: 'utf8'
   @forceWidth: null   ## default: no size forcing
   @forceHeight: null  ## default: no size forcing
+
+  ###
+  Attempt to render pixels as pixels, as needed for old-school graphics.
+  SVG 1.1 and Inkscape define image-rendering="optimizeSpeed" for this.
+  Chrome doesn't support this, but supports a CSS3 (or SVG) specification of
+  "image-rendering:pixelated".  Combining these seems to work everywhere.
+  ###
+  @imageRendering:
+    ' image-rendering="optimizeSpeed" style="image-rendering:pixelated"'
+
   @parse: (key, data) ->
     unless data?
       throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
@@ -112,9 +124,22 @@ class Symbol
       new StaticSymbol key,
         if typeof data == 'string'
           if data.indexOf('<') < 0  ## No <'s -> interpret as filename
-            filename: data
-            svg: fs.readFileSync data,
-                   encoding: @svgEncoding
+            extension = extensionOf data
+            ## <image> tag documentation: "Conforming SVG viewers need to
+            ## support at least PNG, JPEG and SVG format files."
+            ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
+            switch extension
+              when '.png', '.jpg', '.jpeg', '.gif'
+                size = require('image-size') data
+                svg: """
+                  <image xlink:href="#{encodeURIComponent data}" width="#{size.width}" height="#{size.height}"#{@imageRendering}/>
+                """
+              when '.svg'
+                filename: data
+                svg: fs.readFileSync data,
+                       encoding: @svgEncoding
+              else
+                throw new SVGTilerException "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
           else
             svg: data
         else
@@ -201,7 +226,7 @@ class Input
     input.filename = filename
     input
   @load: (filename) ->
-    extension = path.extname filename
+    extension = extensionOf filename
     if extension of extension_map
       extension_map[extension].parseFile filename
     else
@@ -410,12 +435,15 @@ class Drawing extends Input
     svg.setAttributeNS SVGNS, 'width', viewBox[2]
     svg.setAttributeNS SVGNS, 'height', viewBox[3]
     svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
+    out = new XMLSerializer().serializeToString doc
+    ## Parsing xlink:href in user's SVG fragments, and then serializing,
+    ## can lead to these null namespace definitions.  Remove.
+    out = out.replace /\sxmlns:xlink=""/g, ''
     '''
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
-''' +
-      prettyXML new XMLSerializer().serializeToString doc
+''' + prettyXML out
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
@@ -567,9 +595,11 @@ Filename arguments:  (mappings before drawings!)
     console.log "               #{klass.help}" if klass.help?
   console.log """
 
-SYMBOL specifiers:
+SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 
-  'filename.svg':   load SVG from specifies file
+  'filename.svg':   load SVG from specified file
+  'filename.png':   include PNG image from specified file
+  'filename.jpg':   include JPEG image from specified file
   '<svg>...</svg>': raw SVG
   -> ...@key...:    function computing SVG, with `this` bound to Context with
                     `key` set to symbol name, `i` and `j` set to coordinates,

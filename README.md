@@ -241,9 +241,11 @@ Filename arguments:  (mappings before drawings!)
   *.prn        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.dbf        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
 
-SYMBOL specifiers:
+SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 
   'filename.svg':   load SVG from specifies file
+  'filename.png':   include PNG image from specified file
+  'filename.jpg':   include JPEG image from specified file
   '<svg>...</svg>': raw SVG
   -> ...@key...:    function computing SVG, with `this` bound to Context with
                     `key` set to symbol name, `i` and `j` set to coordinates,

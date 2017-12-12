@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 32" width="96" height="32" preserveAspectRatio="xMinYMin meet">
+  <symbol id="I" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_empty.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <symbol id="%20" viewBox="0,0,8,8">
+    <rect fill="black" width="8" height="8"/>
+  </symbol>
+  <symbol id="Z" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_other.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <symbol id="L" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_other.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <symbol id="J" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_filled.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <symbol id="O" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_empty.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <symbol id="S" viewBox="0,0,8,8">
+    <image xlink:href="NES_level7_filled.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
+  </symbol>
+  <use xlink:href="#I" x="0" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="8" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="16" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="24" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="32" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="40" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="48" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="56" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="64" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="72" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="80" y="0" width="8" height="8"/>
+  <use xlink:href="#%20" x="88" y="0" width="8" height="8"/>
+  <use xlink:href="#I" x="0" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="8" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="16" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="24" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="32" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="40" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="48" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="56" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="64" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="72" y="8" width="8" height="8"/>
+  <use xlink:href="#%20" x="80" y="8" width="8" height="8"/>
+  <use xlink:href="#Z" x="88" y="8" width="8" height="8"/>
+  <use xlink:href="#I" x="0" y="16" width="8" height="8"/>
+  <use xlink:href="#L" x="8" y="16" width="8" height="8"/>
+  <use xlink:href="#J" x="16" y="16" width="8" height="8"/>
+  <use xlink:href="#J" x="24" y="16" width="8" height="8"/>
+  <use xlink:href="#J" x="32" y="16" width="8" height="8"/>
+  <use xlink:href="#O" x="40" y="16" width="8" height="8"/>
+  <use xlink:href="#O" x="48" y="16" width="8" height="8"/>
+  <use xlink:href="#%20" x="56" y="16" width="8" height="8"/>
+  <use xlink:href="#S" x="64" y="16" width="8" height="8"/>
+  <use xlink:href="#S" x="72" y="16" width="8" height="8"/>
+  <use xlink:href="#Z" x="80" y="16" width="8" height="8"/>
+  <use xlink:href="#Z" x="88" y="16" width="8" height="8"/>
+  <use xlink:href="#I" x="0" y="24" width="8" height="8"/>
+  <use xlink:href="#L" x="8" y="24" width="8" height="8"/>
+  <use xlink:href="#L" x="16" y="24" width="8" height="8"/>
+  <use xlink:href="#L" x="24" y="24" width="8" height="8"/>
+  <use xlink:href="#J" x="32" y="24" width="8" height="8"/>
+  <use xlink:href="#O" x="40" y="24" width="8" height="8"/>
+  <use xlink:href="#O" x="48" y="24" width="8" height="8"/>
+  <use xlink:href="#S" x="56" y="24" width="8" height="8"/>
+  <use xlink:href="#S" x="64" y="24" width="8" height="8"/>
+  <use xlink:href="#%20" x="72" y="24" width="8" height="8"/>
+  <use xlink:href="#Z" x="80" y="24" width="8" height="8"/>
+  <use xlink:href="#%20" x="88" y="24" width="8" height="8"/>
+</svg>
