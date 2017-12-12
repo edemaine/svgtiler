@@ -215,10 +215,8 @@ Optional arguments:
   --help                Show this help message and exit.
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
-                        (default: null, which means read width from SVG)
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
-                        (default: null, which means read height from SVG)
   -p / --pdf            Convert output SVG files to PDF via Inkscape
 
 Filename arguments:  (mappings before drawings!)

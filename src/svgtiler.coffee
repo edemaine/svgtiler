@@ -99,6 +99,8 @@ zIndex = (node) ->
 
 class Symbol
   @svgEncoding: 'utf8'
+  @forceWidth: null   ## default: no size forcing
+  @forceHeight: null  ## default: no size forcing
   @parse: (key, data) ->
     unless data?
       throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
@@ -551,10 +553,8 @@ Optional arguments:
   -m / --margin         Don't delete blank extreme rows/columns
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
-                        (default: null, which means read width from SVG)
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
-                        (default: null, which means read height from SVG)
   -p / --pdf            Convert output SVG files to PDF via Inkscape
 
 Filename arguments:  (mappings before drawings!)
