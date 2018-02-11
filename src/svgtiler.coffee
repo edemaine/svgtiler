@@ -187,24 +187,30 @@ class StaticSymbol extends Symbol
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
     @zIndex = zIndex @xml.documentElement
   id: ->
-    ## id/href follows the IRI spec [https://tools.ietf.org/html/rfc3987]:
-    ##   ifragment      = *( ipchar / "/" / "?" )
-    ##   ipchar         = iunreserved / pct-encoded / sub-delims / ":" / "@"
-    ##   iunreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~" / ucschar
-    ##   pct-encoded    = "%" HEXDIG HEXDIG
-    ##   sub-delims     = "!" / "$" / "&" / "'" / "(" / ")"
-    ##                  / "*" / "+" / "," / ";" / "="
-    ##   ucschar        = %xA0-D7FF / %xF900-FDCF / #%xFDF0-FFEF
-    ##                  / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD
-    ##                  / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD
-    ##                  / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD
-    ##                  / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD
-    ##                  / %xD0000-DFFFD / %xE1000-EFFFD
-    ## We also want to escape colon (:) which seems to cause trouble.
-    ## We use encodeURIComponent which escapes everything except
-    ##   A-Z a-z 0-9 - _ . ! ~ * ' ( )
-    ## [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent]
+    ###
+    id/href follows the IRI spec [https://tools.ietf.org/html/rfc3987]:
+      ifragment      = *( ipchar / "/" / "?" )
+      ipchar         = iunreserved / pct-encoded / sub-delims / ":" / "@"
+      iunreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~" / ucschar
+      pct-encoded    = "%" HEXDIG HEXDIG
+      sub-delims     = "!" / "$" / "&" / "'" / "(" / ")"
+                     / "*" / "+" / "," / ";" / "="
+      ucschar        = %xA0-D7FF / %xF900-FDCF / #%xFDF0-FFEF
+                     / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD
+                     / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD
+                     / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD
+                     / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD
+                     / %xD0000-DFFFD / %xE1000-EFFFD
+    We also want to escape colon (:) which seems to cause trouble.
+    We use encodeURIComponent which escapes everything except
+      A-Z a-z 0-9 - _ . ! ~ * ' ( )
+    [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent]
+    Unfortunately, Inkscape seems to ignore any %-encoded symbols; see
+    https://bugs.launchpad.net/inkscape/+bug/1737778
+    So we replace '%' with '$', an allowed character that's already escaped.
+    ###
     encodeURIComponent @key
+    .replace /%/g, '$'
   #use: -> @  ## do nothing for static symbol
 
 class DynamicSymbol extends Symbol
