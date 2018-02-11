@@ -4,7 +4,7 @@
   <symbol id="I" viewBox="0,0,8,8">
     <image xlink:href="NES_level7_empty.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
   </symbol>
-  <symbol id="%20" viewBox="0,0,8,8">
+  <symbol id="$20" viewBox="0,0,8,8">
     <rect fill="black" width="8" height="8"/>
   </symbol>
   <symbol id="Z" viewBox="0,0,8,8">
@@ -23,28 +23,28 @@
     <image xlink:href="NES_level7_filled.png" width="8" height="8" image-rendering="optimizeSpeed" style="image-rendering:pixelated"/>
   </symbol>
   <use xlink:href="#I" x="0" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="8" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="16" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="24" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="32" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="40" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="48" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="56" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="64" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="72" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="80" y="0" width="8" height="8"/>
-  <use xlink:href="#%20" x="88" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="8" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="16" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="24" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="32" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="40" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="48" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="56" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="64" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="72" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="80" y="0" width="8" height="8"/>
+  <use xlink:href="#$20" x="88" y="0" width="8" height="8"/>
   <use xlink:href="#I" x="0" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="8" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="16" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="24" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="32" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="40" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="48" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="56" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="64" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="72" y="8" width="8" height="8"/>
-  <use xlink:href="#%20" x="80" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="8" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="16" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="24" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="32" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="40" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="48" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="56" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="64" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="72" y="8" width="8" height="8"/>
+  <use xlink:href="#$20" x="80" y="8" width="8" height="8"/>
   <use xlink:href="#Z" x="88" y="8" width="8" height="8"/>
   <use xlink:href="#I" x="0" y="16" width="8" height="8"/>
   <use xlink:href="#L" x="8" y="16" width="8" height="8"/>
@@ -53,7 +53,7 @@
   <use xlink:href="#J" x="32" y="16" width="8" height="8"/>
   <use xlink:href="#O" x="40" y="16" width="8" height="8"/>
   <use xlink:href="#O" x="48" y="16" width="8" height="8"/>
-  <use xlink:href="#%20" x="56" y="16" width="8" height="8"/>
+  <use xlink:href="#$20" x="56" y="16" width="8" height="8"/>
   <use xlink:href="#S" x="64" y="16" width="8" height="8"/>
   <use xlink:href="#S" x="72" y="16" width="8" height="8"/>
   <use xlink:href="#Z" x="80" y="16" width="8" height="8"/>
@@ -67,7 +67,7 @@
   <use xlink:href="#O" x="48" y="24" width="8" height="8"/>
   <use xlink:href="#S" x="56" y="24" width="8" height="8"/>
   <use xlink:href="#S" x="64" y="24" width="8" height="8"/>
-  <use xlink:href="#%20" x="72" y="24" width="8" height="8"/>
+  <use xlink:href="#$20" x="72" y="24" width="8" height="8"/>
   <use xlink:href="#Z" x="80" y="24" width="8" height="8"/>
-  <use xlink:href="#%20" x="88" y="24" width="8" height="8"/>
+  <use xlink:href="#$20" x="88" y="24" width="8" height="8"/>
 </svg>

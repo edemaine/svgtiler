@@ -7,7 +7,7 @@
   <symbol id="">
     <g/>
   </symbol>
-  <symbol id="%20">
+  <symbol id="$20">
     <g/>
   </symbol>
   <symbol id="O" viewBox="1,1,48,48">
@@ -19,6 +19,6 @@
   </symbol>
   <use xlink:href="#X" x="0" y="0" width="50" height="50"/>
   <use xlink:href="#" x="50" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="100" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="100" y="0" width="50" height="50"/>
   <use xlink:href="#O" x="150" y="0" width="48" height="48"/>
 </svg>

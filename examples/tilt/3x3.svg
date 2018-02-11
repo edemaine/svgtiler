@@ -10,7 +10,7 @@
   <symbol id="2">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">2</text>
   </symbol>
-  <symbol id="%20">
+  <symbol id="$20">
     <g/>
   </symbol>
   <symbol id="X" viewBox="0,0,50,50">
@@ -35,95 +35,95 @@
   <symbol id="C">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">C</text>
   </symbol>
-  <use xlink:href="#%20" x="0" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="50" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="100" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="150" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="200" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="250" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="300" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="350" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="400" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="450" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="500" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="550" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="600" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="650" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="700" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="750" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="800" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="50" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="100" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="150" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="200" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="250" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="300" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="350" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="400" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="450" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="500" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="550" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="600" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="650" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="700" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="750" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="800" y="0" width="50" height="50"/>
   <use xlink:href="#0" x="850" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="900" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="950" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1000" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1050" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1100" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1150" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1200" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1250" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1300" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1350" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1400" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1450" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1500" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1550" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1600" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1650" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1700" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1750" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1800" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1850" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1900" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="1950" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2000" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2050" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="900" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="950" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1000" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1050" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1100" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1150" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1200" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1250" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1300" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1350" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1400" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1450" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1500" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1550" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1600" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1650" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1700" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1750" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1800" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1850" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1900" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="1950" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2000" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2050" y="0" width="50" height="50"/>
   <use xlink:href="#1" x="2100" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2150" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2200" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2250" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2300" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2350" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2400" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2450" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2500" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2550" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2600" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2650" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2700" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2750" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2800" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2850" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2900" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="2950" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3000" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3050" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3100" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3150" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3200" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3250" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3300" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2150" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2200" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2250" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2300" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2350" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2400" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2450" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2500" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2550" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2600" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2650" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2700" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2750" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2800" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2850" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2900" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="2950" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3000" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3050" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3100" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3150" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3200" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3250" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3300" y="0" width="50" height="50"/>
   <use xlink:href="#2" x="3350" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3400" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3450" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3500" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3550" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3600" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3650" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3700" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3750" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3800" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3850" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3900" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="3950" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4000" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4050" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4100" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4150" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4200" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4250" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4300" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="4350" y="0" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="50" width="50" height="50"/>
+  <use xlink:href="#$20" x="3400" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3450" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3500" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3550" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3600" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3650" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3700" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3750" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3800" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3850" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3900" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="3950" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4000" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4050" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4100" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4150" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4200" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4250" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4300" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="4350" y="0" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="50" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="50" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="50" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="50" width="50" height="50"/>
@@ -211,7 +211,7 @@
   <use xlink:href="#X" x="4250" y="50" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="50" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="50" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="100" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="100" width="50" height="50"/>
@@ -299,7 +299,7 @@
   <use xlink:href="#X" x="4250" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="100" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="150" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="150" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="150" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="150" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="150" width="50" height="50"/>
@@ -387,7 +387,7 @@
   <use xlink:href="#X" x="4250" y="150" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="150" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="150" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="200" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="200" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="200" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="200" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="200" width="50" height="50"/>
@@ -475,7 +475,7 @@
   <use xlink:href="#X" x="4250" y="200" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="200" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="200" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="250" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="250" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="250" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="250" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="250" width="50" height="50"/>
@@ -563,7 +563,7 @@
   <use xlink:href="#X" x="4250" y="250" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="250" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="250" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="300" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="300" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="300" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="300" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="300" width="50" height="50"/>
@@ -651,7 +651,7 @@
   <use xlink:href="#X" x="4250" y="300" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="300" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="300" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="350" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="350" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="350" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="350" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="350" width="50" height="50"/>
@@ -739,7 +739,7 @@
   <use xlink:href="#X" x="4250" y="350" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="350" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="350" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="400" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="400" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="400" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="400" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="400" width="50" height="50"/>
@@ -827,7 +827,7 @@
   <use xlink:href="#X" x="4250" y="400" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="400" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="400" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="450" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="450" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="450" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="450" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="450" width="50" height="50"/>
@@ -915,7 +915,7 @@
   <use xlink:href="#X" x="4250" y="450" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="450" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="450" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="500" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="500" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="500" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="500" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="500" width="50" height="50"/>
@@ -1003,7 +1003,7 @@
   <use xlink:href="#X" x="4250" y="500" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="500" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="500" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="550" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="550" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="550" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="550" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="550" width="50" height="50"/>
@@ -1091,7 +1091,7 @@
   <use xlink:href="#X" x="4250" y="550" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="550" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="550" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="600" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="600" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="600" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="600" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="600" width="50" height="50"/>
@@ -1267,7 +1267,7 @@
   <use xlink:href="#X" x="4250" y="650" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="650" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="650" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="700" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="700" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="700" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="700" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="700" width="50" height="50"/>
@@ -1355,7 +1355,7 @@
   <use xlink:href="#X" x="4250" y="700" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="700" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="700" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="750" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="750" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="750" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="750" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="750" width="50" height="50"/>
@@ -1443,7 +1443,7 @@
   <use xlink:href="#X" x="4250" y="750" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="750" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="750" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="800" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="800" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="800" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="800" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="800" width="50" height="50"/>
@@ -1531,7 +1531,7 @@
   <use xlink:href="#X" x="4250" y="800" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="800" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="800" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="850" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="850" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="850" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="850" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="850" width="50" height="50"/>
@@ -1619,7 +1619,7 @@
   <use xlink:href="#X" x="4250" y="850" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="850" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="850" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="900" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="900" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="900" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="900" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="900" width="50" height="50"/>
@@ -1707,7 +1707,7 @@
   <use xlink:href="#X" x="4250" y="900" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="900" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="900" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="950" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="950" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="950" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="950" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="950" width="50" height="50"/>
@@ -1795,7 +1795,7 @@
   <use xlink:href="#X" x="4250" y="950" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="950" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="950" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1000" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1000" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1000" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1000" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="1000" width="50" height="50"/>
@@ -1883,7 +1883,7 @@
   <use xlink:href="#X" x="4250" y="1000" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1000" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1000" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1050" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1050" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1050" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="1050" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="1050" width="50" height="50"/>
@@ -1971,7 +1971,7 @@
   <use xlink:href="#X" x="4250" y="1050" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1050" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1050" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1100" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1100" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1100" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="1100" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1100" width="50" height="50"/>
@@ -2059,7 +2059,7 @@
   <use xlink:href="#X" x="4250" y="1100" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1100" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1100" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1150" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1150" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1150" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="1150" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="1150" width="50" height="50"/>
@@ -2147,7 +2147,7 @@
   <use xlink:href="#X" x="4250" y="1150" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1150" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1150" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1200" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1200" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1200" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1200" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1200" width="50" height="50"/>
@@ -2236,7 +2236,7 @@
   <use xlink:href="#-" x="4300" y="1200" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="1200" width="50" height="50"/>
   <use xlink:href="#A" x="4400" y="1200" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1250" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1250" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1250" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1250" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1250" width="50" height="50"/>
@@ -2325,7 +2325,7 @@
   <use xlink:href="#X" x="4300" y="1250" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1250" width="50" height="50"/>
   <use xlink:href="#0" x="4400" y="1250" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1300" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1300" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1300" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1300" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1300" width="50" height="50"/>
@@ -2413,7 +2413,7 @@
   <use xlink:href="#X" x="4250" y="1300" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1300" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1300" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1350" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1350" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1350" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1350" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1350" width="50" height="50"/>
@@ -2501,7 +2501,7 @@
   <use xlink:href="#X" x="4250" y="1350" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1350" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1350" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1400" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1400" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1400" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1400" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1400" width="50" height="50"/>
@@ -2590,7 +2590,7 @@
   <use xlink:href="#-" x="4300" y="1400" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="1400" width="50" height="50"/>
   <use xlink:href="#A" x="4400" y="1400" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1450" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1450" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1450" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1450" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1450" width="50" height="50"/>
@@ -2679,7 +2679,7 @@
   <use xlink:href="#X" x="4300" y="1450" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1450" width="50" height="50"/>
   <use xlink:href="#1" x="4400" y="1450" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1500" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1500" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1500" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1500" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1500" width="50" height="50"/>
@@ -2767,7 +2767,7 @@
   <use xlink:href="#X" x="4250" y="1500" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1500" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1500" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1550" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1550" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1550" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1550" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1550" width="50" height="50"/>
@@ -2855,7 +2855,7 @@
   <use xlink:href="#X" x="4250" y="1550" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1550" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1550" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1600" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1600" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1600" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1600" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1600" width="50" height="50"/>
@@ -2944,7 +2944,7 @@
   <use xlink:href="#-" x="4300" y="1600" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="1600" width="50" height="50"/>
   <use xlink:href="#A" x="4400" y="1600" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1650" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1650" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1650" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1650" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1650" width="50" height="50"/>
@@ -3121,7 +3121,7 @@
   <use xlink:href="#X" x="4250" y="1700" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1700" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1700" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1750" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1750" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1750" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1750" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1750" width="50" height="50"/>
@@ -3209,7 +3209,7 @@
   <use xlink:href="#X" x="4250" y="1750" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1750" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1750" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1800" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1800" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1800" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1800" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1800" width="50" height="50"/>
@@ -3297,7 +3297,7 @@
   <use xlink:href="#X" x="4250" y="1800" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1800" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1800" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1850" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1850" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1850" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1850" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1850" width="50" height="50"/>
@@ -3385,7 +3385,7 @@
   <use xlink:href="#X" x="4250" y="1850" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1850" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1850" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1900" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1900" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1900" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1900" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1900" width="50" height="50"/>
@@ -3473,7 +3473,7 @@
   <use xlink:href="#X" x="4250" y="1900" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1900" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1900" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="1950" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="1950" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="1950" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="1950" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="1950" width="50" height="50"/>
@@ -3561,7 +3561,7 @@
   <use xlink:href="#X" x="4250" y="1950" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="1950" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="1950" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2000" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2000" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2000" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2000" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="2000" width="50" height="50"/>
@@ -3649,7 +3649,7 @@
   <use xlink:href="#X" x="4250" y="2000" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2000" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2000" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2050" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2050" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2050" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2050" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="2050" width="50" height="50"/>
@@ -3737,7 +3737,7 @@
   <use xlink:href="#X" x="4250" y="2050" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2050" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2050" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2100" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2100" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2100" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="2100" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="2100" width="50" height="50"/>
@@ -3825,7 +3825,7 @@
   <use xlink:href="#X" x="4250" y="2100" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2100" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2100" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2150" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2150" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2150" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="2150" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2150" width="50" height="50"/>
@@ -3913,7 +3913,7 @@
   <use xlink:href="#X" x="4250" y="2150" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2150" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2150" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2200" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2200" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2200" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="2200" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="2200" width="50" height="50"/>
@@ -4001,7 +4001,7 @@
   <use xlink:href="#X" x="4250" y="2200" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2200" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2200" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2250" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2250" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2250" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2250" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2250" width="50" height="50"/>
@@ -4090,7 +4090,7 @@
   <use xlink:href="#-" x="4300" y="2250" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="2250" width="50" height="50"/>
   <use xlink:href="#B" x="4400" y="2250" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2300" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2300" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2300" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2300" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2300" width="50" height="50"/>
@@ -4179,7 +4179,7 @@
   <use xlink:href="#X" x="4300" y="2300" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2300" width="50" height="50"/>
   <use xlink:href="#0" x="4400" y="2300" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2350" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2350" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2350" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2350" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2350" width="50" height="50"/>
@@ -4267,7 +4267,7 @@
   <use xlink:href="#X" x="4250" y="2350" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2350" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2350" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2400" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2400" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2400" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2400" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2400" width="50" height="50"/>
@@ -4355,7 +4355,7 @@
   <use xlink:href="#X" x="4250" y="2400" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2400" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2400" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2450" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2450" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2450" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2450" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2450" width="50" height="50"/>
@@ -4444,7 +4444,7 @@
   <use xlink:href="#-" x="4300" y="2450" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="2450" width="50" height="50"/>
   <use xlink:href="#B" x="4400" y="2450" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2500" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2500" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2500" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2500" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2500" width="50" height="50"/>
@@ -4533,7 +4533,7 @@
   <use xlink:href="#X" x="4300" y="2500" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2500" width="50" height="50"/>
   <use xlink:href="#1" x="4400" y="2500" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2550" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2550" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2550" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2550" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2550" width="50" height="50"/>
@@ -4621,7 +4621,7 @@
   <use xlink:href="#X" x="4250" y="2550" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2550" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2550" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2600" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2600" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2600" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2600" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2600" width="50" height="50"/>
@@ -4709,7 +4709,7 @@
   <use xlink:href="#X" x="4250" y="2600" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2600" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2600" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2650" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2650" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2650" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2650" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2650" width="50" height="50"/>
@@ -4798,7 +4798,7 @@
   <use xlink:href="#-" x="4300" y="2650" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="2650" width="50" height="50"/>
   <use xlink:href="#B" x="4400" y="2650" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2700" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2700" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2700" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2700" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2700" width="50" height="50"/>
@@ -4887,7 +4887,7 @@
   <use xlink:href="#X" x="4300" y="2700" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2700" width="50" height="50"/>
   <use xlink:href="#2" x="4400" y="2700" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2750" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2750" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2750" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2750" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2750" width="50" height="50"/>
@@ -5063,7 +5063,7 @@
   <use xlink:href="#X" x="4250" y="2800" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2800" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2800" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2850" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2850" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2850" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2850" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2850" width="50" height="50"/>
@@ -5151,7 +5151,7 @@
   <use xlink:href="#X" x="4250" y="2850" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2850" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2850" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2900" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2900" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2900" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2900" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2900" width="50" height="50"/>
@@ -5239,7 +5239,7 @@
   <use xlink:href="#X" x="4250" y="2900" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2900" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2900" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="2950" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="2950" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="2950" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="2950" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="2950" width="50" height="50"/>
@@ -5327,7 +5327,7 @@
   <use xlink:href="#X" x="4250" y="2950" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="2950" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2950" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3000" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3000" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3000" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3000" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3000" width="50" height="50"/>
@@ -5415,7 +5415,7 @@
   <use xlink:href="#X" x="4250" y="3000" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3000" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3000" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3050" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3050" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3050" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3050" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3050" width="50" height="50"/>
@@ -5503,7 +5503,7 @@
   <use xlink:href="#X" x="4250" y="3050" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3050" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3050" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3100" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3100" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3100" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3100" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="3100" width="50" height="50"/>
@@ -5591,7 +5591,7 @@
   <use xlink:href="#X" x="4250" y="3100" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3100" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3100" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3150" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3150" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3150" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3150" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="3150" width="50" height="50"/>
@@ -5679,7 +5679,7 @@
   <use xlink:href="#X" x="4250" y="3150" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3150" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3150" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3200" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3200" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3200" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="3200" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="3200" width="50" height="50"/>
@@ -5767,7 +5767,7 @@
   <use xlink:href="#X" x="4250" y="3200" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3200" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3200" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3250" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3250" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3250" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="3250" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3250" width="50" height="50"/>
@@ -5855,7 +5855,7 @@
   <use xlink:href="#X" x="4250" y="3250" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3250" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3250" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3300" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3300" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3300" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="3300" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="3300" width="50" height="50"/>
@@ -5943,7 +5943,7 @@
   <use xlink:href="#X" x="4250" y="3300" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3300" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3300" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3350" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3350" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3350" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3350" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3350" width="50" height="50"/>
@@ -6032,7 +6032,7 @@
   <use xlink:href="#-" x="4300" y="3350" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="3350" width="50" height="50"/>
   <use xlink:href="#C" x="4400" y="3350" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3400" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3400" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3400" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3400" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3400" width="50" height="50"/>
@@ -6121,7 +6121,7 @@
   <use xlink:href="#X" x="4300" y="3400" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3400" width="50" height="50"/>
   <use xlink:href="#0" x="4400" y="3400" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3450" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3450" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3450" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3450" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3450" width="50" height="50"/>
@@ -6209,7 +6209,7 @@
   <use xlink:href="#X" x="4250" y="3450" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3450" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3450" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3500" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3500" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3500" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3500" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3500" width="50" height="50"/>
@@ -6297,7 +6297,7 @@
   <use xlink:href="#X" x="4250" y="3500" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3500" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3500" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3550" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3550" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3550" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3550" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3550" width="50" height="50"/>
@@ -6386,7 +6386,7 @@
   <use xlink:href="#-" x="4300" y="3550" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="3550" width="50" height="50"/>
   <use xlink:href="#C" x="4400" y="3550" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3600" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3600" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3600" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3600" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3600" width="50" height="50"/>
@@ -6475,7 +6475,7 @@
   <use xlink:href="#X" x="4300" y="3600" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3600" width="50" height="50"/>
   <use xlink:href="#1" x="4400" y="3600" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3650" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3650" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3650" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3650" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3650" width="50" height="50"/>
@@ -6563,7 +6563,7 @@
   <use xlink:href="#X" x="4250" y="3650" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3650" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3650" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3700" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3700" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3700" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3700" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3700" width="50" height="50"/>
@@ -6651,7 +6651,7 @@
   <use xlink:href="#X" x="4250" y="3700" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3700" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3700" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3750" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3750" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3750" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3750" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3750" width="50" height="50"/>
@@ -6740,7 +6740,7 @@
   <use xlink:href="#-" x="4300" y="3750" width="50" height="50"/>
   <use xlink:href="#-" x="4350" y="3750" width="50" height="50"/>
   <use xlink:href="#C" x="4400" y="3750" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3800" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3800" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3800" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3800" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3800" width="50" height="50"/>
@@ -6829,7 +6829,7 @@
   <use xlink:href="#X" x="4300" y="3800" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3800" width="50" height="50"/>
   <use xlink:href="#2" x="4400" y="3800" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3850" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3850" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3850" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3850" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3850" width="50" height="50"/>
@@ -6917,7 +6917,7 @@
   <use xlink:href="#-" x="4250" y="3850" width="50" height="50"/>
   <use xlink:href="#X" x="4300" y="3850" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="3850" width="50" height="50"/>
-  <use xlink:href="#%20" x="0" y="3900" width="50" height="50"/>
+  <use xlink:href="#$20" x="0" y="3900" width="50" height="50"/>
   <use xlink:href="#X" x="50" y="3900" width="50" height="50"/>
   <use xlink:href="#X" x="100" y="3900" width="50" height="50"/>
   <use xlink:href="#X" x="150" y="3900" width="50" height="50"/>
