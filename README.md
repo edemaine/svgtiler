@@ -213,11 +213,14 @@ Usage: svgtiler (...options and filenames...)
 
 Optional arguments:
   --help                Show this help message and exit.
+  -m / --margin         Don't delete blank extreme rows/columns
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
+  -P / --png            Convert output SVG files to PNG via Inkscape
+  -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)
 

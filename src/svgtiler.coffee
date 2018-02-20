@@ -565,21 +565,45 @@ extensionMap =
   '.prn': XLSXDrawings   ## Lotus Formatted Text
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
 
-svg2 = (format, svg) ->
+svg2 = (format, svg, sync) ->
+  child_process = require 'child_process'
   filename = path.parse svg
   if filename.ext == ".#{format}"
     filename.base += ".#{format}"
   else
     filename.base = "#{filename.base[...-filename.ext.length]}.#{format}"
   output = path.format filename
-  console.log '=>', output
-  output = require('child_process').spawnSync 'inkscape', [
+  args = [
     '-z'
     "--file=#{svg}"
     "--export-#{format}=#{output}"
   ]
-  if output.error
-    console.error output.error
+  if sync
+    ## In sychronous mode, we let inkscape directly output its error messages,
+    ## and add warnings about any failures that occur.
+    console.log '=>', output
+    output = child_process.spawnSync 'inkscape', args, stdio: 'inherit'
+    if output.error
+      console.log output.error.message
+    else if output.status or output.signal
+      console.log ':-( FAILED'
+  else
+    ## In asychronous mode, we capture inkscape's outputs, and print them only
+    ## when the process has finished, along with which file failed, to avoid
+    ## mixing up messages from parallel executions.
+    (resolve) ->
+      console.log '=>', output
+      inkscape = require('child_process').spawn 'inkscape', args
+      out = ''
+      inkscape.stdout.on 'data', (buf) -> out += buf
+      inkscape.stderr.on 'data', (buf) -> out += buf
+      inkscape.on 'error', (error) ->
+        console.log error.message
+      inkscape.on 'exit', (status, signal) ->
+        if status or signal
+          console.log ":-( #{output} FAILED:"
+          console.log out
+        resolve()
 
 help = ->
   console.log """
@@ -595,6 +619,7 @@ Optional arguments:
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
+  -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)
 
@@ -624,6 +649,8 @@ main = ->
   args = process.argv[2..]
   files = skip = 0
   formats = []
+  jobs = []
+  sync = true
   for arg, i in args
     if skip
       skip--
@@ -643,6 +670,10 @@ main = ->
         formats.push 'pdf'
       when '-P', '--png'
         formats.push 'png'
+      when '-j', '--jobs'
+        jobs = new require('async-limiter') concurrency: parseInt args[i+1]
+        sync = false
+        skip = 1
       else
         files++
         console.log '*', arg
@@ -653,10 +684,10 @@ main = ->
           filenames = input.writeSVG mappings
           for format in formats
             if typeof filenames == 'string'
-              svg2 format, filenames
+              jobs.push svg2 format, filenames, sync
             else
               for filename in filenames
-                svg2 format, filename
+                jobs.push svg2 format, filename, sync
   unless files
     console.log 'Not enough filename arguments'
     help()
