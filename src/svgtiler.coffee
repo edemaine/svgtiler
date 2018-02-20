@@ -1,4 +1,3 @@
-#!/usr/bin/coffee --bare
 `#!/usr/bin/env node
 `
 path = require 'path'
@@ -152,6 +151,7 @@ zeroSizeReplacement = 1
 
 class StaticSymbol extends Symbol
   constructor: (@key, options) ->
+    super()
     for own key, value of options
       @[key] = value
     @xml = new DOMParser().parseFromString @svg
@@ -215,6 +215,7 @@ class StaticSymbol extends Symbol
 
 class DynamicSymbol extends Symbol
   constructor: (@key, @func) ->
+    super()
     @versions = {}
     @nversions = 0
   use: (context) ->
@@ -240,6 +241,7 @@ class Input
 
 class Mapping extends Input
   constructor: (data) ->
+    super()
     @map = {}
     if typeof data == 'function'
       @function = data
@@ -295,7 +297,7 @@ class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   @parse: (data) ->
-    new @ require('coffee-script').eval data
+    new @ require('coffeescript').eval data
 
 class Mappings
   constructor: (@maps = []) ->
@@ -320,6 +322,7 @@ allBlank = (list) ->
 
 class Drawing extends Input
   constructor: (@data) ->
+    super()
   @load: (data) ->
     ## Turn strings into arrays
     data = for row in data
@@ -486,6 +489,7 @@ class TSVDrawing extends DSVDrawing
 class Drawings extends Input
   @filenameSeparator = '_'
   constructor: (@drawings) ->
+    super()
   @load: (datas) ->
     new @ (
       for data in datas

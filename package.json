@@ -28,7 +28,7 @@
     "prepublish": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
   },
   "dependencies": {
-    "coffee-script": "^1.12.6",
+    "coffeescript": "^2.2.1",
     "csv-parse": "^1.2.0",
     "image-size": "^0.6.1",
     "prettify-xml": "^1.2.0",
