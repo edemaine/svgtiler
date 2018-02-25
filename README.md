@@ -232,6 +232,7 @@ Optional arguments:
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
+  --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)

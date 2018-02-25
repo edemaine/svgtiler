@@ -565,6 +565,29 @@ extensionMap =
   '.prn': XLSXDrawings   ## Lotus Formatted Text
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
 
+sanitize = true
+bufferSize = 16*1024
+
+postprocess = (format, filename) ->
+  return unless sanitize
+  try
+    switch format
+      when 'pdf'
+        ## Blank out /CreationDate in PDF for easier version control.
+        ## Replace these commands with spaces to avoid in-file pointer errors.
+        buffer = Buffer.alloc bufferSize
+        fileSize = fs.statSync(filename).size
+        position = Math.max 0, fileSize - bufferSize
+        file = fs.openSync filename, 'r+'
+        readSize = fs.readSync file, buffer, 0, bufferSize, position
+        string = buffer.toString 'binary'  ## must use single-byte encoding!
+        match = /\/CreationDate\s*\((?:[^()\\]|\\[^])*\)/.exec string
+        if match?
+          fs.writeSync file, ' '.repeat(match[0].length), position + match.index
+        fs.closeSync file
+  catch e
+    console.log "Failed to postprocess '#{filename}': #{e}"
+
 svg2 = (format, svg, sync) ->
   child_process = require 'child_process'
   filename = path.parse svg
@@ -582,11 +605,13 @@ svg2 = (format, svg, sync) ->
     ## In sychronous mode, we let inkscape directly output its error messages,
     ## and add warnings about any failures that occur.
     console.log '=>', output
-    output = child_process.spawnSync 'inkscape', args, stdio: 'inherit'
-    if output.error
-      console.log output.error.message
-    else if output.status or output.signal
-      console.log ':-( FAILED'
+    result = child_process.spawnSync 'inkscape', args, stdio: 'inherit'
+    if result.error
+      console.log result.error.message
+    else if result.status or result.signal
+      console.log ":-( #{output} FAILED"
+    else
+      postprocess format, output
   else
     ## In asychronous mode, we capture inkscape's outputs, and print them only
     ## when the process has finished, along with which file failed, to avoid
@@ -603,6 +628,8 @@ svg2 = (format, svg, sync) ->
         if status or signal
           console.log ":-( #{output} FAILED:"
           console.log out
+        else
+          postprocess format, output
         resolve()
 
 help = ->
@@ -619,6 +646,7 @@ Optional arguments:
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
+  --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)
@@ -670,6 +698,8 @@ main = ->
         formats.push 'pdf'
       when '-P', '--png'
         formats.push 'png'
+      when '--no-sanitize'
+        sanitize = false
       when '-j', '--jobs'
         jobs = new require('async-limiter') concurrency: parseInt args[i+1]
         sync = false
