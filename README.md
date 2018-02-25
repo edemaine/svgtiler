@@ -66,7 +66,9 @@ CoffeeScript code, the last line of which should evaluate to either
 The object or function should map a symbol name to either
 
 1. a string of SVG code (detected by the presence of a `<` character),
-2. a filename containing SVG code, or
+2. a filename with `.svg` extension containing SVG code,
+2. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension
+   containing an image, or
 3. a function returning one of the above.
 
 In the last case, the function is called *for each occurrence of the symbol*,
@@ -188,9 +190,19 @@ your `viewBox`es accordingly.
   `<rect x="-5" y="-5" width="10" height="10"/>`
   will create a symbol with `viewBox="-5 -5 10 10"`.
 
-* You can automatically convert all exported SVG files into PDF if you have
-  Inkscape installed, via the `-p` or `--pdf` command-line option.
+* You can automatically convert all exported SVG files into PDF and/or PNG
+  if you have Inkscape installed, via the `-p`/`--pdf` and/or `-P` or `--png`
+  command-line options.
   For example: `svgtiler -p map.coffee drawings.xls`
+  will both `drawings_sheet.svg` and `drawings_sheet.pdf`.
+  PNG conversion is intended for pixel art; see the
+  [examples/tetris/](Tetris example).
+
+* You can speed up Inkscape conversions process on a multithreaded CPU via the
+  `-j`/`--jobs`
+  command-line option.
+  For example, `svgtiler -j 4 -p map.coffee drawings.xls`
+  will run up to four Inkscape jobs at once.
 
 ## Installation
 After [installing Node](https://nodejs.org/en/download/),
