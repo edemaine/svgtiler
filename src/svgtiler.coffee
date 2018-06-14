@@ -689,11 +689,19 @@ main = ->
       when '-m', '--margin'
         Drawing.keepMargins = true
       when '--tw', '--tile-width'
-        Symbol.forceWidth = parseFloat args[i+1]
         skip = 1
+        arg = parseFloat args[i+1]
+        if arg
+          Symbol.forceWidth = arg
+        else
+          console.warn "Invalid argument to --tile-width: #{args[i+1]}"
       when '--th', '--tile-height'
-        Symbol.forceHeight = parseFloat args[i+1]
         skip = 1
+        arg = parseFloat args[i+1]
+        if arg
+          Symbol.forceHeight = arg
+        else
+          console.warn "Invalid argument to --tile-height: #{args[i+1]}"
       when '-p', '--pdf'
         formats.push 'pdf'
       when '-P', '--png'
@@ -701,9 +709,13 @@ main = ->
       when '--no-sanitize'
         sanitize = false
       when '-j', '--jobs'
-        jobs = new require('async-limiter') concurrency: parseInt args[i+1]
-        sync = false
         skip = 1
+        arg = parseInt args[i+1]
+        if arg
+          jobs = new require('async-limiter') concurrency: arg
+          sync = false
+        else
+          console.warn "Invalid argument to --jobs: #{args[i+1]}"
       else
         files++
         console.log '*', arg
