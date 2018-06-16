@@ -1,12 +1,13 @@
 `#!/usr/bin/env node
 `
-path = require 'path'
-fs = require 'fs'
-xmldom = require 'xmldom'
-DOMParser = xmldom.DOMParser
-domImplementation = new xmldom.DOMImplementation()
-XMLSerializer = xmldom.XMLSerializer
-prettyXML = require 'prettify-xml'
+unless window?
+  path = require 'path'
+  fs = require 'fs'
+  xmldom = require 'xmldom'
+  DOMParser = xmldom.DOMParser
+  domImplementation = new xmldom.DOMImplementation()
+  XMLSerializer = xmldom.XMLSerializer
+  prettyXML = require 'prettify-xml'
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -360,7 +361,7 @@ class Drawing extends Input
     console.log '->', filename
     fs.writeFileSync filename, @renderSVG mappings
     filename
-  renderSVG: (mappings) ->
+  renderSVGDOM: (mappings) ->
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
     svg.setAttribute 'xmlns:xlink', XLINKNS
@@ -444,7 +445,9 @@ class Drawing extends Input
     svg.setAttributeNS SVGNS, 'width', viewBox[2]
     svg.setAttributeNS SVGNS, 'height', viewBox[3]
     svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
-    out = new XMLSerializer().serializeToString doc
+    doc
+  renderSVG: (mappings) ->
+    out = new XMLSerializer().serializeToString @renderSVGDOM mappings
     ## Parsing xlink:href in user's SVG fragments, and then serializing,
     ## can lead to these null namespace definitions.  Remove.
     out = out.replace /\sxmlns:xlink=""/g, ''
@@ -733,6 +736,12 @@ main = ->
   unless files
     console.log 'Not enough filename arguments'
     help()
+
+exports =
+  Symbol: Symbol
+  Drawing: Drawing
+module?.exports ?= exports
+window?.svgtiler ?= exports
 
 unless window?
   main()
