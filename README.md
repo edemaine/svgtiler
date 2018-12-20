@@ -29,7 +29,8 @@ svgtiler map1.txt map2.coffee drawing.asc drawings.xls
 ```
 
 will generate drawing.svg using the mappings in `map1.txt` and `map2.coffee`,
-and will generate `drawings_<sheet>.svg` for each sheet in `drawings.xlsx`.
+and will generate `drawings_<sheet>.svg` for each unhidden sheet in
+`drawings.xlsx`.
 
 ## Mapping Files: .txt, .js, .coffee
 
@@ -138,6 +139,8 @@ The **.xlsx, .xlsm, .xlsb, .xls** (Microsoft Excel),
 from spreadsheet software.  This format is special in that it supports
 multiple sheets in one file.  In this case, the output SVG files have
 filenames distinguished by an underscore followed by the sheet name.
+By default, **hidden** sheets are ignored, making it easy to "deprecate" old
+drafts, but if you prefer, you can process hidden sheets via `--hidden`.
 
 ## Layout Algorithm
 
