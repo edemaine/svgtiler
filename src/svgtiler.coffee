@@ -521,8 +521,13 @@ class XLSXDrawings extends Drawings
     workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
     @load (
-      for subname in workbook.SheetNames
+      for sheetInfo in workbook.Workbook.Sheets
+        subname = sheetInfo.name
         sheet = workbook.Sheets[subname]
+        ## 0 = Visible, 1 = Hidden, 2 = Very Hidden
+        ## https://sheetjs.gitbooks.io/docs/#sheet-visibility
+        if sheetInfo.Hidden and not Drawings.keepHidden
+          continue
         if subname.length == 31
           console.warn "Warning: Sheet '#{subname}' has length exactly 31, which may be caused by Google Sheets export truncation"
         rows = xlsx.utils.sheet_to_json sheet,
@@ -643,6 +648,7 @@ Documentation: https://github.com/edemaine/svgtiler#svg-tiler
 Optional arguments:
   --help                Show this help message and exit.
   -m / --margin         Don't delete blank extreme rows/columns
+  --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
@@ -691,6 +697,8 @@ main = ->
         help()
       when '-m', '--margin'
         Drawing.keepMargins = true
+      when '--hidden'
+        Drawings.keepHidden = true
       when '--tw', '--tile-width'
         skip = 1
         arg = parseFloat args[i+1]
