@@ -451,11 +451,13 @@ class Drawing extends Input
     ## Parsing xlink:href in user's SVG fragments, and then serializing,
     ## can lead to these null namespace definitions.  Remove.
     out = out.replace /\sxmlns:xlink=""/g, ''
+    out = prettyXML out,
+      newline: '\n'  ## force consistent line endings, not require('os').EOL
     '''
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
-''' + prettyXML out
+''' + out
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
