@@ -155,7 +155,20 @@ class StaticSymbol extends Symbol
     super()
     for own key, value of options
       @[key] = value
-    @xml = new DOMParser().parseFromString @svg
+    @xml = new DOMParser
+      locator:  ## needed when specifying errorHandler
+        line: 1
+        col: 1
+      errorHandler: (level, msg, indent = '  ') =>
+        msg = msg.replace /^\[xmldom [^\[\]]*\]\t/, ''
+        msg = msg.replace /@#\[line:(\d+),col:(\d+)\]$/, (match, line, col) =>
+          lines = @svg.split '\n'
+          (if line > 1 then indent + lines[line-2] + '\n' else '') +
+          indent + lines[line-1] + '\n' +
+          indent + ' '.repeat(col-1) + '^^^' +
+          (if line < lines.length then '\n' + indent + lines[line] else '')
+        console.error "SVG parse ${level} in symbol '#{@key}': #{msg}"
+    .parseFromString @svg
     @viewBox = svgBBox @xml
     @overflowBox = overflowBox @xml
     @width = @height = null
