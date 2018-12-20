@@ -25,15 +25,15 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "prepublish": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
+    "prepare": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
   },
   "dependencies": {
     "async-limiter": "^1.0.0",
     "coffeescript": "^2.2.1",
-    "csv-parse": "^1.2.0",
+    "csv-parse": "^4.2.0",
     "image-size": "^0.6.1",
     "prettify-xml": "^1.2.0",
-    "xlsx": "^0.10.6",
+    "xlsx": "^0.14.1",
     "xmldom": "^0.1.22"
   },
   "devDependencies": {}
