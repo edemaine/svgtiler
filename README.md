@@ -199,7 +199,7 @@ your `viewBox`es accordingly.
   For example: `svgtiler -p map.coffee drawings.xls`
   will both `drawings_sheet.svg` and `drawings_sheet.pdf`.
   PNG conversion is intended for pixel art; see the
-  [examples/tetris/](Tetris example).
+  [Tetris example](examples/tetris/).
 
 * You can speed up Inkscape conversions process on a multithreaded CPU via the
   `-j`/`--jobs`
