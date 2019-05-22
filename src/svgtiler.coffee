@@ -234,6 +234,8 @@ class DynamicSymbol extends Symbol
     @nversions = 0
   use: (context) ->
     result = @func.call context
+    unless result?
+      throw new Error "Function for symbol #{@key} returned #{result}"
     if result of @versions
       @versions[result]
     else
@@ -389,7 +391,7 @@ class Drawing extends Input
           unless symbol?
             missing[cell] = true
           symbol
-    missing =("'#{key}'" for own key of missing)
+    missing = ("'#{key}'" for own key of missing)
     if missing.length
       console.warn "Failed to recognize symbols:", missing.join ', '
     ## Instantiate (.use) all (dynamic) symbols in the drawing.
