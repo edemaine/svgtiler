@@ -412,7 +412,7 @@ class Drawing extends Input
       if symbol.xml.documentElement.tagName in ['svg', 'symbol']
         ## Remove a layer of indirection for <svg> and <symbol>
         for attribute in symbol.xml.documentElement.attributes
-          unless attribute.name in ['version'] or attribute.name[...5] == 'xmlns'
+          unless attribute.name in ['version', 'id'] or attribute.name[...5] == 'xmlns'
             node.setAttribute attribute.name, attribute.value
         for child in symbol.xml.documentElement.childNodes
           node.appendChild child.cloneNode true
