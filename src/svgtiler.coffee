@@ -123,7 +123,9 @@ class Symbol
     else
       new StaticSymbol key,
         if typeof data == 'string'
-          if data.indexOf('<') < 0  ## No <'s -> interpret as filename
+          if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
+            svg: '<symbol viewBox="0 0 0 0"/>'
+          else if data.indexOf('<') < 0  ## No <'s -> interpret as filename
             extension = extensionOf data
             ## <image> tag documentation: "Conforming SVG viewers need to
             ## support at least PNG, JPEG and SVG format files."
