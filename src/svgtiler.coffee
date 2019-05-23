@@ -325,14 +325,8 @@ class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
-    ## Mimick NodeJS module's __filename and __dirname variables
-    __filename = path.resolve @filename
-    data = """
-      __filename = #{JSON.stringify __filename}
-      __dirname = #{JSON.stringify path.dirname __filename}
-      #{data}
-    """
-    @load require('coffeescript').eval data
+    @load require('coffeescript').eval data,
+      filename: path.resolve @filename
 
 class Mappings
   constructor: (@maps = []) ->
