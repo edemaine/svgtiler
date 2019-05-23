@@ -324,8 +324,27 @@ class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
-    @load require('coffeescript').eval data,
-      filename: path.resolve @filename
+    try
+      @load require('coffeescript').eval data,
+        filename: @filename
+        sourceFiles: [@filename]
+        inlineMap: true
+    catch err
+      if err.stack? and err.stack.startsWith "#{@filename}:"
+        sourceMap = require('coffeescript').compile(data,
+          bare: true
+          filename: @filename
+          sourceFiles: [@filename]
+          sourceMap: true
+        ).sourceMap
+        err.stack = err.stack.replace /:([0-9]*)/, (m, line) ->
+          ## sourceMap starts line numbers at 0, but we want to work from 1
+          for col in sourceMap?.lines[line-1]?.columns ? [] when col?.sourceLine?
+            unless sourceLine? and sourceLine < col.sourceLine
+              sourceLine = col.sourceLine
+              line = sourceLine + 1
+          ":#{line}"
+      throw err
 
 class Mappings
   constructor: (@maps = []) ->
