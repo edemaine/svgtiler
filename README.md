@@ -99,6 +99,9 @@ the following properties:
 * `this.column(dj = 0)` returns an array of `Context` objects, one for each
   symbol in column `j + dj`.
 
+Like regular NodeJS modules, .js and .coffee files can access `__dirname`
+and `__filename`, e.g., to use paths relative to the mapping file.
+
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
 The **.asc format** for drawing files represents traditional ASCII art:
