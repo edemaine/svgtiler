@@ -314,11 +314,10 @@ class JSMapping extends Mapping
   parse: (data) ->
     ## Mimick NodeJS module's __filename and __dirname variables
     __filename = path.resolve @filename
-    data = """
-      let __filename = #{JSON.stringify __filename};
-      let __dirname = #{JSON.stringify path.dirname __filename};
-      #{data}
-    """
+    data =
+      "var __filename = #{JSON.stringify __filename},
+           __dirname = #{JSON.stringify path.dirname __filename};
+       #{data}\n//@ sourceURL=#{@filename}"
     @load eval data
 
 class CoffeeMapping extends Mapping
