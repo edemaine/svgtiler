@@ -246,11 +246,14 @@ class DynamicSymbol extends Symbol
 class Input
   @encoding: 'utf8'
   @parseFile: (filename) ->
-    input = @parse fs.readFileSync filename,
-      encoding: @encoding
+    ## Generic method to parse file once we're already in the right class.
+    input = new @
     input.filename = filename
+    input.parse fs.readFileSync filename,
+      encoding: @encoding
     input
-  @load: (filename) ->
+  @recognize: (filename) ->
+    ## Recognize type of file and call corresponding class's `parseFile`.
     extension = extensionOf filename
     if extension of extensionMap
       extensionMap[extension].parseFile filename
@@ -258,8 +261,7 @@ class Input
       throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
 class Mapping extends Input
-  constructor: (data) ->
-    super()
+  load: (data) ->
     @map = {}
     if typeof data == 'function'
       @function = data
@@ -289,7 +291,7 @@ class Mapping extends Input
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
   @help: "Each line is <symbol-name><space><raw SVG or filename.svg>"
-  @parse: (data) ->
+  parse: (data) ->
     map = {}
     for line in splitIntoLines data
       separator = whitespace.exec line
@@ -304,19 +306,19 @@ class ASCIIMapping extends Mapping
       else
         key = line[...separator.index]
       map[key] = line[separator.index + separator[0].length..]
-    new @ map
+    @load map
 
 class JSMapping extends Mapping
   @title: "JavaScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
-  @parse: (data) ->
-    new @ eval data
+  parse: (data) ->
+    @load eval data
 
 class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
-  @parse: (data) ->
-    new @ require('coffeescript').eval data
+  parse: (data) ->
+    @load require('coffeescript').eval data
 
 class Mappings
   constructor: (@maps = []) ->
@@ -340,9 +342,7 @@ allBlank = (list) ->
   true
 
 class Drawing extends Input
-  constructor: (@data) ->
-    super()
-  @load: (data) ->
+  load: (data) ->
     ## Turn strings into arrays
     data = for row in data
              for cell in row
@@ -366,7 +366,7 @@ class Drawing extends Input
             if j < row.length
               row.pop()
           j--
-    new @ data
+    @data = data
   writeSVG: (mappings, filename) ->
     ## Default filename is the input filename with extension replaced by .svg
     unless filename?
@@ -479,11 +479,11 @@ class Drawing extends Input
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
-  @parse: (data) ->
+  parse: (data) ->
     @load splitIntoLines data
 
 class DSVDrawing extends Drawing
-  @parse: (data) ->
+  parse: (data) ->
     ## Remove trailing newline / final blank line.
     if data[-2..] == '\r\n'
       data = data[...-2]
@@ -497,7 +497,7 @@ class DSVDrawing extends Drawing
 class SSVDrawing extends DSVDrawing
   @title: "Space-delimiter drawing (one word per symbol)"
   @delimiter: ' '
-  @parse: (data) ->
+  parse: (data) ->
     ## Coallesce non-newline whitespace into single space
     super data.replace /[ \t\f\v]+/g, ' '
 
@@ -511,15 +511,13 @@ class TSVDrawing extends DSVDrawing
 
 class Drawings extends Input
   @filenameSeparator = '_'
-  constructor: (@drawings) ->
-    super()
-  @load: (datas) ->
-    new @ (
+  load: (datas) ->
+    @drawings =
       for data in datas
-        drawing = Drawing.load data
+        drawing = new Drawing
         drawing.subname = data.subname
+        drawing.load data
         drawing
-    )
   writeSVG: (mappings, filename) ->
     for drawing in @drawings
       drawing.writeSVG mappings,
@@ -536,7 +534,7 @@ class Drawings extends Input
 class XLSXDrawings extends Drawings
   @encoding: 'binary'
   @title: "Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)"
-  @parse: (data) ->
+  parse: (data) ->
     xlsx = require 'xlsx'
     workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
@@ -750,7 +748,7 @@ main = ->
       else
         files++
         console.log '*', arg
-        input = Input.load arg
+        input = Input.recognize arg
         if input instanceof Mapping
           mappings.push input
         else if input instanceof Drawing or input instanceof Drawings
