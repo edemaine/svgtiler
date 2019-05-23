@@ -271,6 +271,7 @@ class Mapping extends Input
         value = Symbol.parse key, value
       @map[key] = value
   lookup: (key) ->
+    key = key.toString()  ## Sometimes get a number, e.g., from XLSX
     if key of @map
       @map[key]
     else if @function?
