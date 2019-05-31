@@ -117,6 +117,12 @@ O   O
  OOO
 ```
 
+`.asc` files can include Unicode characters encoded in UTF8.
+In this case, a single "character" is defined as a full "Unicode grapheme"
+(according to [UAX #29](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundary_Rules), via the [grapheme-splitter library](https://github.com/orling/grapheme-splitter)),
+such as 👍🏽.
+See [an example with Unicode](examples/unicode).
+
 The **.ssv, .csv, and .tsv formats** use
 [delimiter-separated values (DSV)](https://en.wikipedia.org/wiki/Delimiter-separated_values)
 to specify an array of symbol names.  In particular,
