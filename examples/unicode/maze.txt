@@ -1,0 +1,4 @@
+  <symbol viewBox="-10 -10 20 20"></symbol>
+█ <rect width="20" height="20" stroke="black" fill="purple"/>
+😊 <symbol viewBox="-10 -10 20 20"><circle r="5" fill="red"/></symbol>
+👍🏽 <symbol viewBox="-10 -10 20 20"><line x1="-5" y1="-5" x2="5" y2="5" stroke="green"/><line x1="-5" y1="5" x2="5" y2="-5" stroke="green"/></symbol>

@@ -1,7 +1,7 @@
 {
   "name": "svgtiler",
   "description": "Tool for drawing diagrams on a grid, combining grids of SVGs into a big SVG figure",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/edemaine/svg-tiler.git"
@@ -31,6 +31,7 @@
     "async-limiter": "^1.0.0",
     "coffeescript": "^2.2.1",
     "csv-parse": "^4.2.0",
+    "grapheme-splitter": "^1.0.4",
     "image-size": "^0.6.1",
     "prettify-xml": "^1.2.0",
     "xlsx": "^0.14.1",

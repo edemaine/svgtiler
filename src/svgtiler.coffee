@@ -8,6 +8,7 @@ unless window?
   domImplementation = new xmldom.DOMImplementation()
   XMLSerializer = xmldom.XMLSerializer
   prettyXML = require 'prettify-xml'
+  graphemeSplitter = new require('grapheme-splitter')()
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -506,7 +507,10 @@ class Drawing extends Input
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
   parse: (data) ->
-    @load splitIntoLines data
+    @load(
+      for line in splitIntoLines data
+        graphemeSplitter.splitGraphemes line
+    )
 
 class DSVDrawing extends Drawing
   parse: (data) ->
