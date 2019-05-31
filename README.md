@@ -107,7 +107,7 @@ and `__filename`, e.g., to use paths relative to the mapping file.
 The **.asc format** for drawing files represents traditional ASCII art:
 each non-newline character represents a one-character symbol name.
 For example, here is a simple 5 &times; 5 ASCII drawing using symbols
-`O` and ` ` (space):
+`O` and ` `&nbsp;(space):
 
 ```
  OOO
@@ -117,7 +117,7 @@ O   O
  OOO
 ```
 
-`.asc` files can include Unicode characters encoded in UTF8.
+.asc files can include Unicode characters encoded in UTF8.
 In this case, a single "character" is defined as a full "Unicode grapheme"
 (according to [UAX #29](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundary_Rules), via the [grapheme-splitter library](https://github.com/orling/grapheme-splitter)),
 such as 👍🏽.
