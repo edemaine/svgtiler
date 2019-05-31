@@ -1,4 +1,4 @@
   <symbol viewBox="-10 -10 20 20"></symbol>
-█ <rect width="20" height="20" stroke="black" fill="purple"/>
-😊 <symbol viewBox="-10 -10 20 20"><circle r="5" fill="red"/></symbol>
-👍🏽 <symbol viewBox="-10 -10 20 20"><line x1="-5" y1="-5" x2="5" y2="5" stroke="green"/><line x1="-5" y1="5" x2="5" y2="-5" stroke="green"/></symbol>
+█ <symbol viewBox="0 0 20 20" overflowBox="-0.5 -0.5 21 21" style="overflow: visible"><rect width="20" height="20" stroke="black" fill="purple"/></symbol>
+😊 <symbol viewBox="-10 -10 20 20"><circle r="6" fill="red"/><circle cx="-2" cy="-2" r="1" fill="white"/><circle cx="2" cy="-2" r="1" fill="white"/><path d="M -3 1 Q 0 4, 3 1" fill="none" stroke="white"/></symbol>
+👍🏽 <symbol viewBox="-10 -10 20 20"><line x1="-5" y1="-5" x2="5" y2="5" stroke="green" stroke-width="2" stroke-linecap="round"/><line x1="-5" y1="5" x2="5" y2="-5" stroke="green" stroke-width="2" stroke-linecap="round"/></symbol>
