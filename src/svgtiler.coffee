@@ -521,7 +521,7 @@ class DSVDrawing extends Drawing
       data = data[...-1]
     ## CSV parser.
     @load require('csv-parse/lib/sync') data,
-      delimiter: @delimiter
+      delimiter: @constructor.delimiter
       relax_column_count: true
 
 class SSVDrawing extends DSVDrawing
