@@ -175,13 +175,15 @@ your `viewBox`es accordingly.
   then instantiated (via SVG's `<use>`) many times,
   resulting in relatively small and efficient SVG outputs.
 
-* [z-index](https://svgwg.org/svg2-draft/render.html#ZIndexProperty)
+* [z-index](https://www.w3.org/TR/2016/CR-SVG2-20160915/render.html#ZIndexProperty)
   support on symbols defined by mapping files, even though output is
   SVG 1.1 (which does not support z-index): symbol uses get re-ordered to
   simulate the correct z order.  For example,
-  `<symbol viewBox="0 0 10 10" style="z-index: 2">...</symbol>`
+  `<symbol viewBox="0 0 10 10" z-index="2">...</symbol>`
   will be rendered on top of (later than) all symbols without a
-  `style="z-index:..."` specification (which default to a z-index of 0).
+  `z-index="..."` specification (which default to a z-index of 0).
+  You can use a `z-index="..."` property or an HTML-style
+  `style="z-index: ..."` property.
 
 * Symbols can draw beyond their `viewBox` via `style="overflow: visible"`
   (as in normal SVG).  Furthermore, the `viewBox` of the overall output

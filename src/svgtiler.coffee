@@ -94,6 +94,13 @@ svgBBox = (xml) ->
       viewBox
 
 zIndex = (node) ->
+  ## Check whether DOM node has a specified z-index, defaulting to zero.
+  ## Note that z-index must be an integer.
+  ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
+  ## a z-index="..." attribute.  Check for this first.
+  if z = node.getAttribute 'z-index'
+    return parseInt z
+  ## 2. Look for style="z-index:..." as in HTML.
   style = node.getAttribute 'style'
   return 0 unless style
   match = /(?:^|\W)z-index\s*:\s*([-\d]+)/i.exec style

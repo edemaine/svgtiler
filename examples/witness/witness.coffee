@@ -5,19 +5,19 @@ pathColor = '#d3ac0d'
 ## https://github.com/thefifthmatt/windmill-client/blob/master/src/windmill.soy
 
 horizontal = """
-  <symbol viewBox="10 -10 80 20" style="overflow: visible; z-index: ZZZ">
+  <symbol viewBox="10 -10 80 20" style="overflow: visible" z-index="ZZZ">
     <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
 vertical = """
-  <symbol viewBox="-10 10 20 80" style="overflow: visible; z-index: ZZZ">
+  <symbol viewBox="-10 10 20 80" style="overflow: visible" z-index="ZZZ">
     <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="COLOR"/>
   </symbol>
 """
 
 dot = (solution) -> -> ## dynamic symbol
-  s = '<symbol viewBox="-10 -10 20 20" style="z-index: ZZZ">'
+  s = '<symbol viewBox="-10 -10 20 20" z-index="ZZZ">'
   #console.log @neighbor(-1,0).includes('-'), @neighbor(+1,0).includes('-'),
   #            @neighbor(0,-1).includes('|'), @neighbor(0,+1).includes('|')
   if (@neighbor(-1,0).includes('-') and @neighbor(+1,0).includes('-')) or
@@ -69,7 +69,7 @@ blank = ->
 
 start = (solution) -> ->
   s = """
-    <symbol viewBox="-10 -10 20 20" overflowBox="-25 -25 50 50" style="overflow: visible; z-index: 2">
+    <symbol viewBox="-10 -10 20 20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
       <circle cx="0" cy="0" r="25" fill="COLOR" />
   """
   if @neighbor(-1,0).includes('-s') + @neighbor(+1,0).includes('-s') +
