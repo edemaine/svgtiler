@@ -1,6 +1,7 @@
 # Automatic Width/Height Tile Test
 
-Input:
+## Input:
+
 * [ASCII mapping file](auto.txt)
 * [ASCII art](grid.asc)
 
@@ -14,11 +15,13 @@ Input:
 +-+-+X+
 ```
 
-Output: [SVG](grid.svg)
+## Output:
+
+[SVG](grid.svg)
 
 ![maze](grid.svg)
 
-Symbol behavior:
+## Symbol behavior:
 
 * `+`, `-`, and `|` symbols (the rectangles) have specified dimensions
   (to form a grid)
