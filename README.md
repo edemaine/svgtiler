@@ -230,7 +230,19 @@ your `viewBox`es accordingly.
   For example, `svgtiler -j 4 -p map.coffee drawings.xls`
   will run up to four Inkscape jobs at once.
 
+## Examples
+
+Games
+* [Tetris](examples/tetris)
+* [The Witness](examples/witness)
+* [Tilt](examples/witness)
+
+Demos
+* [Auto width/height](examples/auto)
+* [Unicode](examples/unicode)
+
 ## Installation
+
 After [installing Node](https://nodejs.org/en/download/),
 you can install this tool via
 
