@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="220" height="220" preserveAspectRatio="xMinYMin meet">
+  <symbol id="1" viewBox="-40,-40,80,80">
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(0,0)"/>
+  </symbol>
+  <symbol id="2" viewBox="-40,-40,80,80">
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(-10,0)"/>
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(10,0)"/>
+  </symbol>
+  <symbol id="3" viewBox="-40,-40,80,80">
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(-20,0)"/>
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(0,0)"/>
+    <polygon fill="orange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(20,0)"/>
+  </symbol>
+  <symbol id=".s-v6" viewBox="-10,-10,20,20" z-index="3">
+    <circle x="0" y="0" r="10" fill="black"/>
+    <rect x="0" y="-10" width="10" height="20" fill="black"/>
+    <rect x="-10" y="0" width="20" height="10" fill="black"/>
+    <circle x="0" y="0" r="10" fill="#d3ac0d"/>
+    <rect x="0" y="-10" width="10" height="20" fill="#d3ac0d"/>
+    <rect x="-10" y="0" width="20" height="10" fill="#d3ac0d"/>
+  </symbol>
+  <symbol id="-s" viewBox="10,-10,80,20" style="overflow: visible" z-index="4">
+    <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="#d3ac0d"/>
+  </symbol>
+  <symbol id=".s-v7" viewBox="-10,-10,20,20" z-index="3">
+    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
+    <circle x="0" y="0" r="10" fill="#d3ac0d"/>
+    <rect x="-10" y="-10" width="10" height="20" fill="#d3ac0d"/>
+    <rect x="-10" y="0" width="20" height="10" fill="#d3ac0d"/>
+  </symbol>
+  <symbol id="-" viewBox="10,-10,80,20" style="overflow: visible" z-index="1">
+    <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="black"/>
+  </symbol>
+  <symbol id=".-v2" viewBox="-10,-10,20,20" z-index="0">
+    <circle x="0" y="0" r="10" fill="black"/>
+    <rect x="-10" y="-10" width="10" height="20" fill="black"/>
+    <rect x="-10" y="0" width="20" height="10" fill="black"/>
+  </symbol>
+  <symbol id="$7Cs" viewBox="-10,10,20,80" style="overflow: visible" z-index="4">
+    <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="#d3ac0d"/>
+  </symbol>
+  <symbol id="$7C" viewBox="-10,10,20,80" style="overflow: visible" z-index="1">
+    <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="black"/>
+  </symbol>
+  <symbol id=".s-v8" viewBox="-10,-10,20,20" z-index="3">
+    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
+    <circle x="0" y="0" r="10" fill="#d3ac0d"/>
+    <rect x="-10" y="-10" width="20" height="10" fill="#d3ac0d"/>
+  </symbol>
+  <symbol id=".s-v9" viewBox="-10,-10,20,20" z-index="3">
+    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
+    <circle x="0" y="0" r="10" fill="#d3ac0d"/>
+    <rect x="0" y="-10" width="10" height="20" fill="#d3ac0d"/>
+    <rect x="-10" y="-10" width="20" height="10" fill="#d3ac0d"/>
+  </symbol>
+  <symbol id=".s-v5" viewBox="-10,-10,20,20" z-index="3">
+    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
+    <circle x="0" y="0" r="10" fill="#d3ac0d"/>
+    <rect x="-10" y="-10" width="10" height="20" fill="#d3ac0d"/>
+  </symbol>
+  <symbol id="-v0" viewBox="0,0,80,80"/>
+  <symbol id=".-v3" viewBox="-10,-10,20,20" z-index="0">
+    <circle x="0" y="0" r="10" fill="black"/>
+    <rect x="0" y="-10" width="10" height="20" fill="black"/>
+    <rect x="-10" y="-10" width="20" height="10" fill="black"/>
+  </symbol>
+  <symbol id=".-v1" viewBox="-10,-10,20,20" z-index="0">
+    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
+  </symbol>
+  <symbol id=".-v4" viewBox="-10,-10,20,20" z-index="0">
+    <circle x="0" y="0" r="10" fill="black"/>
+    <rect x="-10" y="-10" width="10" height="20" fill="black"/>
+    <rect x="-10" y="-10" width="20" height="10" fill="black"/>
+  </symbol>
+  <use xlink:href="#.-v2" x="200" y="0" width="20" height="20"/>
+  <use xlink:href="#3" x="20" y="20" width="80" height="80"/>
+  <use xlink:href="#2" x="120" y="20" width="80" height="80"/>
+  <use xlink:href="#-v0" x="20" y="120" width="80" height="80"/>
+  <use xlink:href="#1" x="120" y="120" width="80" height="80"/>
+  <use xlink:href="#.-v3" x="0" y="200" width="20" height="20"/>
+  <use xlink:href="#.-v1" x="100" y="200" width="20" height="20"/>
+  <use xlink:href="#.-v4" x="200" y="200" width="20" height="20"/>
+  <use xlink:href="#-" x="120" y="0" width="80" height="20"/>
+  <use xlink:href="#$7C" x="200" y="20" width="20" height="80"/>
+  <use xlink:href="#-" x="20" y="100" width="80" height="20"/>
+  <use xlink:href="#$7C" x="0" y="120" width="20" height="80"/>
+  <use xlink:href="#$7C" x="100" y="120" width="20" height="80"/>
+  <use xlink:href="#$7C" x="200" y="120" width="20" height="80"/>
+  <use xlink:href="#-" x="20" y="200" width="80" height="20"/>
+  <use xlink:href="#-" x="120" y="200" width="80" height="20"/>
+  <use xlink:href="#.s-v6" x="0" y="0" width="20" height="20"/>
+  <use xlink:href="#.s-v7" x="100" y="0" width="20" height="20"/>
+  <use xlink:href="#.s-v8" x="0" y="100" width="20" height="20"/>
+  <use xlink:href="#.s-v9" x="100" y="100" width="20" height="20"/>
+  <use xlink:href="#.s-v5" x="200" y="100" width="20" height="20"/>
+  <use xlink:href="#-s" x="20" y="0" width="80" height="20"/>
+  <use xlink:href="#$7Cs" x="0" y="20" width="20" height="80"/>
+  <use xlink:href="#$7Cs" x="100" y="20" width="20" height="80"/>
+  <use xlink:href="#-s" x="120" y="100" width="80" height="20"/>
+</svg>
