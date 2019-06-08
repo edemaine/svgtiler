@@ -181,6 +181,9 @@ class StaticSymbol extends Symbol
     .parseFromString @svg
     @viewBox = svgBBox @xml
     @overflowBox = overflowBox @xml
+    @overflowVisible =
+      @xml.documentElement.hasAttribute('style') and
+      /overflow\s*:\s*visible/.test @xml.documentElement.getAttribute 'style'
     @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
@@ -190,8 +193,7 @@ class StaticSymbol extends Symbol
       or <height>] disables rendering of the element."  Avoid this.
       [https://www.w3.org/TR/SVG11/coords.html#ViewBoxAttribute]
       ###
-      if @xml.documentElement.hasAttribute('style') and
-         /overflow\s*:\s*visible/.test @xml.documentElement.getAttribute('style')
+      if @overflowVisible
         if @width == 0
           @viewBox[2] = zeroSizeReplacement
         if @height == 0
