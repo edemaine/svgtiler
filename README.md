@@ -198,6 +198,18 @@ your `viewBox`es accordingly.
   Even zero-width and zero-height symbols will get rendered when
   `style="overflow: visible"` is specified, by overriding `viewBox`.
 
+* Symbols can specify `width="auto"` and/or `height="auto"` to make their
+  instantiated width and/or height match their column and/or row,
+  respectively.  In this way, multiple uses of the same symbol can appear
+  as different sizes.  See the [auto sizing example](examples/auto).
+  If you want to nonuniformly scale the tile, you may want to also adjust
+  the symbol's [preserveAspectRatio](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
+
+* Any undefined symbol displays as a red-on-yellow diamond question mark
+  (like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
+  with automatic width and height, so that it's easy to spot.
+  See the [auto sizing example](examples/auto).
+
 * Very limited automatic `viewBox` setting via bounding box computation
   (but see the code for many SVG features not supported).
   For example, the SVG

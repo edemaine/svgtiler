@@ -93,6 +93,10 @@ svgBBox = (xml) ->
     else
       viewBox
 
+isAuto = (xml, prop) ->
+  xml.documentElement.hasAttribute(prop) and
+  /^\s*auto\s*$/i.test xml.documentElement.getAttribute prop
+
 zIndex = (node) ->
   ## Check whether DOM node has a specified z-index, defaulting to zero.
   ## Note that z-index must be an integer.
@@ -211,6 +215,12 @@ class StaticSymbol extends Symbol
       @height = 0 unless @height?
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
+    ## Detect special `width="auto"` and/or `height="auto"` fields for future
+    ## processing, and remove them to ensure valid SVG.
+    @autoWidth = isAuto @xml, 'width'
+    @autoHeight = isAuto @xml, 'height'
+    @xml.documentElement.removeAttribute 'width' if @autoWidth
+    @xml.documentElement.removeAttribute 'height' if @autoHeight
     @zIndex = zIndex @xml.documentElement
   id: ->
     ###
@@ -252,6 +262,16 @@ class DynamicSymbol extends Symbol
       @versions[result]
     else
       @versions[result] = Symbol.parse "#{@key}-v#{@nversions++}", result
+
+## Symbol to fall back to when encountering an unrecognized symbol.
+## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
+## by Amit6, released into the public domain.
+unrecognizedSymbol = new StaticSymbol 'UNRECOGNIZED', svg: '''
+  <symbol viewBox="0 0 200 200" preserveAspectRatio="none" width="auto" height="auto">
+    <rect width="200" height="200" fill="yellow"/>
+    <path xmlns="http://www.w3.org/2000/svg" stroke="none" fill="red" d="M 200,100 100,200 0,100 100,0 200,100 z M 135.64709,74.70585 q 0,-13.52935 -10.00006,-22.52943 -9.99999,-8.99999 -24.35289,-8.99999 -17.29415,0 -30.117661,5.29409 L 69.05879,69.52938 q 9.764731,-6.23528 21.52944,-6.23528 8.82356,0 14.58824,4.82351 5.76469,4.82351 5.76469,12.70589 0,8.5883 -9.94117,21.70588 -9.94117,13.11766 -9.94117,26.76473 l 17.88236,0 q 0,-6.3529 6.9412,-14.9412 11.76471,-14.58816 12.82351,-16.35289 6.9412,-11.05887 6.9412,-23.29417 z m -22.00003,92.11771 0,-24.70585 -27.29412,0 0,24.70585 27.29412,0 z"/>
+  </symbol>
+'''
 
 class Input
   @encoding: 'utf8'
@@ -427,9 +447,11 @@ class Drawing extends Input
       for row in @data
         for cell in row
           symbol = mappings.lookup cell
-          unless symbol?
+          if symbol?
+            lastSymbol = symbol
+          else
             missing[cell] = true
-          symbol
+            unrecognizedSymbol
     missing = ("'#{key}'" for own key of missing)
     if missing.length
       console.warn "Failed to recognize symbols:", missing.join ', '
@@ -462,8 +484,12 @@ class Drawing extends Input
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
     levels = {}
     y = 0
+    colWidths = {}
     for row, i in symbols
       rowHeight = 0
+      for symbol in row when not symbol.autoHeight
+        if symbol.height > rowHeight
+          rowHeight = symbol.height
       x = 0
       for symbol, j in row
         continue unless symbol?
@@ -472,19 +498,32 @@ class Drawing extends Input
         use.setAttribute 'xlink:href', '#' + symbol.id()
         use.setAttributeNS SVGNS, 'x', x
         use.setAttributeNS SVGNS, 'y', y
-        use.setAttributeNS SVGNS, 'width', symbol.viewBox?[2] ? symbol.width
-        use.setAttributeNS SVGNS, 'height', symbol.viewBox?[3] ? symbol.height
+        scaleX = scaleY = 1
+        if symbol.autoWidth
+          colWidths[j] ?= Math.max 0, ...(
+            for row2 in symbols when row2[j]? and not row2[j].autoWidth
+              row2[j].width
+          )
+          scaleX = colWidths[j] / symbol.width unless symbol.width == 0
+          scaleY = scaleX unless symbol.autoHeight
+        if symbol.autoHeight
+          scaleY = rowHeight / symbol.height unless symbol.height == 0
+          scaleX = scaleY unless symbol.autoWidth
+        ## Scaling of symbol is relative to viewBox, so use that to define
+        ## width and height attributes:
+        use.setAttributeNS SVGNS, 'width',
+          (symbol.viewBox?[2] ? symbol.width) * scaleX
+        use.setAttributeNS SVGNS, 'height',
+          (symbol.viewBox?[3] ? symbol.height) * scaleY
         if symbol.overflowBox?
-          dx = symbol.overflowBox[0] - symbol.viewBox[0]
-          dy = symbol.overflowBox[1] - symbol.viewBox[1]
+          dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
+          dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
           viewBox[0] = Math.min viewBox[0], x + dx
           viewBox[1] = Math.min viewBox[1], y + dy
-          viewBox[2] = Math.max viewBox[2], x + dx + symbol.overflowBox[2]
-          viewBox[3] = Math.max viewBox[3], y + dy + symbol.overflowBox[3]
-        x += symbol.width
+          viewBox[2] = Math.max viewBox[2], x + dx + symbol.overflowBox[2] * scaleX
+          viewBox[3] = Math.max viewBox[3], y + dy + symbol.overflowBox[3] * scaleY
+        x += symbol.width * scaleX
         viewBox[2] = Math.max viewBox[2], x
-        if symbol.height > rowHeight
-          rowHeight = symbol.height
       y += rowHeight
       viewBox[3] = Math.max viewBox[3], y
     ## Change from x-min, y-min, x-max, y-max to x-min, y-min, width, height
