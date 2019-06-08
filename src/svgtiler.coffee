@@ -125,32 +125,36 @@ class Symbol
   @imageRendering:
     ' image-rendering="optimizeSpeed" style="image-rendering:pixelated"'
 
-  @parse: (key, data) ->
+  @parse: (key, data, dirname) ->
     unless data?
       throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
     else if typeof data == 'function'
-      new DynamicSymbol key, data
+      new DynamicSymbol key, data, dirname
     else if data.function?
-      new DynamicSymbol key, data.function
+      new DynamicSymbol key, data.function, dirname
     else
       new StaticSymbol key,
         if typeof data == 'string'
           if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
             svg: '<symbol viewBox="0 0 0 0"/>'
           else if data.indexOf('<') < 0  ## No <'s -> interpret as filename
+            if dirname?
+              filename = path.join dirname, data
+            else
+              filename = data
             extension = extensionOf data
             ## <image> tag documentation: "Conforming SVG viewers need to
             ## support at least PNG, JPEG and SVG format files."
             ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
             switch extension
               when '.png', '.jpg', '.jpeg', '.gif'
-                size = require('image-size') data
+                size = require('image-size') filename
                 svg: """
                   <image xlink:href="#{encodeURIComponent data}" width="#{size.width}" height="#{size.height}"#{@imageRendering}/>
                 """
               when '.svg'
-                filename: data
-                svg: fs.readFileSync data,
+                filename: filename
+                svg: fs.readFileSync filename,
                        encoding: @svgEncoding
               else
                 throw new SVGTilerException "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
@@ -250,7 +254,7 @@ class StaticSymbol extends Symbol
   #use: -> @  ## do nothing for static symbol
 
 class DynamicSymbol extends Symbol
-  constructor: (@key, @func) ->
+  constructor: (@key, @func, @dirname) ->
     super()
     @versions = {}
     @nversions = 0
@@ -261,7 +265,8 @@ class DynamicSymbol extends Symbol
     if result of @versions
       @versions[result]
     else
-      @versions[result] = Symbol.parse "#{@key}-v#{@nversions++}", result
+      @versions[result] =
+        Symbol.parse "#{@key}-v#{@nversions++}", result, @dirname
 
 ## Symbol to fall back to when encountering an unrecognized symbol.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
@@ -298,9 +303,10 @@ class Mapping extends Input
     else
       @merge data
   merge: (data) ->
+    dirname = path.dirname @filename if @filename?
     for own key, value of data
       unless value instanceof Symbol
-        value = Symbol.parse key, value
+        value = Symbol.parse key, value, dirname
       @map[key] = value
   lookup: (key) ->
     key = key.toString()  ## Sometimes get a number, e.g., from XLSX
