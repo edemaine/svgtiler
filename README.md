@@ -32,7 +32,7 @@ will generate drawing.svg using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `drawings.xlsx`.
 
-## Mapping Files: .txt, .js, .coffee
+## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
 
 In the **.txt format** for mapping files, each line consists of a symbol name
 (either having no spaces, or consisting entirely of a single space),
@@ -56,8 +56,8 @@ O O.svg
  blank.svg
 ```
 
-In the **.js / .coffee formats**, the file consists of JavaScript /
-CoffeeScript code, the last line of which should evaluate to either
+In the **.js / .coffee / .jsx / .cjsx formats**, the file consists of
+JavaScript / CoffeeScript code, the last line of which should evaluate to either
 
 1. an *object* whose keys are symbol names, or
 2. a *function* in one argument, a symbol name (string).
@@ -67,10 +67,15 @@ CoffeeScript code, the last line of which should evaluate to either
 The object or function should map a symbol name to either
 
 1. a string of SVG code (detected by the presence of a `<` character),
-2. a filename with `.svg` extension containing SVG code,
-2. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension
+2. [Preact](https://preactjs.com/) (React-style) Virtual DOM elements, via
+   [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax
+   (or its [CoffeeScript analog](https://coffeescript.org/#jsx))
+   or via `preact.h` calls
+   (see [the polyomino example](examples/polyomino)),
+3. a filename with `.svg` extension containing SVG code,
+4. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension
    containing an image, or
-3. a function returning one of the above.
+5. a function returning one of the above.
 
 In the last case, the function is called *for each occurrence of the symbol*,
 and has `this` bound to a manufactured `Context` object, giving you access to
@@ -238,6 +243,7 @@ Games
 * [Tilt](examples/witness)
 
 Demos
+* [Polyomino outline drawing and JSX](examples/polyomino)
 * [Auto width/height](examples/auto)
 * [Unicode](examples/unicode)
 
