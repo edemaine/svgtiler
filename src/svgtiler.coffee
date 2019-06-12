@@ -133,6 +133,11 @@ class Symbol
     else if data.function?
       new DynamicSymbol key, data.function, dirname
     else
+      ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
+      ## Serialization + parsing shouldn't be necessary, but this lets us
+      ## deal with one parsed format (xmldom).
+      if typeof data == 'object' and data.type? and data.props?
+        data = require('preact-render-to-string') data
       new StaticSymbol key,
         if typeof data == 'string'
           if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
@@ -262,10 +267,14 @@ class DynamicSymbol extends Symbol
     result = @func.call context
     unless result?
       throw new Error "Function for symbol #{@key} returned #{result}"
-    if result of @versions
-      @versions[result]
+    ## We use JSON serialization to detect duplicate symbols.  This enables
+    ## return values like {filename: ...} and JSX virtual dom elements,
+    ## in addition to raw SVG strings.
+    string = JSON.stringify result
+    if string of @versions
+      @versions[string]
     else
-      @versions[result] =
+      @versions[string] =
         Symbol.parse "#{@key}-v#{@nversions++}", result, @dirname
 
 ## Symbol to fall back to when encountering an unrecognized symbol.
@@ -348,13 +357,23 @@ class JSMapping extends Mapping
   @title: "JavaScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
+    {code} = require('@babel/core').transform data,
+      filename: @filename
+      plugins: [['@babel/plugin-transform-react-jsx',
+        useBuiltIns: true
+        pragma: 'preact.h'
+        pragmaFrag: 'preact.Fragment'
+        throwIfNamespace: false
+      ]]
+    if 0 <= code.indexOf 'preact.'
+      code = "var preact = require('preact'), h = preact.h; #{code}"
     ## Mimick NodeJS module's __filename and __dirname variables
     __filename = path.resolve @filename
-    data =
+    code =
       "var __filename = #{JSON.stringify __filename},
            __dirname = #{JSON.stringify path.dirname __filename};
-       #{data}\n//@ sourceURL=#{@filename}"
-    @load eval data
+       #{code}\n//@ sourceURL=#{@filename}"
+    @load eval code
 
 class CoffeeMapping extends Mapping
   @title: "CoffeeScript mapping file"
@@ -659,6 +678,7 @@ class Context
 extensionMap =
   '.txt': ASCIIMapping
   '.js': JSMapping
+  '.jsx': JSMapping
   '.coffee': CoffeeMapping
   '.asc': ASCIIDrawing
   '.ssv': SSVDrawing
