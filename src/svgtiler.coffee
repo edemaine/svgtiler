@@ -1,5 +1,6 @@
 `#!/usr/bin/env node
 `
+#require('source-map-support').install()
 unless window?
   path = require 'path'
   fs = require 'fs'
@@ -365,6 +366,8 @@ class JSMapping extends Mapping
         pragmaFrag: 'preact.Fragment'
         throwIfNamespace: false
       ]]
+      sourceMaps: 'inline'
+      retainLines: true
     if 0 <= code.indexOf 'preact.'
       code = "var preact = require('preact'), h = preact.h; #{code}"
     ## Mimick NodeJS module's __filename and __dirname variables
@@ -375,31 +378,33 @@ class JSMapping extends Mapping
        #{code}\n//@ sourceURL=#{@filename}"
     @load eval code
 
-class CoffeeMapping extends Mapping
+class CoffeeMapping extends JSMapping
   @title: "CoffeeScript mapping file"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
-    try
-      @load require('coffeescript').eval data,
+    #try
+      super.parse require('coffeescript').compile data,
+        bare: true
         filename: @filename
         sourceFiles: [@filename]
         inlineMap: true
-    catch err
-      if err.stack? and err.stack.startsWith "#{@filename}:"
-        sourceMap = require('coffeescript').compile(data,
-          bare: true
-          filename: @filename
-          sourceFiles: [@filename]
-          sourceMap: true
-        ).sourceMap
-        err.stack = err.stack.replace /:([0-9]*)/, (m, line) ->
-          ## sourceMap starts line numbers at 0, but we want to work from 1
-          for col in sourceMap?.lines[line-1]?.columns ? [] when col?.sourceLine?
-            unless sourceLine? and sourceLine < col.sourceLine
-              sourceLine = col.sourceLine
-              line = sourceLine + 1
-          ":#{line}"
-      throw err
+    #catch err
+    #  throw err
+    #  if err.stack? and err.stack.startsWith "#{@filename}:"
+    #    sourceMap = require('coffeescript').compile(data,
+    #      bare: true
+    #      filename: @filename
+    #      sourceFiles: [@filename]
+    #      sourceMap: true
+    #    ).sourceMap
+    #    err.stack = err.stack.replace /:([0-9]*)/, (m, line) ->
+    #      ## sourceMap starts line numbers at 0, but we want to work from 1
+    #      for col in sourceMap?.lines[line-1]?.columns ? [] when col?.sourceLine?
+    #        unless sourceLine? and sourceLine < col.sourceLine
+    #          sourceLine = col.sourceLine
+    #          line = sourceLine + 1
+    #      ":#{line}"
+    #  throw err
 
 class Mappings
   constructor: (@maps = []) ->
@@ -680,6 +685,7 @@ extensionMap =
   '.js': JSMapping
   '.jsx': JSMapping
   '.coffee': CoffeeMapping
+  '.cjsx': CoffeeMapping
   '.asc': ASCIIDrawing
   '.ssv': SSVDrawing
   '.csv': CSVDrawing
