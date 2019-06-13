@@ -360,7 +360,7 @@ class JSMapping extends Mapping
   parse: (data) ->
     {code} = require('@babel/core').transform data,
       filename: @filename
-      plugins: [['@babel/plugin-transform-react-jsx',
+      plugins: [[require.resolve('@babel/plugin-transform-react-jsx'),
         useBuiltIns: true
         pragma: 'preact.h'
         pragmaFrag: 'preact.Fragment'
