@@ -192,7 +192,7 @@ class StaticSymbol extends Symbol
           indent + ' '.repeat(col-1) + '^^^' +
           (if line < lines.length then '\n' + indent + lines[line] else '')
         console.error "SVG parse ${level} in symbol '#{@key}': #{msg}"
-    .parseFromString @svg
+    .parseFromString @svg, 'image/svg+xml'
     @viewBox = svgBBox @xml
     @overflowBox = overflowBox @xml
     @overflowVisible =
