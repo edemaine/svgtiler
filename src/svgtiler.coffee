@@ -1,6 +1,6 @@
 `#!/usr/bin/env node
+(function() {
 `
-#require('source-map-support').install()
 unless window?
   path = require 'path'
   fs = require 'fs'
@@ -10,6 +10,11 @@ unless window?
   XMLSerializer = xmldom.XMLSerializer
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
+else
+  DOMParser = window.DOMParser # escape CoffeeScript scope
+  path =
+    extname: (x) -> /\.[^/]+$/.exec(x)[0]
+    dirname: (x) -> /[^]*\/|/.exec(x)[0]
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -179,6 +184,15 @@ class StaticSymbol extends Symbol
     super()
     for own key, value of options
       @[key] = value
+    ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
+    ## (This is especially important on the browser, so the results can be
+    ## reparented into an HTML Document.)
+    @svg = @svg.replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
+      (match, end) ->
+        unless 'xmlns' in match
+          match = match[...match.length-end.length] +
+            " xmlns='#{SVGNS}'" + match[match.length-end.length..]
+        match
     @xml = new DOMParser
       locator:  ## needed when specifying errorHandler
         line: 1
@@ -290,18 +304,19 @@ unrecognizedSymbol = new StaticSymbol 'UNRECOGNIZED', svg: '''
 
 class Input
   @encoding: 'utf8'
-  @parseFile: (filename) ->
+  @parseFile: (filename, filedata) ->
     ## Generic method to parse file once we're already in the right class.
     input = new @
     input.filename = filename
-    input.parse fs.readFileSync filename,
-      encoding: @encoding
+    unless filedata?
+      filedata = fs.readFileSync filename, encoding: @encoding
+    input.parse filedata
     input
-  @recognize: (filename) ->
+  @recognize: (filename, filedata) ->
     ## Recognize type of file and call corresponding class's `parseFile`.
     extension = extensionOf filename
     if extension of extensionMap
-      extensionMap[extension].parseFile filename
+      extensionMap[extension].parseFile filename, filedata
     else
       throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
@@ -873,11 +888,15 @@ main = ->
     console.log 'Not enough filename arguments'
     help()
 
-exports =
-  Symbol: Symbol
-  Drawing: Drawing
+exports = {Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
+  Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
+  Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
+  Drawings, XLSXDrawings,
+  Input, Mappings, Context, SVGTilerException, SVGNS, XLINKNS, main}
 module?.exports ?= exports
 window?.svgtiler ?= exports
 
 unless window?
   main()
+
+`}).call(this)`
