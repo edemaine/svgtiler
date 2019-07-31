@@ -37,6 +37,13 @@ overflowBox = (xml) ->
   else
     null
 
+parseNum = (x) ->
+  parsed = parseFloat x
+  if isNaN parsed
+    null
+  else
+    parsed
+
 svgBBox = (xml) ->
   ## xxx Many unsupported features!
   ##   - transformations
@@ -45,35 +52,40 @@ svgBBox = (xml) ->
   ##   - text
   ##   - line widths which extend bounding box
   if xml.documentElement.hasAttribute 'viewBox'
-    xml.documentElement.getAttribute('viewBox').split /\s*,?\s+/
-    .map parseFloat
+    viewBox = xml.documentElement.getAttribute('viewBox').split /\s*,?\s+/
+    .map parseNum
+    if null in viewBox
+      null
+    else
+      viewBox
   else
     recurse = (node) ->
       if node.nodeType != node.ELEMENT_NODE or
          node.tagName in ['defs', 'symbol', 'use']
-        return [null, null, null, null]
+        return null
       switch node.tagName
         when 'rect', 'image'
-          [parseFloat node.getAttribute('x') or 0
-           parseFloat node.getAttribute('y') or 0
-           parseFloat node.getAttribute('width') or '100%'
-           parseFloat node.getAttribute('height') or '100%']
+          ## For <image>, should autodetect image size (#42)
+          [parseNum(node.getAttribute 'x') ? 0
+           parseNum(node.getAttribute 'y') ? 0
+           parseNum(node.getAttribute 'width') ? 0
+           parseNum(node.getAttribute 'height') ? 0]
         when 'circle'
-          cx = parseFloat node.getAttribute('cx') or 0
-          cy = parseFloat node.getAttribute('cy') or 0
-          r = parseFloat node.getAttribute('r') or 0
+          cx = parseNum(node.getAttribute 'cx') ? 0
+          cy = parseNum(node.getAttribute 'cy') ? 0
+          r = parseNum(node.getAttribute 'r') ? 0
           [cx - r, cy - r, 2*r, 2*r]
         when 'ellipse'
-          cx = parseFloat node.getAttribute('cx') or 0
-          cy = parseFloat node.getAttribute('cy') or 0
-          rx = parseFloat node.getAttribute('rx') or 0
-          ry = parseFloat node.getAttribute('ry') or 0
+          cx = parseNum(node.getAttribute 'cx') ? 0
+          cy = parseNum(node.getAttribute 'cy') ? 0
+          rx = parseNum(node.getAttribute 'rx') ? 0
+          ry = parseNum(node.getAttribute 'ry') ? 0
           [cx - rx, cy - ry, 2*rx, 2*ry]
         when 'line'
-          x1 = parseFloat node.getAttribute('x1') or 0
-          y1 = parseFloat node.getAttribute('y1') or 0
-          x2 = parseFloat node.getAttribute('x2') or 0
-          y2 = parseFloat node.getAttribute('y2') or 0
+          x1 = parseNum(node.getAttribute 'x1') ? 0
+          y1 = parseNum(node.getAttribute 'y1') ? 0
+          x2 = parseNum(node.getAttribute 'x2') ? 0
+          y2 = parseNum(node.getAttribute 'y2') ? 0
           xmin = Math.min x1, x2
           ymin = Math.min y1, y2
           [xmin, ymin, Math.max(x1, x2) - xmin, Math.max(y1, y2) - ymin]
@@ -85,13 +97,17 @@ svgBBox = (xml) ->
           ys = (point[1] for point in points)
           xmin = Math.min xs...
           ymin = Math.min ys...
-          [xmin, ymin, Math.max(xs...) - xmin, Math.max(ys...) - ymin]
+          if isNaN(xmin) or isNaN(ymin) # invalid points attribute; don't render
+            null
+          else
+            [xmin, ymin, Math.max(xs...) - xmin, Math.max(ys...) - ymin]
         else
           viewBoxes = (recurse(child) for child in node.childNodes)
-          xmin = Math.min (viewBox[0] for viewBox in viewBoxes when viewBox[0])...
-          ymin = Math.min (viewBox[1] for viewBox in viewBoxes when viewBox[1])...
-          xmax = Math.max (viewBox[0]+viewBox[2] for viewBox in viewBoxes when viewBox[0] and viewBox[2])...
-          ymax = Math.max (viewBox[1]+viewBox[3] for viewBox in viewBoxes when viewBox[1] and viewBox[3])...
+          viewBoxes = (viewBox for viewBox in viewBoxes when viewBox?)
+          xmin = Math.min ...(viewBox[0] for viewBox in viewBoxes)
+          ymin = Math.min ...(viewBox[1] for viewBox in viewBoxes)
+          xmax = Math.max ...(viewBox[0]+viewBox[2] for viewBox in viewBoxes)
+          ymax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
           [xmin, ymin, xmax - xmin, ymax - ymin]
     viewBox = recurse xml.documentElement
     if Infinity in viewBox or -Infinity in viewBox
