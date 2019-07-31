@@ -249,10 +249,10 @@ class StaticSymbol extends Symbol
     warnings = []
     unless @width?
       warnings.push 'width'
-      @width = 0 unless @width?
+      @width = 0
     unless @height?
       warnings.push 'height'
-      @height = 0 unless @height?
+      @height = 0
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
     ## Detect special `width="auto"` and/or `height="auto"` fields for future
