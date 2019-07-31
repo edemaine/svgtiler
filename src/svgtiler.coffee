@@ -12,6 +12,7 @@ unless window?
   graphemeSplitter = new require('grapheme-splitter')()
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
+  domImplementation = document.implementation
   path =
     extname: (x) -> /\.[^/]+$/.exec(x)[0]
     dirname: (x) -> /[^]*\/|/.exec(x)[0]
