@@ -288,7 +288,8 @@ class StaticSymbol extends Symbol
     ###
     encodeURIComponent @key
     .replace /%/g, '$'
-  #use: -> @  ## do nothing for static symbol
+  use: -> @  ## do nothing for static symbol
+  usesContext: false
 
 class DynamicSymbol extends Symbol
   constructor: (@key, @func, @dirname) ->
@@ -308,6 +309,7 @@ class DynamicSymbol extends Symbol
     else
       @versions[string] =
         Symbol.parse "#{@key}-v#{@nversions++}", result, @dirname
+  usesContext: true
 
 ## Symbol to fall back to when encountering an unrecognized symbol.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
@@ -522,9 +524,11 @@ class Drawing extends Input
     symbols =
       for row, i in symbols
         for symbol, j in row
-          if symbol?.use?
+          if symbol.usesContext
             symbol = symbol.use new Context symbols, i, j
-          symbolsByKey[symbol?.key] = symbol
+          else
+            symbol = symbol.use()
+          symbolsByKey[symbol.key] = symbol
     ## Include all used symbols in SVG
     for key, symbol of symbolsByKey
       continue unless symbol?
