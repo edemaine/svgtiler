@@ -756,7 +756,7 @@ postprocess = (format, filename) ->
   catch e
     console.log "Failed to postprocess '#{filename}': #{e}"
 
-svg2 = (format, svg, sync) ->
+convertSVG = (format, svg, sync) ->
   child_process = require 'child_process'
   filename = path.parse svg
   if filename.ext == ".#{format}"
@@ -897,10 +897,10 @@ main = ->
           filenames = input.writeSVG mappings
           for format in formats
             if typeof filenames == 'string'
-              jobs.push svg2 format, filenames, sync
+              jobs.push convertSVG format, filenames, sync
             else
               for filename in filenames
-                jobs.push svg2 format, filename, sync
+                jobs.push convertSVG format, filename, sync
   unless files
     console.log 'Not enough filename arguments'
     help()
