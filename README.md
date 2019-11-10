@@ -240,7 +240,7 @@ your `viewBox`es accordingly.
 Games
 * [Tetris](examples/tetris)
 * [The Witness](examples/witness)
-* [Tilt](examples/witness)
+* [Tilt](examples/tilt)
 
 Demos
 * [Polyomino outline drawing and JSX](examples/polyomino)
