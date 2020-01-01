@@ -224,6 +224,9 @@ class StaticSymbol extends Symbol
           (if line < lines.length then '\n' + indent + lines[line] else '')
         console.error "SVG parse ${level} in symbol '#{@key}': #{msg}"
     .parseFromString @svg, 'image/svg+xml'
+    # Remove from the symbol any top-level xmlns=SVGNS possibly added above:
+    # we will have such a tag in the top-level <svg>.
+    @xml.documentElement.removeAttribute 'xmlns'
     @viewBox = svgBBox @xml
     @overflowBox = overflowBox @xml
     @overflowVisible =
