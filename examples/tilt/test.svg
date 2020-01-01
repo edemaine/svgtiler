@@ -10,7 +10,7 @@
   <symbol id="$20">
     <g/>
   </symbol>
-  <symbol id="O" viewBox="1,1,48,48">
+  <symbol id="O" viewBox="0,0,50,50">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
       <circle cx="25" cy="25" r="24" fill="#9bcf51"/>
@@ -20,5 +20,5 @@
   <use xlink:href="#X" x="0" y="0" width="50" height="50"/>
   <use xlink:href="#" x="50" y="0" width="50" height="50"/>
   <use xlink:href="#$20" x="100" y="0" width="50" height="50"/>
-  <use xlink:href="#O" x="150" y="0" width="48" height="48"/>
+  <use xlink:href="#O" x="150" y="0" width="50" height="50"/>
 </svg>

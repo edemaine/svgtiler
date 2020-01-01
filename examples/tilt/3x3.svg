@@ -19,7 +19,7 @@
   <symbol id="-" viewBox="0,0,50,50">
     <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
   </symbol>
-  <symbol id="O" viewBox="1,1,48,48">
+  <symbol id="O" viewBox="0,0,50,50">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
       <circle cx="25" cy="25" r="24" fill="#9bcf51"/>
@@ -228,7 +228,7 @@
   <use xlink:href="#X" x="700" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="750" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="800" y="100" width="50" height="50"/>
-  <use xlink:href="#O" x="850" y="100" width="48" height="48"/>
+  <use xlink:href="#O" x="850" y="100" width="50" height="50"/>
   <use xlink:href="#-" x="900" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="950" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="1000" y="100" width="50" height="50"/>
@@ -253,7 +253,7 @@
   <use xlink:href="#X" x="1950" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="2000" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="2050" y="100" width="50" height="50"/>
-  <use xlink:href="#O" x="2100" y="100" width="48" height="48"/>
+  <use xlink:href="#O" x="2100" y="100" width="50" height="50"/>
   <use xlink:href="#-" x="2150" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="2200" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="2250" y="100" width="50" height="50"/>
@@ -278,7 +278,7 @@
   <use xlink:href="#X" x="3200" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="3250" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="3300" y="100" width="50" height="50"/>
-  <use xlink:href="#O" x="3350" y="100" width="48" height="48"/>
+  <use xlink:href="#O" x="3350" y="100" width="50" height="50"/>
   <use xlink:href="#-" x="3400" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="3450" y="100" width="50" height="50"/>
   <use xlink:href="#X" x="3500" y="100" width="50" height="50"/>
@@ -1180,7 +1180,7 @@
   <use xlink:href="#X" x="4300" y="600" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="600" width="50" height="50"/>
   <use xlink:href="#A" x="0" y="650" width="50" height="50"/>
-  <use xlink:href="#O" x="50" y="650" width="48" height="48"/>
+  <use xlink:href="#O" x="50" y="650" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="650" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="650" width="50" height="50"/>
   <use xlink:href="#-" x="200" y="650" width="50" height="50"/>
@@ -3034,7 +3034,7 @@
   <use xlink:href="#X" x="4350" y="1650" width="50" height="50"/>
   <use xlink:href="#2" x="4400" y="1650" width="50" height="50"/>
   <use xlink:href="#B" x="0" y="1700" width="50" height="50"/>
-  <use xlink:href="#O" x="50" y="1700" width="48" height="48"/>
+  <use xlink:href="#O" x="50" y="1700" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="1700" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="1700" width="50" height="50"/>
   <use xlink:href="#-" x="200" y="1700" width="50" height="50"/>
@@ -4976,7 +4976,7 @@
   <use xlink:href="#X" x="4300" y="2750" width="50" height="50"/>
   <use xlink:href="#X" x="4350" y="2750" width="50" height="50"/>
   <use xlink:href="#C" x="0" y="2800" width="50" height="50"/>
-  <use xlink:href="#O" x="50" y="2800" width="48" height="48"/>
+  <use xlink:href="#O" x="50" y="2800" width="50" height="50"/>
   <use xlink:href="#-" x="100" y="2800" width="50" height="50"/>
   <use xlink:href="#-" x="150" y="2800" width="50" height="50"/>
   <use xlink:href="#-" x="200" y="2800" width="50" height="50"/>
