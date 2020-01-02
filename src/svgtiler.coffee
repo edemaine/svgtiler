@@ -295,10 +295,18 @@ class StaticSymbol extends Symbol
   usesContext: false
 
 class DynamicSymbol extends Symbol
+  @all: []
   constructor: (@key, @func, @dirname) ->
     super()
     @versions = {}
     @nversions = 0
+    @constructor.all.push @
+  @resetAll: ->
+    ## Resets all DynamicSymbol's versions to 0.
+    ## Use before starting a new SVG document.
+    for symbol in @all
+      symbol.versions = {}
+      symbol.nversions = 0
   use: (context) ->
     result = @func.call context
     unless result?
@@ -503,6 +511,7 @@ class Drawing extends Input
     fs.writeFileSync filename, @renderSVG mappings
     filename
   renderSVGDOM: (mappings) ->
+    DynamicSymbol.resetAll()
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
     svg.setAttribute 'xmlns:xlink', XLINKNS
