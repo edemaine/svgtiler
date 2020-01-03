@@ -540,7 +540,11 @@ class Drawing extends Input
             symbol = symbol.use new Context symbols, i, j
           else
             symbol = symbol.use()
-          symbolsByKey[symbol.key] = symbol
+          unless symbol.key of symbolsByKey
+            symbolsByKey[symbol.key] = symbol
+          else if symbolsByKey[symbol.key] is not symbol
+            console.warn "Multiple symbols with key #{symbol.key}"
+          symbol
     ## Include all used symbols in SVG
     for key, symbol of symbolsByKey
       continue unless symbol?
