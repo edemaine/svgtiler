@@ -178,7 +178,7 @@ class Symbol
               when '.png', '.jpg', '.jpeg', '.gif'
                 size = require('image-size') filename
                 svg: """
-                  <image xlink:href="#{encodeURIComponent data}" width="#{size.width}" height="#{size.height}"#{@imageRendering}/>
+                  <image xlink:href="#{encodeURI data}" width="#{size.width}" height="#{size.height}"#{@imageRendering}/>
                 """
               when '.svg'
                 filename: filename
