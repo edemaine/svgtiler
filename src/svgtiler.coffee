@@ -328,12 +328,13 @@ class DynamicSymbol extends Symbol
 ## Symbol to fall back to when encountering an unrecognized symbol.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
 ## by Amit6, released into the public domain.
-unrecognizedSymbol = new StaticSymbol 'UNRECOGNIZED', svg: '''
+unrecognizedSymbol = new StaticSymbol '$UNRECOGNIZED$', svg: '''
   <symbol viewBox="0 0 200 200" preserveAspectRatio="none" width="auto" height="auto">
     <rect width="200" height="200" fill="yellow"/>
     <path xmlns="http://www.w3.org/2000/svg" stroke="none" fill="red" d="M 200,100 100,200 0,100 100,0 200,100 z M 135.64709,74.70585 q 0,-13.52935 -10.00006,-22.52943 -9.99999,-8.99999 -24.35289,-8.99999 -17.29415,0 -30.117661,5.29409 L 69.05879,69.52938 q 9.764731,-6.23528 21.52944,-6.23528 8.82356,0 14.58824,4.82351 5.76469,4.82351 5.76469,12.70589 0,8.5883 -9.94117,21.70588 -9.94117,13.11766 -9.94117,26.76473 l 17.88236,0 q 0,-6.3529 6.9412,-14.9412 11.76471,-14.58816 12.82351,-16.35289 6.9412,-11.05887 6.9412,-23.29417 z m -22.00003,92.11771 0,-24.70585 -27.29412,0 0,24.70585 27.29412,0 z"/>
   </symbol>
 '''
+unrecognizedSymbol.id = -> '$UNRECOGNIZED$' # cannot be output of standard id()
 
 class Input
   @encoding: 'utf8'
