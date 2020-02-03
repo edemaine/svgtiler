@@ -221,6 +221,13 @@ your `viewBox`es accordingly.
   `<rect x="-5" y="-5" width="10" height="10"/>`
   will create a symbol with `viewBox="-5 -5 10 10"`.
 
+* You can extract all `<text>` from the SVG into a LaTeX overlay file.
+  For example: `svgtiler -p -l map.coffee drawings.xls`
+  will create `drawings_sheet.svg`, `drawings_sheet.pdf`, and
+  `drawings_sheet.tex`.  The first two files omit the text, while the third
+  file is the one to include in LaTeX: use `\input{drawings_sheet.tex}`.
+  (See the `.tex` file for more details.)
+
 * You can automatically convert all exported SVG files into PDF and/or PNG
   if you have Inkscape installed, via the `-p`/`--pdf` and/or `-P` or `--png`
   command-line options.
@@ -277,6 +284,7 @@ Optional arguments:
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
+  -t / --tex            Move <text> from SVG to accompanying LaTeX file.tex
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
 

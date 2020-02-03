@@ -145,6 +145,7 @@ class Symbol
   @svgEncoding: 'utf8'
   @forceWidth: null   ## default: no size forcing
   @forceHeight: null  ## default: no size forcing
+  @texText: false
 
   ###
   Attempt to render pixels as pixels, as needed for old-school graphics.
@@ -301,6 +302,21 @@ class StaticSymbol extends Symbol
     @xml.documentElement.removeAttribute 'width' if @autoWidth
     @xml.documentElement.removeAttribute 'height' if @autoHeight
     @zIndex = zIndex @xml.documentElement
+    ## Optionally extract <text> nodes for LaTeX output
+    if Symbol.texText
+      @text = []
+      extract = (node) =>
+        return unless node.hasChildNodes()
+        child = node.lastChild
+        while child?
+          nextChild = child.previousSibling
+          if child.nodeName == 'text'
+            @text.push child
+            node.removeChild child
+          else
+            extract child
+          child = nextChild
+      extract @xml.documentElement
   id: ->
     escapeId @key
   use: -> @  ## do nothing for static symbol
@@ -525,6 +541,12 @@ class Drawing extends Input
     fs.writeFileSync filename, @renderSVG mappings
     filename
   renderSVGDOM: (mappings) ->
+    ###
+    Main rendering engine, returning an xmldom object for the whole document.
+    Also saves the table of symbols in `@symbols`, the corresponding
+    coordinates in `@coords`, and overall `@weight` and `@height`,
+    for use by `renderTeX`.
+    ###
     DynamicSymbol.resetAll()
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
@@ -533,7 +555,7 @@ class Drawing extends Input
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## Look up all symbols in the drawing.
     missing = {}
-    symbols =
+    @symbols =
       for row in @data
         for cell in row
           symbol = mappings.lookup cell
@@ -547,11 +569,11 @@ class Drawing extends Input
       console.warn "Failed to recognize symbols:", missing.join ', '
     ## Instantiate (.use) all (dynamic) symbols in the drawing.
     symbolsByKey = {}
-    symbols =
-      for row, i in symbols
+    @symbols =
+      for row, i in @symbols
         for symbol, j in row
           if symbol.usesContext
-            symbol = symbol.use new Context symbols, i, j
+            symbol = symbol.use new Context @symbols, i, j
           else
             symbol = symbol.use()
           unless symbol.key of symbolsByKey
@@ -581,13 +603,16 @@ class Drawing extends Input
     levels = {}
     y = 0
     colWidths = {}
-    for row, i in symbols
+    @coords = []
+    for row, i in @symbols
+      @coords.push coordsRow = []
       rowHeight = 0
       for symbol in row when not symbol.autoHeight
         if symbol.height > rowHeight
           rowHeight = symbol.height
       x = 0
       for symbol, j in row
+        coordsRow.push {x, y}
         continue unless symbol?
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
@@ -597,7 +622,7 @@ class Drawing extends Input
         scaleX = scaleY = 1
         if symbol.autoWidth
           colWidths[j] ?= Math.max 0, ...(
-            for row2 in symbols when row2[j]? and not row2[j].autoWidth
+            for row2 in @symbols when row2[j]? and not row2[j].autoWidth
               row2[j].width
           )
           scaleX = colWidths[j] / symbol.width unless symbol.width == 0
@@ -631,8 +656,8 @@ class Drawing extends Input
       for node in levels[level]
         svg.appendChild node
     svg.setAttributeNS SVGNS, 'viewBox', viewBox.join ' '
-    svg.setAttributeNS SVGNS, 'width', viewBox[2]
-    svg.setAttributeNS SVGNS, 'height', viewBox[3]
+    svg.setAttributeNS SVGNS, 'width', @width = viewBox[2]
+    svg.setAttributeNS SVGNS, 'height', @height = viewBox[3]
     svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
     doc
   renderSVG: (mappings) ->
@@ -647,6 +672,51 @@ class Drawing extends Input
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
 ''' + out
+  renderTeX: (filename) ->
+    ## Must be called *after* `renderSVG` (or `renderSVGDOM`)
+    basename = path.parse filename
+    basename = basename.base[...-basename.ext.length]
+    lines = ["""
+      \\begingroup
+        \\begin{picture}(#{@width},#{@height})%
+          \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{#{basename}}}%
+    """]
+    for row, i in @symbols
+      for symbol, j in row
+        {x, y} = @coords[i][j]
+        for text in symbol.text
+          tx = parseNum(text.getAttribute('x')) ? 0
+          ty = parseNum(text.getAttribute('y')) ? 0
+          content = (
+            for child in text.childNodes when child.nodeType == 3 # TEXT_NODE
+              child.data
+          ).join ''
+          anchor = attributeOrStyle text, 'text-anchor'
+          if /^middle\b/.test anchor
+            box = 'cb'
+          else if /^end\b/.test anchor
+            box = 'rb'
+          else #if /^start\b/.test anchor  # default
+            box = 'lb'
+          lines.push "    \\put(#{x+tx},#{@height - (y+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}\\makebox(0,0)[#{box}]{#{content}}}%"
+    lines.push """
+        \\end{picture}%
+      \\endgroup
+    """, '' # trailing newline
+    lines.join '\n'
+  writeTeX: (filename) ->
+    ## Must be called *after* `writeSVG`
+    ## Default filename is the input filename with extension replaced by .tex
+    unless filename?
+      filename = path.parse @filename
+      if filename.ext == '.tex'
+        filename.base += '.tex'
+      else
+        filename.base = filename.base[...-filename.ext.length] + '.tex'
+      filename = path.format filename
+    console.log ' &', filename
+    fs.writeFileSync filename, @renderTeX filename
+    filename
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
@@ -692,18 +762,22 @@ class Drawings extends Input
         drawing.subname = data.subname
         drawing.load data
         drawing
+  subfilename: (extension, drawing) ->
+    if @drawings.length > 1
+      filename2 = path.parse filename ? @filename
+      filename2.base = filename2.base[...-filename2.ext.length]
+      filename2.base += @constructor.filenameSeparator + drawing.subname
+      filename2.base += extension
+      path.format filename2
+    else
+      drawing?.filename = @filename  ## use Drawing default if not filename?
+      filename
   writeSVG: (mappings, filename) ->
     for drawing in @drawings
-      drawing.writeSVG mappings,
-        if @drawings.length > 1
-          filename2 = path.parse filename ? @filename
-          filename2.base = filename2.base[...-filename2.ext.length]
-          filename2.base += @constructor.filenameSeparator + drawing.subname
-          filename2.base += '.svg'
-          path.format filename2
-        else
-          drawing.filename = @filename  ## use Drawing default if not filename?
-          filename
+      drawing.writeSVG mappings, @subfilename '.svg', drawing
+  writeTeX: (filename) ->
+    for drawing in @drawings
+      drawing.writeTeX @subfilename '.tex', drawing
 
 class XLSXDrawings extends Drawings
   @encoding: 'binary'
@@ -911,6 +985,8 @@ main = ->
         formats.push 'pdf'
       when '-P', '--png'
         formats.push 'png'
+      when '-t', '--tex'
+        Symbol.texText = true
       when '--no-sanitize'
         sanitize = false
       when '-j', '--jobs'
@@ -929,6 +1005,7 @@ main = ->
           mappings.push input
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings
+          input.writeTeX mappings if Symbol.texText
           for format in formats
             if typeof filenames == 'string'
               jobs.push convertSVG format, filenames, sync
