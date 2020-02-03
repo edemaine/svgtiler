@@ -10,6 +10,7 @@ unless window?
   XMLSerializer = xmldom.XMLSerializer
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
+  svgtiler = require '../package.json'
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
   domImplementation = document.implementation
@@ -674,10 +675,55 @@ class Drawing extends Input
 ''' + out
   renderTeX: (filename) ->
     ## Must be called *after* `renderSVG` (or `renderSVGDOM`)
-    basename = path.parse filename
-    basename = basename.base[...-basename.ext.length]
+    filename = path.parse filename
+    basename = filename.base[...-filename.ext.length]
+    ## LaTeX based loosely on Inkscape's PDF/EPS/PS + LaTeX output extension.
+    ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
     lines = ["""
+      %% Creator: svgtiler #{svgtiler.version}, https://github.com/edemaine/svgtiler
+      %% This LaTeX file includes and overlays text on top of #{basename}.svg/.pdf
+      %%
+      %% Instead of \\includegraphics, include this figure via
+      %%   \\input{#{filename.base}}
+      %% You can scale the image by first defining \\svg{width,height,scale}:
+      %%   \\def\\svgwidth{\\linewidth} % full width
+      %% or
+      %%   \\def\\svgheight{\\linewidth} % full width
+      %% or
+      %%   \\def\\svgscale{0.5} % 50%
+      %% (If multiple are specified, the first in the list above takes priority.)
+      %%
+      %% If this file resides in another directory from the root .tex file,
+      %% you need to help it find its auxiliary .svg/.pdf file via one of the
+      %% following options (any one will do):
+      %%   1. \\usepackage{currfile} so that this file can find its own directory.
+      %%   2. \\usepackage{import} and \\import{path/to/file}{#{filename.base}}
+      %%   3. \\graphicspath{{path/to/file/}} % note trailing slash
+      %%
       \\begingroup
+        \\providecommand\\color[2][]{%
+          \\errmessage{You should load package 'color.sty' to render color in svgtiler text.}%
+          \\renewcommand\\color[2][]{}%
+        }%
+        \\ifx\\svgwidth\\undefined
+          \\ifx\\svgheight\\undefined
+            \\unitlength=0.75pt\\relax % 1px (SVG unit) = 0.75pt
+            \\ifx\\svgscale\\undefined\\else
+              \\ifx\\real\\undefined % in case calc.sty not loaded
+                \\unitlength=\\svgscale \\unitlength
+              \\else
+                \\setlength{\\unitlength}{\\unitlength * \\real{\\svgscale}}%
+              \\fi
+            \\fi
+          \\else
+            \\unitlength=\\svgheight
+            \\unitlength=#{1/@height}\\unitlength % divide by image height
+          \\fi
+        \\else
+          \\unitlength=\\svgwidth
+          \\unitlength=#{1/@width}\\unitlength % divide by image width
+        \\fi
+        \\def\\clap#1{\\hbox to 0pt{\\hss#1\\hss}}%
         \\begin{picture}(#{@width},#{@height})%
           \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{#{basename}}}%
     """]
@@ -693,12 +739,13 @@ class Drawing extends Input
           ).join ''
           anchor = attributeOrStyle text, 'text-anchor'
           if /^middle\b/.test anchor
-            box = 'cb'
+            wrap = '\\clap{'
           else if /^end\b/.test anchor
-            box = 'rb'
+            wrap = '\\rlap{'
           else #if /^start\b/.test anchor  # default
-            box = 'lb'
-          lines.push "    \\put(#{x+tx},#{@height - (y+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}\\makebox(0,0)[#{box}]{#{content}}}%"
+            wrap = '\\llap{'
+          # "@height -" is to flip between y down (SVG) and y up (picture)
+          lines.push "    \\put(#{x+tx},#{@height - (y+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
     lines.push """
         \\end{picture}%
       \\endgroup
