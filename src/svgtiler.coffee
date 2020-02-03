@@ -120,19 +120,26 @@ isAuto = (xml, prop) ->
   xml.documentElement.hasAttribute(prop) and
   /^\s*auto\s*$/i.test xml.documentElement.getAttribute prop
 
+attributeOrStyle = (node, attr, styleKey = attr) ->
+  if value = node.getAttribute attr
+    value.trim()
+  else
+    style = node.getAttribute 'style'
+    if style
+      match = /(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)/i.exec style
+      match?[1]
+
 zIndex = (node) ->
   ## Check whether DOM node has a specified z-index, defaulting to zero.
   ## Note that z-index must be an integer.
   ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
   ## a z-index="..." attribute.  Check for this first.
-  if z = node.getAttribute 'z-index'
-    return parseInt z
   ## 2. Look for style="z-index:..." as in HTML.
-  style = node.getAttribute 'style'
-  return 0 unless style
-  match = /(?:^|\W)z-index\s*:\s*([-\d]+)/i.exec style
-  return 0 unless match?
-  parseInt match[1]
+  z = parseInt attributeOrStyle node, 'z-index'
+  if isNaN z
+    0
+  else
+    z
 
 class Symbol
   @svgEncoding: 'utf8'
@@ -258,9 +265,8 @@ class StaticSymbol extends Symbol
     @xml.documentElement.removeAttribute 'xmlns'
     @viewBox = svgBBox @xml
     @overflowBox = overflowBox @xml
-    @overflowVisible =
-      @xml.documentElement.hasAttribute('style') and
-      /overflow\s*:\s*visible/.test @xml.documentElement.getAttribute 'style'
+    overflow = attributeOrStyle @xml.documentElement, 'overflow'
+    @overflowVisible = (overflow? and /^visible\b/.test overflow)
     @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
