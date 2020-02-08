@@ -919,10 +919,16 @@ convertSVG = (format, svg, sync) ->
   else
     filename.base = "#{filename.base[...-filename.ext.length]}.#{format}"
   output = path.format filename
+  ## Workaround relative paths not working in MacOS distribution of Inkscape
+  ## [https://bugs.launchpad.net/inkscape/+bug/181639]
+  if process.platform == 'darwin'
+    preprocess = path.resolve
+  else
+    preprocess = (x) -> x
   args = [
     '-z'
-    "--file=#{svg}"
-    "--export-#{format}=#{output}"
+    "--file=#{preprocess svg}"
+    "--export-#{format}=#{preprocess output}"
   ]
   if sync
     ## In sychronous mode, we let inkscape directly output its error messages,
