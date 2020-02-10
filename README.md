@@ -106,6 +106,8 @@ the following properties:
 
 Like regular NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
+They can also use `require('./filename')` to import local modules,
+which is useful for sharing code among mapping files.
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 

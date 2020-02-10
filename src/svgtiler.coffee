@@ -11,6 +11,7 @@ unless window?
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
   svgtiler = require '../package.json'
+  require 'coffeescript/register'
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
   domImplementation = document.implementation
@@ -446,11 +447,15 @@ class JSMapping extends Mapping
       retainLines: true
     if 0 <= code.indexOf 'preact.'
       code = "var preact = require('preact'), h = preact.h; #{code}"
-    ## Mimick NodeJS module's __filename and __dirname variables
+    ## Mimick NodeJS module's __filename and __dirname variables.
+    ## Redirect require() to use paths relative to the mapping file.
+    ## xxx should probably actually create a NodeJS module when possible
     __filename = path.resolve @filename
     code =
       "var __filename = #{JSON.stringify __filename},
-           __dirname = #{JSON.stringify path.dirname __filename};
+           __dirname = #{JSON.stringify path.dirname __filename},
+           __require = require;
+       require = (module) => __require(module.startsWith('.') ? __require('path').resolve(__dirname, module) : module);
        #{code}\n//@ sourceURL=#{@filename}"
     @load eval code
 
