@@ -715,7 +715,7 @@ class Drawing extends Input
         \\fi
         \\ifx\\svgwidth\\undefined
           \\ifx\\svgheight\\undefined
-            \\unitlength=0.75pt\\relax % 1px (SVG unit) = 0.75pt
+            \\unitlength=0.75bp\\relax % 1px (SVG unit) = 0.75bp (SVG pts)
             \\ifx\\svgscale\\undefined\\else
               \\ifx\\real\\undefined % in case calc.sty not loaded
                 \\unitlength=\\svgscale \\unitlength
