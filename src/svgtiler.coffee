@@ -760,14 +760,19 @@ class Drawing extends Input
     """, '' # trailing newline
     lines.join '\n'
   writeTeX: (filename) ->
-    ## Must be called *after* `writeSVG`
-    ## Default filename is the input filename with extension replaced by .tex
+    ###
+    Must be called *after* `writeSVG`.
+    Default filename is the input filename with extension replaced by .svg_tex
+    (analogous to .pdf_tex from Inkscape's --export-latex feature, but noting
+    that the text is extracted from the SVG not the PDF, and that this file
+    works with both .pdf and .png auxiliary files).
+    ###
     unless filename?
       filename = path.parse @filename
-      if filename.ext == '.tex'
-        filename.base += '.tex'
+      if filename.ext == '.svg_tex'
+        filename.base += '.svg_tex'
       else
-        filename.base = filename.base[...-filename.ext.length] + '.tex'
+        filename.base = filename.base[...-filename.ext.length] + '.svg_tex'
       filename = path.format filename
     console.log ' &', filename
     fs.writeFileSync filename, @renderTeX filename
@@ -832,7 +837,7 @@ class Drawings extends Input
       drawing.writeSVG mappings, @subfilename '.svg', drawing
   writeTeX: (filename) ->
     for drawing in @drawings
-      drawing.writeTeX @subfilename '.tex', drawing
+      drawing.writeTeX @subfilename '.svg_tex', drawing
 
 class XLSXDrawings extends Drawings
   @encoding: 'binary'

@@ -226,10 +226,10 @@ your `viewBox`es accordingly.
 * You can extract all `<text>` from the SVG into a LaTeX overlay file.
   For example: `svgtiler -p -l map.coffee drawings.xls`
   will create `drawings_sheet.svg`, `drawings_sheet.pdf`, and
-  `drawings_sheet.tex`.  The first two files omit the text, while the third
-  file is the one to include in LaTeX: use `\input{drawings_sheet.tex}`
+  `drawings_sheet.svg_tex`.  The first two files omit the text, while the third
+  file is the one to include in LaTeX: use `\input{drawings_sheet.svg_tex}`
   after optionally setting `\svgwidth`, `\svgheight`, or `\svgscale`.
-  (See the `.tex` file for more details.)
+  (See the `.svg_tex` file for more details.)
 
 * You can automatically convert all exported SVG files into PDF and/or PNG
   if you have Inkscape installed, via the `-p`/`--pdf` and/or `-P` or `--png`
