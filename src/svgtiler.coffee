@@ -968,6 +968,7 @@ convertSVG = (format, svg, sync) ->
 
 help = ->
   console.log """
+svgtiler #{svgtiler.version ? "(web)"}
 Usage: #{process.argv[1]} (...options and filenames...)
 Documentation: https://github.com/edemaine/svgtiler#svg-tiler
 
