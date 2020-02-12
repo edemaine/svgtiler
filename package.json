@@ -4,12 +4,12 @@
   "version": "1.13.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edemaine/svg-tiler.git"
+    "url": "git+https://github.com/edemaine/svgtiler.git"
   },
   "bugs": {
-    "url": "https://github.com/edemaine/svg-tiler/issues"
+    "url": "https://github.com/edemaine/svgtiler/issues"
   },
-  "homepage": "https://github.com/edemaine/svg-tiler",
+  "homepage": "https://github.com/edemaine/svgtiler",
   "author": {
     "name": "Erik Demaine",
     "email": "edemaine@mit.edu",
