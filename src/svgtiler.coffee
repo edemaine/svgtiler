@@ -686,24 +686,26 @@ class Drawing extends Input
     ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
     lines = ["""
       %% Creator: svgtiler #{svgtiler.version}, https://github.com/edemaine/svgtiler
-      %% This LaTeX file includes and overlays text on top of #{basename}.svg/.pdf
+      %% This LaTeX file includes and overlays text on top of companion file
+      %% #{basename}.pdf/.png
       %%
       %% Instead of \\includegraphics, include this figure via
       %%   \\input{#{filename.base}}
       %% You can scale the image by first defining \\svg{width,height,scale}:
       %%   \\def\\svgwidth{\\linewidth} % full width
       %% or
-      %%   \\def\\svgheight{\\linewidth} % full width
+      %%   \\def\\svgheight{5in}
       %% or
       %%   \\def\\svgscale{0.5} % 50%
       %% (If multiple are specified, the first in the list above takes priority.)
       %%
       %% If this file resides in another directory from the root .tex file,
-      %% you need to help it find its auxiliary .svg/.pdf file via one of the
+      %% you need to help it find its auxiliary .pdf/.png file via one of the
       %% following options (any one will do):
       %%   1. \\usepackage{currfile} so that this file can find its own directory.
       %%   2. \\usepackage{import} and \\import{path/to/file/}{#{filename.base}}
-      %%   3. \\graphicspath{{path/to/file/}} % note trailing slash
+      %%      instead of \\import{#{filename.base}}
+      %%   3. \\graphicspath{{path/to/file/}} % note extra braces and trailing slash
       %%
       \\begingroup
         \\providecommand\\color[2][]{%

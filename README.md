@@ -223,13 +223,32 @@ your `viewBox`es accordingly.
   `<rect x="-5" y="-5" width="10" height="10"/>`
   will create a symbol with `viewBox="-5 -5 10 10"`.
 
-* You can extract all `<text>` from the SVG into a LaTeX overlay file.
+* You can extract all `<text>` from the SVG into a LaTeX overlay file
+  so that your text gets rendered by LaTeX during inclusion.
+
   For example: `svgtiler -p -l map.coffee drawings.xls`
   will create `drawings_sheet.svg`, `drawings_sheet.pdf`, and
   `drawings_sheet.svg_tex`.  The first two files omit the text, while the third
-  file is the one to include in LaTeX: use `\input{drawings_sheet.svg_tex}`
-  after optionally setting `\svgwidth`, `\svgheight`, or `\svgscale`.
-  (See the `.svg_tex` file for more details.)
+  file is the one to include in LaTeX, via `\input{drawings_sheet.svg_tex}`.
+  The same `.svg_tex` file will include graphics defined by `.pdf`
+  (created with `-p`) or `.png` (created with `-P`).
+
+  You can control the scale of the graphics component by defining
+  `\svgwidth`, `\svgheight`, or `\svgscale` before `\input`ting the `.svg_tex`.
+  (If more than one is specified, the first in the list above takes priority.)
+  For example:
+  * `\def\svgwidth{\linewidth}` causes the figure to span the full width
+  * `\def\svgheight{5in}` makes the figure 5 inches tall
+  * `\def\svgscale{0.5}` makes the figure 50% of its natural size
+    (where the SVG coordinates' unit translates to 1px = 0.75bp)
+
+  If the figure files are in a different directory from your root `.tex` file,
+  you need to help the `.svg_tex` file find its auxiliary `.pdf`/`.png` file
+  via one of the following options (any one will do):
+  1. `\usepackage{currfile}` to enable finding the figure's directory.
+  2. `\usepackage{import}` and `\import{path/to/file/}{filename.svg_tex}`
+     instead of `\import{filename.svg_tex}`.
+  3. `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
 
 * You can automatically convert all exported SVG files into PDF and/or PNG
   if you have Inkscape installed, via the `-p`/`--pdf` and/or `-P` or `--png`
