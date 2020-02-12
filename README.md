@@ -28,7 +28,7 @@ For example:
 svgtiler map1.txt map2.coffee drawing.asc drawings.xls
 ```
 
-will generate drawing.svg using the mappings in `map1.txt` and `map2.coffee`,
+will generate `drawing.svg` using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `drawings.xlsx`.
 
@@ -163,7 +163,8 @@ drafts, but if you prefer, you can process hidden sheets via `--hidden`.
 Given one or more mapping files and a drawing file, SVG Tiler follows a fairly
 simple layout algorithm to place the SVG expansions of the symbols into a
 single SVG output.  Each symbol has a bounding box, either specified by
-the `viewBox` of the root element, or automatically computed.
+the `viewBox` of the root element, or
+[automatically computed](#automatic-symbol-wrapping).
 The algorithm places symbols in a single row to align their top edges,
 with no horizontal space between them.
 The algorithm places rows to align their left edges so that the rows' bounding
@@ -176,93 +177,127 @@ and different columns have different widths.  But it probably isn't what you
 want if symbols have wildly differing widths or heights, so you should set
 your `viewBox`es accordingly.
 
-## Additional Features
+Each unique symbol gets defined just once (via SVG's `<symbol>`) and
+then instantiated (via SVG's `<use>`) many times,
+resulting in relatively small and efficient SVG outputs.
 
-* Each unique symbols gets defined just once (via SVG's `<symbol>`) and
-  then instantiated (via SVG's `<use>`) many times,
-  resulting in relatively small and efficient SVG outputs.
+## z-index: Stacking Order of Symbols
 
-* [z-index](https://www.w3.org/TR/2016/CR-SVG2-20160915/render.html#ZIndexProperty)
-  support on symbols defined by mapping files, even though output is
-  SVG 1.1 (which does not support z-index): symbol uses get re-ordered to
-  simulate the correct z order.  For example,
-  `<symbol viewBox="0 0 10 10" z-index="2">...</symbol>`
-  will be rendered on top of (later than) all symbols without a
-  `z-index="..."` specification (which default to a z-index of 0).
-  You can use a `z-index="..."` property or an HTML-style
-  `style="z-index: ..."` property.
+Often it is helpful to render some tile symbols on top of others.
+Although [SVG](https://www.w3.org/TR/SVG2/) does not support a `z-index`
+property, there was
+[a proposal](https://www.w3.org/TR/2016/CR-SVG2-20160915/render.html#ZIndexProperty)
+which SVG Tiler supports *at the `<symbol>` level*, emulated by
+re-ordering tile rendering order to simulate the specified z order.
+For example, `<symbol viewBox="0 0 10 10" z-index="2">...</symbol>`
+will be rendered on top of (later than) all symbols without a
+`z-index="..."` specification (which default to a z-index of 0).
+You can use a `z-index="..."` property or an HTML-style
+`style="z-index: ..."` property.
 
-* Symbols can draw beyond their `viewBox` via `style="overflow: visible"`
-  (as in normal SVG).  Furthermore, the `viewBox` of the overall output
-  drawing can still be computed correctly (larger than the bounding box
-  of the symbol `viewBox`es) via a special `overflowBox` attribute.
-  For example,
-  `<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" style="overflow: visible">...</symbol>`
-  defines a symbol that gets laid out as if it occupies the [0, 10] &times;
-  [0, 10] square, but the symbol can draw outside that square, and the overall
-  drawing bounding box will be set as if the symbol occupies the
-  [&minus;5, 15] &times; [&minus;5, 15] square.
-  Even zero-width and zero-height symbols will get rendered when
-  `style="overflow: visible"` is specified, by overriding `viewBox`.
+## Overflow and Bounding Box
 
-* Symbols can specify `width="auto"` and/or `height="auto"` to make their
-  instantiated width and/or height match their column and/or row,
-  respectively.  In this way, multiple uses of the same symbol can appear
-  as different sizes.  See the [auto sizing example](examples/auto).
-  If you want to nonuniformly scale the tile, you may want to also adjust
-  the symbol's [preserveAspectRatio](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
+To allow a tile `<symbol>` to draw outside its own `viewBox`, you need to set
+`overflow="visible"` or `style="overflow: visible"`.  (This is
+[a standard SVG feature](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/overflow).)
+In this case, `viewBox` represents the size of the element in the grid layout,
+but allows the element's actual bounding box to be something else.
+To correctly set the bounding box of the overall SVG drawing, SVG Tiler
+defines an additional symbol attribute called `overflowBox`, which is like
+`viewBox` but for specifying the actual bounding box of the content
+(when they differ &mdash; `overflowBox` defaults to the value of `viewBox`).
+The `viewBox` of the overall SVG is set to the minimum rectangle
+containing all symbols' `overflowBox`s.
 
-* Any undefined symbol displays as a red-on-yellow diamond question mark
-  (like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
-  with automatic width and height, so that it's easy to spot.
-  See the [auto sizing example](examples/auto).
+For example, `<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" overflow="visible">...</symbol>`
+defines a symbol that gets laid out as if it occupies the [0, 10] &times;
+[0, 10] square, but the symbol can draw outside that square, and the overall
+drawing bounding box will be set as if the symbol occupies the
+[&minus;5, 15] &times; [&minus;5, 15] square.
 
-* Very limited automatic `viewBox` setting via bounding box computation
-  (but see the code for many SVG features not supported).
-  For example, the SVG
-  `<rect x="-5" y="-5" width="10" height="10"/>`
-  will create a symbol with `viewBox="-5 -5 10 10"`.
+Even zero-width and zero-height symbols will get rendered when
+`overflow="visible"` is specified.  This can be useful for drawing grid
+outlines without affecting the overall grid layout, for example.
+(SVG defines that [symbols are invisible if they have zero width or
+height](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox),
+so SVG Tiler automatically works around this by using slightly positive
+widths and heights in the output `viewBox`.)
 
-* You can extract all `<text>` from the SVG into a LaTeX overlay file
-  so that your text gets rendered by LaTeX during inclusion.
+## Autosizing Symbols
 
-  For example: `svgtiler -p -l map.coffee drawings.xls`
-  will create `drawings_sheet.svg`, `drawings_sheet.pdf`, and
-  `drawings_sheet.svg_tex`.  The first two files omit the text, while the third
-  file is the one to include in LaTeX, via `\input{drawings_sheet.svg_tex}`.
-  The same `.svg_tex` file will include graphics defined by `.pdf`
-  (created with `-p`) or `.png` (created with `-P`).
+As a special non-SVG feature, symbols can specify `width="auto"` and/or
+`height="auto"` to make their instantiated width and/or height match their
+column and/or row, respectively.
+In this way, multiple uses of the same symbol can appear as different sizes.
+See the [auto sizing example](examples/auto).
 
-  You can control the scale of the graphics component by defining
-  `\svgwidth`, `\svgheight`, or `\svgscale` before `\input`ting the `.svg_tex`.
-  (If more than one is specified, the first in the list above takes priority.)
-  For example:
-  * `\def\svgwidth{\linewidth}` causes the figure to span the full width
-  * `\def\svgheight{5in}` makes the figure 5 inches tall
-  * `\def\svgscale{0.5}` makes the figure 50% of its natural size
-    (where the SVG coordinates' unit translates to 1px = 0.75bp)
+If you want to nonuniformly scale the tile, you may want to also adjust
+the symbol's [`preserveAspectRatio`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
 
-  If the figure files are in a different directory from your root `.tex` file,
-  you need to help the `.svg_tex` file find its auxiliary `.pdf`/`.png` file
-  via one of the following options (any one will do):
-  1. `\usepackage{currfile}` to enable finding the figure's directory.
-  2. `\usepackage{import}` and `\import{path/to/file/}{filename.svg_tex}`
-     instead of `\import{filename.svg_tex}`.
-  3. `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
+## Unrecognized Symbols
 
-* You can automatically convert all exported SVG files into PDF and/or PNG
-  if you have Inkscape installed, via the `-p`/`--pdf` and/or `-P` or `--png`
-  command-line options.
-  For example: `svgtiler -p map.coffee drawings.xls`
-  will both `drawings_sheet.svg` and `drawings_sheet.pdf`.
-  PNG conversion is intended for pixel art; see the
-  [Tetris example](examples/tetris/).
+Any undefined symbol displays as a red-on-yellow diamond question mark
+(like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
+with automatic width and height, so that it is easy to spot.
+See the [auto sizing example](examples/auto).
 
-* You can speed up Inkscape conversions process on a multithreaded CPU via the
-  `-j`/`--jobs`
-  command-line option.
-  For example, `svgtiler -j 4 -p map.coffee drawings.xls`
-  will run up to four Inkscape jobs at once.
+## Automatic `<symbol>` Wrapping
+
+In limited cases, you can avoid wrapping your symbol definitions in
+`<symbol>` tags, or avoid specifying the `viewBox` of the `<symbol>` tag.
+In this case, SVG Tiler attempts to set the `viewBox` to the bounding box of
+the SVG elements in the symbol.
+For example, the SVG `<rect x="-5" y="-5" width="10" height="10"/>`
+will automatically get wrapped by `<symbol viewBox="-5 -5 10 10">`.
+However, the current computation has many limitations (see the code for
+details), so it is recommended to specify your own `viewBox`, especially to
+control the layout bounding box which may different from the contents'
+bounding box.
+
+## Converting SVG to PDF/PNG
+
+SVG Tiler can automatically convert all exported SVG files into PDF and/or PNG,
+if you have [Inkscape](https://inkscape.org/) installed, via the `-p`/`--pdf`
+and/or `-P` or `--png` command-line options.
+For example: `svgtiler -p map.coffee drawings.xls`
+will generate both `drawings_sheet.svg` and `drawings_sheet.pdf`.
+PNG conversion is intended for pixel art; see the
+[Tetris example](examples/tetris/).
+
+You can speed up multiple Inkscape conversions process on a multithreaded CPU
+via the `-j`/`--jobs` command-line option.
+For example, `svgtiler -j 4 -p map.coffee drawings.xls`
+will run up to four Inkscape jobs at once.
+
+## LaTeX Text
+
+Using the `-t` command-line option, you can extract all `<text>` from the SVG
+into a LaTeX overlay file so that your text gets rendered by LaTeX during
+inclusion.
+
+For example: `svgtiler -p -t map.coffee drawings.xls`
+will create `drawings_sheet.svg`, `drawings_sheet.pdf`, and
+`drawings_sheet.svg_tex`.  The first two files omit the text, while the third
+file is the one to include in LaTeX, via `\input{drawings_sheet.svg_tex}`.
+The same `.svg_tex` file will include graphics defined by `.pdf`
+(created with `-p`) or `.png` (created with `-P`).
+
+You can control the scale of the graphics component by defining
+`\svgwidth`, `\svgheight`, or `\svgscale` before `\input`ting the `.svg_tex`.
+(If more than one is specified, the first in the list takes priority.)
+For example:
+* `\def\svgwidth{\linewidth}` causes the figure to span the full width
+* `\def\svgheight{5in}` makes the figure 5 inches tall
+* `\def\svgscale{0.5}` makes the figure 50% of its natural size
+  (where the SVG coordinates' unit translates to 1px = 0.75bp)
+
+If the figure files are in a different directory from your root `.tex` file,
+you need to help the `.svg_tex` file find its auxiliary `.pdf`/`.png` file
+via one of the following options (any one will do):
+* `\usepackage{currfile}` to enable finding the figure's directory.
+* `\usepackage{import}` and `\import{path/to/file/}{filename.svg_tex}`
+* instead of `\import{filename.svg_tex}`.
+* `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
 
 ## Examples
 
@@ -281,7 +316,9 @@ Demos
 After [installing Node](https://nodejs.org/en/download/),
 you can install this tool via
 
-    npm install -g svgtiler
+```sh
+npm install -g svgtiler
+```
 
 ## Command-Line Usage
 
