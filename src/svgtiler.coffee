@@ -702,7 +702,7 @@ class Drawing extends Input
       %% you need to help it find its auxiliary .svg/.pdf file via one of the
       %% following options (any one will do):
       %%   1. \\usepackage{currfile} so that this file can find its own directory.
-      %%   2. \\usepackage{import} and \\import{path/to/file}{#{filename.base}}
+      %%   2. \\usepackage{import} and \\import{path/to/file/}{#{filename.base}}
       %%   3. \\graphicspath{{path/to/file/}} % note trailing slash
       %%
       \\begingroup
@@ -710,6 +710,9 @@ class Drawing extends Input
           \\errmessage{You should load package 'color.sty' to render color in svgtiler text.}%
           \\renewcommand\\color[2][]{}%
         }%
+        \\ifx\\currfiledir\\undefined
+          \\def\\currfiledir{}%
+        \\fi
         \\ifx\\svgwidth\\undefined
           \\ifx\\svgheight\\undefined
             \\unitlength=0.75pt\\relax % 1px (SVG unit) = 0.75pt
@@ -730,7 +733,7 @@ class Drawing extends Input
         \\fi
         \\def\\clap#1{\\hbox to 0pt{\\hss#1\\hss}}%
         \\begin{picture}(#{@width},#{@height})%
-          \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{#{basename}}}%
+          \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{basename}}}%
     """]
     for row, i in @symbols
       for symbol, j in row
