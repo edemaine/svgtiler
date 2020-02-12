@@ -4,7 +4,7 @@
   <symbol id="X" viewBox="0,0,50,50">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
   </symbol>
-  <symbol id="">
+  <symbol id="$BLANK$">
     <g/>
   </symbol>
   <symbol id="$20">
@@ -18,7 +18,7 @@
     </g>
   </symbol>
   <use xlink:href="#X" x="0" y="0" width="50" height="50"/>
-  <use xlink:href="#" x="50" y="0" width="50" height="50"/>
+  <use xlink:href="#$BLANK$" x="50" y="0" width="50" height="50"/>
   <use xlink:href="#$20" x="100" y="0" width="50" height="50"/>
   <use xlink:href="#O" x="150" y="0" width="50" height="50"/>
 </svg>

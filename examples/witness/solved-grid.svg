@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="-15 -15 250 250" width="250" height="250" preserveAspectRatio="xMinYMin meet">
-  <symbol id="start-v0" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
+  <symbol id="start$v0" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
     <circle cx="0" cy="0" r="25" fill="black"/>
   </symbol>
   <symbol id="-" viewBox="10,-10,80,20" style="overflow: visible" z-index="1">
     <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="black"/>
   </symbol>
-  <symbol id=".s-v0" viewBox="-10,-10,20,20" z-index="3">
+  <symbol id=".s$v0" viewBox="-10,-10,20,20" z-index="3">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
     <circle x="0" y="0" r="10" fill="#d3ac0d"/>
     <rect x="0" y="-10" width="10" height="20" fill="#d3ac0d"/>
@@ -16,7 +16,7 @@
   <symbol id="-s" viewBox="10,-10,80,20" style="overflow: visible" z-index="4">
     <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="#d3ac0d"/>
   </symbol>
-  <symbol id=".s-v1" viewBox="-10,-10,20,20" z-index="3">
+  <symbol id=".s$v1" viewBox="-10,-10,20,20" z-index="3">
     <circle x="0" y="0" r="10" fill="black"/>
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
@@ -36,24 +36,24 @@
   <symbol id="bq" viewBox="0,0,80,80">
     <rect x="20" y="20" width="40" height="40" rx="15" ry="15" fill="blue" stroke="blue"/>
   </symbol>
-  <symbol id="start-v1" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
+  <symbol id="start$v1" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
     <circle cx="0" cy="0" r="25" fill="black"/>
     <circle x="0" y="0" r="10" fill="#d3ac0d"/>
     <rect x="-10" y="-10" width="10" height="20" fill="#d3ac0d"/>
     <rect x="-10" y="-10" width="20" height="10" fill="#d3ac0d"/>
   </symbol>
-  <symbol id="start-v2" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
+  <symbol id="start$v2" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
     <circle cx="0" cy="0" r="25" fill="black"/>
     <rect x="-10" y="-10" width="20" height="20" fill="#d3ac0d"/>
   </symbol>
-  <symbol id="-v0" viewBox="0,0,80,80"/>
-  <symbol id="start-v3" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
+  <symbol id="$BLANK$$v0" viewBox="0,0,80,80"/>
+  <symbol id="start$v3" viewBox="-10,-10,20,20" overflowBox="-25 -25 50 50" style="overflow: visible" z-index="2">
     <circle cx="0" cy="0" r="25" fill="#d3ac0d"/>
   </symbol>
-  <symbol id=".-v0" viewBox="-10,-10,20,20" z-index="0">
+  <symbol id=".$v0" viewBox="-10,-10,20,20" z-index="0">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
   </symbol>
-  <symbol id=".s-v2" viewBox="-10,-10,20,20" z-index="3">
+  <symbol id=".s$v2" viewBox="-10,-10,20,20" z-index="3">
     <circle x="0" y="0" r="10" fill="black"/>
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
@@ -63,22 +63,22 @@
   <use xlink:href="#rq" x="20" y="20" width="80" height="80"/>
   <use xlink:href="#bq" x="120" y="20" width="80" height="80"/>
   <use xlink:href="#bq" x="20" y="120" width="80" height="80"/>
-  <use xlink:href="#-v0" x="120" y="120" width="80" height="80"/>
-  <use xlink:href="#.-v0" x="100" y="200" width="20" height="20"/>
+  <use xlink:href="#$BLANK$$v0" x="120" y="120" width="80" height="80"/>
+  <use xlink:href="#.$v0" x="100" y="200" width="20" height="20"/>
   <use xlink:href="#-" x="20" y="0" width="80" height="20"/>
   <use xlink:href="#$7C" x="0" y="20" width="20" height="80"/>
   <use xlink:href="#-" x="120" y="100" width="80" height="20"/>
   <use xlink:href="#$7C" x="100" y="120" width="20" height="80"/>
   <use xlink:href="#-" x="20" y="200" width="80" height="20"/>
   <use xlink:href="#-" x="120" y="200" width="80" height="20"/>
-  <use xlink:href="#start-v0" x="0" y="0" width="20" height="20"/>
-  <use xlink:href="#start-v1" x="100" y="100" width="20" height="20"/>
-  <use xlink:href="#start-v2" x="200" y="100" width="20" height="20"/>
-  <use xlink:href="#start-v3" x="0" y="200" width="20" height="20"/>
-  <use xlink:href="#.s-v0" x="100" y="0" width="20" height="20"/>
-  <use xlink:href="#.s-v1" x="200" y="0" width="20" height="20"/>
-  <use xlink:href="#.s-v0" x="0" y="100" width="20" height="20"/>
-  <use xlink:href="#.s-v2" x="200" y="200" width="20" height="20"/>
+  <use xlink:href="#start$v0" x="0" y="0" width="20" height="20"/>
+  <use xlink:href="#start$v1" x="100" y="100" width="20" height="20"/>
+  <use xlink:href="#start$v2" x="200" y="100" width="20" height="20"/>
+  <use xlink:href="#start$v3" x="0" y="200" width="20" height="20"/>
+  <use xlink:href="#.s$v0" x="100" y="0" width="20" height="20"/>
+  <use xlink:href="#.s$v1" x="200" y="0" width="20" height="20"/>
+  <use xlink:href="#.s$v0" x="0" y="100" width="20" height="20"/>
+  <use xlink:href="#.s$v2" x="200" y="200" width="20" height="20"/>
   <use xlink:href="#-s" x="120" y="0" width="80" height="20"/>
   <use xlink:href="#$7Cs" x="100" y="20" width="20" height="80"/>
   <use xlink:href="#$7Cs" x="200" y="20" width="20" height="80"/>
