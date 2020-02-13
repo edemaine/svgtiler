@@ -579,7 +579,7 @@ class Drawing extends Input
       for row, i in @symbols
         for symbol, j in row
           if symbol.usesContext
-            symbol = symbol.use new Context @symbols, i, j
+            symbol = symbol.use new Context @, i, j
           else
             symbol = symbol.use()
           unless symbol.key of symbolsByKey
@@ -816,11 +816,12 @@ class TSVDrawing extends DSVDrawing
   @delimiter: '\t'
 
 class Drawings extends Input
-  @filenameSeparator = '_'
+  @filenameSeparator: '_'
   load: (datas) ->
     @drawings =
       for data in datas
         drawing = new Drawing
+        drawing.filename = @filename
         drawing.subname = data.subname
         drawing.load data
         drawing
@@ -866,21 +867,24 @@ class XLSXDrawings extends Drawings
     )
 
 class Context
-  constructor: (@symbols, @i, @j) ->
+  constructor: (@drawing, @i, @j) ->
+    @symbols = @drawing.symbols
+    @filename = @drawing.filename
+    @subname = @drawing.subname
     @symbol = @symbols[@i]?[@j]
     @key = @symbol?.key
   neighbor: (dj, di) ->
-    new Context @symbols, @i + di, @j + dj
+    new Context @drawing, @i + di, @j + dj
   includes: (args...) ->
     @symbol? and @symbol.includes args...
   row: (di = 0) ->
     i = @i + di
     for symbol, j in @symbols[i] ? []
-      new Context @symbols, i, j
+      new Context @drawing, i, j
   column: (dj = 0) ->
     j = @j + dj
     for row, i in @symbols
-      new Context @symbols, i, j
+      new Context @drawing, i, j
 
 extensionMap =
   '.txt': ASCIIMapping
@@ -980,7 +984,7 @@ help = ->
   console.log """
 svgtiler #{svgtiler.version ? "(web)"}
 Usage: #{process.argv[1]} (...options and filenames...)
-Documentation: https://github.com/edemaine/svgtiler#svg-tiler
+Documentation: https://github.com/edemaine/svgtiler
 
 Optional arguments:
   --help                Show this help message and exit.
@@ -1013,8 +1017,9 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
   'filename.jpg':   include JPEG image from specified file
   '<svg>...</svg>': raw SVG
   -> ...@key...:    function computing SVG, with `this` bound to Context with
-                    `key` set to symbol name, `i` and `j` set to coordinates,
-                    and supporting `neighbor` and `includes` methods.
+                    `key` (symbol name), `i` and `j` (y and x coordinates),
+                    `filename` (drawing filename), `subname` (subsheet name),
+                    and supporting `neighbor`/`includes`/`row`/`column` methods
 """
   #object with one or more attributes
   process.exit()

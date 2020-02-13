@@ -82,13 +82,13 @@ and has `this` bound to a manufactured `Context` object, giving you access to
 the following properties:
 
 * `this.key` is the symbol name, or `null` if the `Context` is out of bounds
-  of the drawing;
+  of the drawing.
 * `this.includes(substring)` computes whether `this.key` contains the given
   `substring` (as would `this.key.includes(substring)` in ECMAScript 2015).
 * `this.i` is the row number of the cell of this symbol occurrence (starting
-  at 0);
+  at 0).
 * `this.j` is the column number of the cell of this symbol occurrence
-  (starting at 0);
+  (starting at 0).
 * `this.neighbor(dj, di)` returns a new `Context` for row `i + di` and
   column `j + dj`.  (Note the reversal of coordinates, so that the order
   passed to `neighbor` corresponds to *x* then *y* coordinate.)
@@ -103,11 +103,14 @@ the following properties:
   on this array to do bulk tests on the row.
 * `this.column(dj = 0)` returns an array of `Context` objects, one for each
   symbol in column `j + dj`.
+* `this.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
+* `this.subname` is the name of the sheet within the spreadsheet drawing input,
+  or `undefined` if the input format does allow multiple sheets.
 
 Like regular NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
-They can also use `require('./filename')` to import local modules,
-which is useful for sharing code among mapping files.
+They can also use `require('./filename')` to import local modules relative to
+the mapping file, which is useful for sharing code among mapping files.
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
@@ -376,8 +379,9 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
   'filename.jpg':   include JPEG image from specified file
   '<svg>...</svg>': raw SVG
   -> ...@key...:    function computing SVG, with `this` bound to Context with
-                    `key` set to symbol name, `i` and `j` set to coordinates,
-                    and supporting `neighbor` and `includes` methods.
+                    `key` (symbol name), `i` and `j` (y and x coordinates),
+                    `filename` (drawing filename), `subname` (subsheet name),
+                    and supporting `neighbor`/`includes`/`row`/`column` methods
 ```
 
 ## About
