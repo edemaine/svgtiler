@@ -826,15 +826,12 @@ class Drawings extends Input
         drawing.load data
         drawing
   subfilename: (extension, drawing) ->
+    filename2 = path.parse @filename
+    filename2.base = filename2.base[...-filename2.ext.length]
     if @drawings.length > 1
-      filename2 = path.parse filename ? @filename
-      filename2.base = filename2.base[...-filename2.ext.length]
       filename2.base += @constructor.filenameSeparator + drawing.subname
-      filename2.base += extension
-      path.format filename2
-    else
-      drawing?.filename = @filename  ## use Drawing default if not filename?
-      filename
+    filename2.base += extension
+    path.format filename2
   writeSVG: (mappings, filename) ->
     for drawing in @drawings
       drawing.writeSVG mappings, @subfilename '.svg', drawing
