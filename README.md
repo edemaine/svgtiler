@@ -264,6 +264,26 @@ details), so it is recommended to specify your own `viewBox`, especially to
 control the layout bounding box which may different from the contents'
 bounding box.
 
+## `<image>` Processing
+
+`<image>` tags in SVG (or image filenames specified by a mapping file, which
+automatically get wrapped by an `<image>` tag) get some special additional
+processing:
+
+1. The default
+   [`image-rendering`](https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering)
+   is the equivalent of `pixelated`, for pixel art.
+   You can also explicitly specify `image-rendering="pixelated"`
+   or `image-rendering="optimizeSpeed"`.
+   Either way, this behavior gets achieved by a combination of
+   `image-rendering="optimizeSpeed"` (for Inkscape) and
+   `style="image-rendering:pixelated"` (for Chrome).
+
+   If you would rather have smoothed images, set `image-rendering="auto"`.
+
+2. An omitted `width` and/or `height` automatically get filled in according to
+   the image size (scaled if exactly one of `width` and `height` is specified).
+
 ## Converting SVG to PDF/PNG
 
 SVG Tiler can automatically convert all exported SVG files into PDF and/or PNG,

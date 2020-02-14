@@ -141,6 +141,22 @@ zIndex = (node) ->
   else
     z
 
+domRecurse = (node, callback) ->
+  ###
+  Recurse through DOM starting at `node`, calling `callback(node, parent)`
+  on every recursive node except `node` itself.
+  `callback()` should return a true value if you want to recurse into
+  the specified node's children (typically, when there isn't a match).
+  ###
+  return unless node.hasChildNodes()
+  child = node.lastChild
+  while child?
+    nextChild = child.previousSibling
+    if callback child, node
+      domRecurse child, callback
+    child = nextChild
+  null
+
 class Symbol
   @svgEncoding: 'utf8'
   @forceWidth: null   ## default: no size forcing
@@ -150,15 +166,6 @@ class Symbol
   # use overflow:hidden to restore normal SVG behavior of keeping each tile
   # within its bounding box.
   @overflowDefault: 'visible'
-
-  ###
-  Attempt to render pixels as pixels, as needed for old-school graphics.
-  SVG 1.1 and Inkscape define image-rendering="optimizeSpeed" for this.
-  Chrome doesn't support this, but supports a CSS3 (or SVG) specification of
-  "image-rendering:pixelated".  Combining these seems to work everywhere.
-  ###
-  @imageRendering:
-    ' image-rendering="optimizeSpeed" style="image-rendering:pixelated"'
 
   @parse: (key, data, dirname) ->
     unless data?
@@ -188,17 +195,19 @@ class Symbol
             ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
             switch extension
               when '.png', '.jpg', '.jpeg', '.gif'
-                size = require('image-size') filename
+                dirname: dirname
                 svg: """
-                  <image xlink:href="#{encodeURI data}" width="#{size.width}" height="#{size.height}"#{@imageRendering}/>
+                  <image xlink:href="#{encodeURI data}"/>
                 """
               when '.svg'
+                dirname: path.dirname filename
                 filename: filename
                 svg: fs.readFileSync filename,
                        encoding: @svgEncoding
               else
                 throw new SVGTilerException "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
           else
+            dirname: dirname
             svg: data
         else
           data
@@ -263,11 +272,53 @@ class StaticSymbol extends Symbol
           indent + lines[line-1] + '\n' +
           indent + ' '.repeat(col-1) + '^^^' +
           (if line < lines.length then '\n' + indent + lines[line] else '')
-        console.error "SVG parse ${level} in symbol '#{@key}': #{msg}"
+        console.error "SVG parse #{level} in symbol '#{@key}': #{msg}"
     .parseFromString @svg, 'image/svg+xml'
     # Remove from the symbol any top-level xmlns=SVGNS possibly added above:
     # we will have such a tag in the top-level <svg>.
     @xml.documentElement.removeAttribute 'xmlns'
+
+    ## <image> processing
+    domRecurse @xml.documentElement, (node) =>
+      if node.nodeName == 'image'
+        ###
+        Fix image-rendering: if unspecified, or if specified as "optimizeSpeed"
+        or "pixelated", attempt to render pixels as pixels, as needed for
+        old-school graphics.  SVG 1.1 and Inkscape define
+        image-rendering="optimizeSpeed" for this.  Chrome doesn't support this,
+        but supports a CSS3 (or SVG) specification of
+        "image-rendering:pixelated".  Combining these seems to work everywhere.
+        ###
+        rendering = attributeOrStyle node, 'image-rendering'
+        if not rendering? or rendering in ['optimizeSpeed', 'pixelated']
+          node.setAttribute 'image-rendering', 'optimizeSpeed'
+          style = node.getAttribute('style') ? ''
+          style = style.replace /(^|;)\s*image-rendering\s*:\s*\w+\s*($|;)/,
+            (m, before, after) -> before or after or ''
+          style += ';' if style
+          node.setAttribute 'style', style + 'image-rendering:pixelated'
+        ## Fill in width and height
+        unless node.hasAttribute('width') and node.hasAttribute('height')
+          filename = node.getAttribute('xlink:href') or node.getAttribute('href')
+          if filename
+            filename = path.join @dirname, filename if @dirname?
+            try
+              size = require('image-size') filename
+            catch e
+              console.warn "Failed to detect size of image '#{filename}': #{e}"
+              size = null
+            if size?
+              ## If one of width and height is set, scale to match.
+              if not isNaN width = parseFloat node.getAttribute 'width'
+                node.setAttribute 'height', size.height * (width / size.width)
+              else if not isNaN height = parseFloat node.getAttribute 'height'
+                node.setAttribute 'width', size.width * (height / size.height)
+              else
+                ## If neither width nor height are set, set both.
+                node.setAttribute 'width', size.width
+                node.setAttribute 'height', size.height
+      true
+
     @viewBox = svgBBox @xml
     # Overflow behavior
     overflow = attributeOrStyle @xml.documentElement, 'overflow'
@@ -313,18 +364,13 @@ class StaticSymbol extends Symbol
     ## Optionally extract <text> nodes for LaTeX output
     if Symbol.texText
       @text = []
-      extract = (node) =>
-        return unless node.hasChildNodes()
-        child = node.lastChild
-        while child?
-          nextChild = child.previousSibling
-          if child.nodeName == 'text'
-            @text.push child
-            node.removeChild child
-          else
-            extract child
-          child = nextChild
-      extract @xml.documentElement
+      domRecurse @xml.documentElement, (node, parent) =>
+        if node.nodeName == 'text'
+          @text.push node
+          parent.removeChild node
+          false # don't recurse into <text>'s children
+        else
+          true
   id: ->
     escapeId @key
   use: -> @  ## do nothing for static symbol
@@ -402,6 +448,7 @@ class Mapping extends Input
         value = Symbol.parse key, value, dirname
       @map[key] = value
   lookup: (key) ->
+    dirname = path.dirname @filename if @filename?
     key = key.toString()  ## Sometimes get a number, e.g., from XLSX
     if key of @map
       @map[key]
@@ -411,7 +458,7 @@ class Mapping extends Input
       ## it to make multiple versions, but keep track of which are the same.
       value = @function key
       if value?
-        @map[key] = Symbol.parse key, value
+        @map[key] = Symbol.parse key, value, dirname
       else
         value
     else
