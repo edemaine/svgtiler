@@ -157,6 +157,13 @@ domRecurse = (node, callback) ->
     child = nextChild
   null
 
+contentType =
+  '.png': 'image/png'
+  '.jpg': 'image/jpeg'
+  '.jpeg': 'image/jpeg'
+  '.gif': 'image/gif'
+  '.svg': 'image/svg+xml'
+
 class Symbol
   @svgEncoding: 'utf8'
   @forceWidth: null   ## default: no size forcing
@@ -297,13 +304,21 @@ class StaticSymbol extends Symbol
             (m, before, after) -> before or after or ''
           style += ';' if style
           node.setAttribute 'style', style + 'image-rendering:pixelated'
-        ## Fill in width and height
-        unless node.hasAttribute('width') and node.hasAttribute('height')
-          filename = node.getAttribute('xlink:href') or node.getAttribute('href')
-          if filename
-            filename = path.join @dirname, filename if @dirname?
+        ## Read file for width/height detection and/or inlining
+        for key in ['xlink:href', 'href']
+          if filename = node.getAttribute key
+            break
+        filename = path.join @dirname, filename if @dirname? and filename
+        if filename? and not /^data:|file:|[a-z]+:\/\//.test filename # skip URLs
+          filedata = null
+          try
+            filedata = fs.readFileSync filename unless window?
+          catch e
+            console.warn "Failed to read image '#{filename}': #{e}"
+          ## Fill in width and height
+          unless window? or (node.hasAttribute('width') and node.hasAttribute('height'))
             try
-              size = require('image-size') filename
+              size = require('image-size') filedata ? filename
             catch e
               console.warn "Failed to detect size of image '#{filename}': #{e}"
               size = null
@@ -317,7 +332,15 @@ class StaticSymbol extends Symbol
                 ## If neither width nor height are set, set both.
                 node.setAttribute 'width', size.width
                 node.setAttribute 'height', size.height
-      true
+          ## Inline
+          if filedata? and Drawing.inlineImages
+            type = contentType[extensionOf filename]
+            if type?
+              node.setAttribute key,
+                "data:#{type};base64,#{filedata.toString 'base64'}"
+        false
+      else
+        true
 
     @viewBox = svgBBox @xml
     # Overflow behavior
@@ -562,6 +585,7 @@ allBlank = (list) ->
   true
 
 class Drawing extends Input
+  @inlineImages: not window?
   load: (data) ->
     ## Turn strings into arrays
     data = for row in data
@@ -1047,6 +1071,7 @@ Optional arguments:
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.tex
+  --no-inline           Don't inline <image>s into output SVG
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
@@ -1116,6 +1141,8 @@ main = ->
         sanitize = false
       when '--no-overflow'
         Symbol.overflowDefault = null # no default
+      when '--no-inline'
+        Drawing.inlineImages = false
       when '-j', '--jobs'
         skip = 1
         arg = parseInt args[i+1]
