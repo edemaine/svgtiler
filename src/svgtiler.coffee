@@ -609,9 +609,9 @@ class Drawing extends Input
           node.appendChild child.cloneNode true
       else
         node.appendChild symbol.xml.documentElement.cloneNode true
-      ## Set/overwrite any viewbox attribute with one from symbol.
+      ## Set/overwrite any viewBox attribute with one from symbol.
       if symbol.viewBox?
-        node.setAttribute 'viewBox', symbol.viewBox
+        node.setAttribute 'viewBox', symbol.viewBox.join ' '
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
     levels = {}
