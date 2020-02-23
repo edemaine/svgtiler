@@ -200,10 +200,17 @@ You can use a `z-index="..."` property or an HTML-style
 
 ## Overflow and Bounding Box
 
-To allow a tile `<symbol>` to draw outside its own `viewBox`, you need to set
-`overflow="visible"` or `style="overflow: visible"`.  (This is
-[a standard SVG feature](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/overflow).)
-In this case, `viewBox` represents the size of the element in the grid layout,
+By default, SVG Tiler (v1.15+) sets all tile `<symbol>`s to have
+[`overflow="visible"`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/overflow)
+behavior, meaning that they can draw outside their `viewBox`.
+If you want to override this behavior and clip symbols to their `viewBox`,
+you have two options.  At the `<symbol>` level, use `overflow="hidden"` or
+`style="overflow: hidden"`.  At the global level, use the `--no-overflow`
+command-line option (and use `overflow="visible"` to make some symbols
+overflow).
+
+When `overflow` is `visible`, `viewBox` still represents the size of the
+element in the [grid layout](#layout-algorithm),
 but allows the element's actual bounding box to be something else.
 To correctly set the bounding box of the overall SVG drawing, SVG Tiler
 defines an additional symbol attribute called `overflowBox`, which is like
@@ -218,8 +225,8 @@ defines a symbol that gets laid out as if it occupies the [0, 10] &times;
 drawing bounding box will be set as if the symbol occupies the
 [&minus;5, 15] &times; [&minus;5, 15] square.
 
-Even zero-width and zero-height symbols will get rendered when
-`overflow="visible"` is specified.  This can be useful for drawing grid
+Even zero-width and zero-height symbols will get rendered (unless
+`overflow="hidden").  This can be useful for drawing grid
 outlines without affecting the overall grid layout, for example.
 (SVG defines that [symbols are invisible if they have zero width or
 height](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox),

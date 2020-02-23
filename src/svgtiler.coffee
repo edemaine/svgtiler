@@ -148,6 +148,10 @@ class Symbol
   @forceWidth: null   ## default: no size forcing
   @forceHeight: null  ## default: no size forcing
   @texText: false
+  # Set default overflow behavior to visible unless --no-overflow specified;
+  # use overflow:hidden to restore normal SVG behavior of keeping each tile
+  # within its bounding box.
+  @overflowDefault: 'visible'
 
   ###
   Attempt to render pixels as pixels, as needed for old-school graphics.
@@ -267,9 +271,12 @@ class StaticSymbol extends Symbol
     # we will have such a tag in the top-level <svg>.
     @xml.documentElement.removeAttribute 'xmlns'
     @viewBox = svgBBox @xml
-    @overflowBox = overflowBox @xml
+    # Overflow behavior
     overflow = attributeOrStyle @xml.documentElement, 'overflow'
-    @overflowVisible = (overflow? and /^visible\b/.test overflow)
+    if @constructor.overflowDefault? and not overflow?
+      @xml.documentElement.setAttribute 'overflow',
+        overflow = @constructor.overflowDefault
+    @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
     @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
@@ -284,6 +291,7 @@ class StaticSymbol extends Symbol
           @viewBox[2] = zeroSizeReplacement
         if @height == 0
           @viewBox[3] = zeroSizeReplacement
+    @overflowBox = overflowBox @xml
     if Symbol.forceWidth?
       @width = Symbol.forceWidth
     if Symbol.forceHeight?
@@ -1061,6 +1069,8 @@ main = ->
         Symbol.texText = true
       when '--no-sanitize'
         sanitize = false
+      when '--no-overflow'
+        Symbol.overflowDefault = null # no default
       when '-j', '--jobs'
         skip = 1
         arg = parseInt args[i+1]
