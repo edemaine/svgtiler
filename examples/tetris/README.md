@@ -15,6 +15,10 @@ ILLLJOOSS Z
 
 ## Output:
 
-[PNG](example.png), [SVG](example.svg) (with relative links to sprites)
+[PNG](example.png)
 
 ![](example.png)
+
+[SVG](example.svg) (with inlined sprites)
+
+![](example.svg)
