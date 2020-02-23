@@ -73,8 +73,8 @@ The object or function should map a symbol name to either
    or via `preact.h` calls
    (see [the polyomino example](examples/polyomino)),
 3. a filename with `.svg` extension containing SVG code,
-4. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension
-   containing an image, or
+4. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension containing an
+   image (which will get [processed](#image-processing) as an `<image>`), or
 5. a function returning one of the above.
 
 In the last case, the function is called *for each occurrence of the symbol*,
@@ -180,9 +180,11 @@ and different columns have different widths.  But it probably isn't what you
 want if symbols have wildly differing widths or heights, so you should set
 your `viewBox`es accordingly.
 
-Each unique symbol gets defined just once (via SVG's `<symbol>`) and
-then instantiated (via SVG's `<use>`) many times,
-resulting in relatively small and efficient SVG outputs.
+Each unique symbol gets defined just once (via SVG's
+[`<symbol>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol))
+and then instantiated (via SVG's
+[`<use>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use))
+many times, resulting in relatively small and efficient SVG outputs.
 
 ## z-index: Stacking Order of Symbols
 
@@ -283,6 +285,18 @@ processing:
 
 2. An omitted `width` and/or `height` automatically get filled in according to
    the image size (scaled if exactly one of `width` and `height` is specified).
+
+3. The image file contents will get inlined into the SVG document (in base64),
+   which makes the `.svg` file a stand-alone document.
+   If you specify the `--no-inline` command-line option, the `.svg` file will
+   load externally linked images only if you have the auxiliary image files
+   with the correct paths.
+
+4. Duplicate inlined images (with the same contents and `image-rendering`, but
+   not necessarily the same `x`/`y`/`width`/`height`) will get shared via a
+   common SVG `<symbol>`.  This makes for efficient SVG files when multiple
+   keys map to the same symbol, or when multiple symbols use the same
+   component image.
 
 ## Converting SVG to PDF/PNG
 
