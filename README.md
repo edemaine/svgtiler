@@ -389,6 +389,7 @@ Optional arguments:
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.tex
   --no-inline           Don't inline <image>s into output SVG
+  --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
