@@ -346,6 +346,7 @@ via one of the following options (any one will do):
 ## Examples
 
 Games
+* [Super Mario Bros.](examples/mario)
 * [Tetris](examples/tetris)
 * [The Witness](examples/witness)
 * [Tilt](examples/tilt)
