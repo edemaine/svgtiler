@@ -33,12 +33,15 @@ class SVGTilerException
   toString: ->
     "svgtiler: #{@message}"
 
+parseBox = (box) ->
+  return null unless box
+  box = box.split /\s*[\s,]\s*/
+  .map parseNum
+  return null if null in box
+  box
+
 overflowBox = (xml) ->
-  if xml.documentElement.hasAttribute 'overflowBox'
-    xml.documentElement.getAttribute('overflowBox').split /\s*,?\s+/
-    .map parseFloat
-  else
-    null
+  parseBox xml.documentElement.getAttribute 'overflowBox'
 
 parseNum = (x) ->
   parsed = parseFloat x
@@ -55,12 +58,7 @@ svgBBox = (xml) ->
   ##   - text
   ##   - line widths which extend bounding box
   if xml.documentElement.hasAttribute 'viewBox'
-    viewBox = xml.documentElement.getAttribute('viewBox').split /\s*,?\s+/
-    .map parseNum
-    if null in viewBox
-      null
-    else
-      viewBox
+    parseBox xml.documentElement.getAttribute 'viewBox'
   else
     recurse = (node) ->
       if node.nodeType != node.ELEMENT_NODE or
