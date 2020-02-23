@@ -128,7 +128,7 @@ attributeOrStyle = (node, attr, styleKey = attr) ->
   else
     style = node.getAttribute 'style'
     if style
-      match = /(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)/i.exec style
+      match = ///(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)///i.exec style
       match?[1]
 
 zIndex = (node) ->
