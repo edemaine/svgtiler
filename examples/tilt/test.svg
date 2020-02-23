@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" preserveAspectRatio="xMinYMin meet">
-  <symbol id="X" viewBox="0,0,50,50">
+  <symbol id="X" viewBox="0 0 50 50" overflow="visible">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
   </symbol>
-  <symbol id="$BLANK$">
+  <symbol id="$BLANK$" overflow="visible">
     <g/>
   </symbol>
-  <symbol id="$20">
+  <symbol id="$20" overflow="visible">
     <g/>
   </symbol>
-  <symbol id="O" viewBox="0,0,50,50">
+  <symbol id="O" viewBox="0 0 50 50" overflow="visible">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
       <circle cx="25" cy="25" r="24" fill="#9bcf51"/>

@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4450 3950" width="4450" height="3950" preserveAspectRatio="xMinYMin meet">
-  <symbol id="0">
+  <symbol id="0" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">0</text>
   </symbol>
-  <symbol id="1">
+  <symbol id="1" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">1</text>
   </symbol>
-  <symbol id="2">
+  <symbol id="2" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">2</text>
   </symbol>
-  <symbol id="$20">
+  <symbol id="$20" overflow="visible">
     <g/>
   </symbol>
-  <symbol id="X" viewBox="0,0,50,50">
+  <symbol id="X" viewBox="0 0 50 50" overflow="visible">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
   </symbol>
-  <symbol id="-" viewBox="0,0,50,50">
+  <symbol id="-" viewBox="0 0 50 50" overflow="visible">
     <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
   </symbol>
-  <symbol id="O" viewBox="0,0,50,50">
+  <symbol id="O" viewBox="0 0 50 50" overflow="visible">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
       <circle cx="25" cy="25" r="24" fill="#9bcf51"/>
       <circle cx="25" cy="25" r="17" fill="#9ecd50" stroke="#5c8f23" stroke-width="4"/>
     </g>
   </symbol>
-  <symbol id="A">
+  <symbol id="A" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">A</text>
   </symbol>
-  <symbol id="B">
+  <symbol id="B" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">B</text>
   </symbol>
-  <symbol id="C">
+  <symbol id="C" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">C</text>
   </symbol>
   <use xlink:href="#$20" x="0" y="0" width="50" height="50"/>

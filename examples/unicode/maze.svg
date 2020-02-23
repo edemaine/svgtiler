@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 141 141" width="141" height="141" preserveAspectRatio="xMinYMin meet">
-  <symbol id="$E2$96$88" viewBox="0,0,20,20" overflowBox="-0.5 -0.5 21 21" style="overflow: visible">
+  <symbol id="$E2$96$88" viewBox="0 0 20 20" overflowBox="-0.5 -0.5 21 21" overflow="visible">
     <rect width="20" height="20" stroke="black" fill="purple"/>
   </symbol>
-  <symbol id="$F0$9F$98$8A" viewBox="-10,-10,20,20">
+  <symbol id="$F0$9F$98$8A" viewBox="-10 -10 20 20" overflow="visible">
     <circle r="6" fill="red"/>
     <circle cx="-2" cy="-2" r="1" fill="white"/>
     <circle cx="2" cy="-2" r="1" fill="white"/>
     <path d="M -3 1 Q 0 4, 3 1" fill="none" stroke="white"/>
   </symbol>
-  <symbol id="$20" viewBox="-10,-10,20,20"/>
-  <symbol id="$F0$9F$91$8D$F0$9F$8F$BD" viewBox="-10,-10,20,20">
+  <symbol id="$20" viewBox="-10 -10 20 20" overflow="visible"/>
+  <symbol id="$F0$9F$91$8D$F0$9F$8F$BD" viewBox="-10 -10 20 20" overflow="visible">
     <line x1="-5" y1="-5" x2="5" y2="5" stroke="green" stroke-width="2" stroke-linecap="round"/>
     <line x1="-5" y1="5" x2="5" y2="-5" stroke="green" stroke-width="2" stroke-linecap="round"/>
   </symbol>
