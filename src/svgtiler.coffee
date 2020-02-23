@@ -62,7 +62,10 @@ svgBBox = (xml) ->
   else
     recurse = (node) ->
       if node.nodeType != node.ELEMENT_NODE or
-         node.tagName in ['defs', 'symbol', 'use']
+         node.nodeName in ['defs', 'use']
+        return null
+      # Ignore <symbol>s except the root <symbol> that we're bounding
+      if node.nodeName == 'symbol' and node != xml.documentElement
         return null
       switch node.tagName
         when 'rect', 'image'
@@ -111,7 +114,7 @@ svgBBox = (xml) ->
           ymax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
           [xmin, ymin, xmax - xmin, ymax - ymin]
     viewBox = recurse xml.documentElement
-    if Infinity in viewBox or -Infinity in viewBox
+    if not viewBox? or Infinity in viewBox or -Infinity in viewBox
       null
     else
       viewBox
@@ -128,6 +131,15 @@ attributeOrStyle = (node, attr, styleKey = attr) ->
     if style
       match = ///(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)///i.exec style
       match?[1]
+
+getHref = (node) ->
+  for key in ['xlink:href', 'href']
+    if href = node.getAttribute key
+      return
+        key: key
+        href: href
+  key: null
+  href: null
 
 zIndex = (node) ->
   ## Check whether DOM node has a specified z-index, defaulting to zero.
@@ -285,6 +297,23 @@ class StaticSymbol extends Symbol
     # we will have such a tag in the top-level <svg>.
     @xml.documentElement.removeAttribute 'xmlns'
 
+    ## Wrap XML in <symbol> if not already.
+    symbol = @xml.createElementNS SVGNS, 'symbol'
+    symbol.setAttribute 'id', @id = escapeId @key
+    # Avoid a layer of indirection for <symbol>/<svg> at top level
+    if @xml.documentElement.nodeName in ['symbol', 'svg'] and
+       not @xml.documentElement.nextSibling?
+      for attribute in @xml.documentElement.attributes
+        unless attribute.name in ['version', 'id'] or attribute.name[...5] == 'xmlns'
+          symbol.setAttribute attribute.name, attribute.value
+      doc = @xml.documentElement
+      @xml.removeChild @xml.documentElement
+    else
+      doc = @xml
+    for child in (node for node in doc.childNodes)
+      symbol.appendChild child
+    @xml.appendChild symbol
+
     ## <image> processing
     domRecurse @xml.documentElement, (node) =>
       if node.nodeName == 'image'
@@ -305,9 +334,8 @@ class StaticSymbol extends Symbol
           style += ';' if style
           node.setAttribute 'style', style + 'image-rendering:pixelated'
         ## Read file for width/height detection and/or inlining
-        for key in ['xlink:href', 'href']
-          if filename = node.getAttribute key
-            break
+        {href, key} = getHref node
+        filename = href
         filename = path.join @dirname, filename if @dirname? and filename
         if filename? and not /^data:|file:|[a-z]+:\/\//.test filename # skip URLs
           filedata = null
@@ -316,33 +344,41 @@ class StaticSymbol extends Symbol
           catch e
             console.warn "Failed to read image '#{filename}': #{e}"
           ## Fill in width and height
-          unless window? or (node.hasAttribute('width') and node.hasAttribute('height'))
+          size = null
+          unless window?
             try
               size = require('image-size') filedata ? filename
             catch e
               console.warn "Failed to detect size of image '#{filename}': #{e}"
-              size = null
-            if size?
-              ## If one of width and height is set, scale to match.
-              if not isNaN width = parseFloat node.getAttribute 'width'
-                node.setAttribute 'height', size.height * (width / size.width)
-              else if not isNaN height = parseFloat node.getAttribute 'height'
-                node.setAttribute 'width', size.width * (height / size.height)
-              else
-                ## If neither width nor height are set, set both.
-                node.setAttribute 'width', size.width
-                node.setAttribute 'height', size.height
+          if size?
+            ## If one of width and height is set, scale to match.
+            if not isNaN width = parseFloat node.getAttribute 'width'
+              node.setAttribute 'height', size.height * (width / size.width)
+            else if not isNaN height = parseFloat node.getAttribute 'height'
+              node.setAttribute 'width', size.width * (height / size.height)
+            else
+              ## If neither width nor height are set, set both.
+              node.setAttribute 'width', size.width
+              node.setAttribute 'height', size.height
           ## Inline
           if filedata? and Drawing.inlineImages
             type = contentType[extensionOf filename]
             if type?
+              node.setAttribute "data-filename", filename
+              if size?
+                node.setAttribute "data-width", size.width
+                node.setAttribute "data-height", size.height
               node.setAttribute key,
                 "data:#{type};base64,#{filedata.toString 'base64'}"
         false
       else
         true
 
+    ## Set viewBox attribute if absent.
     @viewBox = svgBBox @xml
+    if @viewBox? and not @xml.documentElement.hasAttribute 'viewBox'
+      @xml.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+
     # Overflow behavior
     overflow = attributeOrStyle @xml.documentElement, 'overflow'
     if @constructor.overflowDefault? and not overflow?
@@ -394,8 +430,9 @@ class StaticSymbol extends Symbol
           false # don't recurse into <text>'s children
         else
           true
-  id: ->
-    escapeId @key
+  setId: (id) ->
+    @id = id # for <use>
+    @xml.documentElement.setAttribute 'id', id
   use: -> @  ## do nothing for static symbol
   usesContext: false
 
@@ -424,7 +461,7 @@ class DynamicSymbol extends Symbol
       version = @nversions++
       @versions[string] =
         Symbol.parse "#{@key}$v#{version}", result, @dirname
-      @versions[string].id = => "#{escapeId @key}$v#{version}"
+      @versions[string].setId "#{escapeId @key}$v#{version}"
     @versions[string]
   usesContext: true
 
@@ -437,7 +474,7 @@ unrecognizedSymbol = new StaticSymbol '$UNRECOGNIZED$', svg: '''
     <path xmlns="http://www.w3.org/2000/svg" stroke="none" fill="red" d="M 200,100 100,200 0,100 100,0 200,100 z M 135.64709,74.70585 q 0,-13.52935 -10.00006,-22.52943 -9.99999,-8.99999 -24.35289,-8.99999 -17.29415,0 -30.117661,5.29409 L 69.05879,69.52938 q 9.764731,-6.23528 21.52944,-6.23528 8.82356,0 14.58824,4.82351 5.76469,4.82351 5.76469,12.70589 0,8.5883 -9.94117,21.70588 -9.94117,13.11766 -9.94117,26.76473 l 17.88236,0 q 0,-6.3529 6.9412,-14.9412 11.76471,-14.58816 12.82351,-16.35289 6.9412,-11.05887 6.9412,-23.29417 z m -22.00003,92.11771 0,-24.70585 -27.29412,0 0,24.70585 27.29412,0 z"/>
   </symbol>
 '''
-unrecognizedSymbol.id = -> '$UNRECOGNIZED$' # cannot be output of standard id()
+unrecognizedSymbol.setId '$UNRECOGNIZED$' # cannot be output of escapeId()
 
 class Input
   @encoding: 'utf8'
@@ -667,20 +704,49 @@ class Drawing extends Input
     ## Include all used symbols in SVG
     for key, symbol of symbolsByKey
       continue unless symbol?
-      svg.appendChild node = doc.createElementNS SVGNS, 'symbol'
-      node.setAttribute 'id', symbol.id()
-      if symbol.xml.documentElement.tagName in ['svg', 'symbol']
-        ## Remove a layer of indirection for <svg> and <symbol>
-        for attribute in symbol.xml.documentElement.attributes
-          unless attribute.name in ['version', 'id'] or attribute.name[...5] == 'xmlns'
-            node.setAttribute attribute.name, attribute.value
-        for child in symbol.xml.documentElement.childNodes
-          node.appendChild child.cloneNode true
-      else
-        node.appendChild symbol.xml.documentElement.cloneNode true
-      ## Set/overwrite any viewBox attribute with one from symbol.
-      if symbol.viewBox?
-        node.setAttribute 'viewBox', symbol.viewBox.join ' '
+      svg.appendChild symbol.xml.documentElement.cloneNode true
+    ## Factor out duplicate inline <image>s into separate <symbol>s.
+    inlineImages = {}
+    inlineImageVersions = {}
+    domRecurse svg, (node, parent) ->
+      return true unless node.nodeName == 'image'
+      {href} = getHref node
+      return true unless href?.startsWith 'data:'
+      # data-filename gets set to the original filename when inlining,
+      # which we use for key labels so isn't needed as an exposed attribute.
+      # Ditto for width and height of image.
+      filename = node.getAttribute('data-filename') ? ''
+      node.removeAttribute 'data-filename'
+      width = node.getAttribute 'data-width'
+      node.removeAttribute 'data-width'
+      height = node.getAttribute 'data-height'
+      node.removeAttribute 'data-height'
+      # Transfer x/y/width/height to <use> element, for more re-usability.
+      parent.replaceChild (use = doc.createElementNS SVGNS, 'use'), node
+      for attr in ['x', 'y', 'width', 'height']
+        use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
+        node.removeAttribute attr
+      # Memoize versions
+      attributes =
+        for attr in node.attributes
+          "#{attr.name}=#{attr.value}"
+      attributes.sort()
+      attributes = attributes.join ' '
+      if attributes not of inlineImages
+        inlineImageVersions[filename] ?= 0
+        version = inlineImageVersions[filename]++
+        inlineImages[attributes] = "$image$#{escapeId filename}$v#{version}"
+        svg.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
+        symbol.setAttribute 'id', inlineImages[attributes]
+        # If we don't have width/height set from data-width/height fields,
+        # we take the first used width/height as the master height.
+        node.setAttribute 'width', width or use.getAttribute 'width'
+        node.setAttribute 'height', height or use.getAttribute 'height'
+        symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
+        symbol.appendChild node
+      use.setAttribute 'xlink:href', '#' + inlineImages[attributes]
+      keyBase = "$image$#{filename}"
+      false
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
     levels = {}
@@ -699,7 +765,7 @@ class Drawing extends Input
         continue unless symbol?
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
-        use.setAttribute 'xlink:href', '#' + symbol.id()
+        use.setAttribute 'xlink:href', '#' + symbol.id
         use.setAttributeNS SVGNS, 'x', x
         use.setAttributeNS SVGNS, 'y', y
         scaleX = scaleY = 1
