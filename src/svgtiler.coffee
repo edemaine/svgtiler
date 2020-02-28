@@ -494,6 +494,19 @@ class Input
     else
       throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
+class Style extends Input
+  load: (@css) ->
+
+class CSSStyle extends Style
+  @title: "CSS style file"
+  parse: (filedata) ->
+    @load filedata
+
+class Styles
+  constructor: (@styles = []) ->
+  push: (map) ->
+    @styles.push map
+
 class Mapping extends Input
   load: (data) ->
     @map = {}
@@ -648,7 +661,7 @@ class Drawing extends Input
               row.pop()
           j--
     @data = data
-  writeSVG: (mappings, filename) ->
+  writeSVG: (mappings, styles, filename) ->
     ## Default filename is the input filename with extension replaced by .svg
     unless filename?
       filename = path.parse @filename
@@ -658,9 +671,9 @@ class Drawing extends Input
         filename.base = filename.base[...-filename.ext.length] + '.svg'
       filename = path.format filename
     console.log '->', filename
-    fs.writeFileSync filename, @renderSVG mappings
+    fs.writeFileSync filename, @renderSVG mappings, styles
     filename
-  renderSVGDOM: (mappings) ->
+  renderSVGDOM: (mappings, styles) ->
     ###
     Main rendering engine, returning an xmldom object for the whole document.
     Also saves the table of symbols in `@symbols`, the corresponding
@@ -673,6 +686,10 @@ class Drawing extends Input
     svg.setAttribute 'xmlns:xlink', XLINKNS
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
+    ## <style> tags for CSS
+    for style in styles.styles
+      svg.appendChild styleTag = doc.createElementNS SVGNS, 'style'
+      styleTag.textContent = style.css
     ## Look up all symbols in the drawing.
     missing = {}
     @symbols =
@@ -809,8 +826,8 @@ class Drawing extends Input
     svg.setAttributeNS SVGNS, 'height', @height = viewBox[3]
     svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
     doc
-  renderSVG: (mappings) ->
-    out = new XMLSerializer().serializeToString @renderSVGDOM mappings
+  renderSVG: (mappings, styles) ->
+    out = new XMLSerializer().serializeToString @renderSVGDOM mappings, styles
     ## Parsing xlink:href in user's SVG fragments, and then serializing,
     ## can lead to these null namespace definitions.  Remove.
     out = out.replace /\sxmlns:xlink=""/g, ''
@@ -975,9 +992,9 @@ class Drawings extends Input
       filename2.base += @constructor.filenameSeparator + drawing.subname
     filename2.base += extension
     path.format filename2
-  writeSVG: (mappings, filename) ->
+  writeSVG: (mappings, styles, filename) ->
     for drawing in @drawings
-      drawing.writeSVG mappings, @subfilename '.svg', drawing
+      drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
   writeTeX: (filename) ->
     for drawing in @drawings
       drawing.writeTeX @subfilename '.svg_tex', drawing
@@ -1027,11 +1044,15 @@ class Context
       new Context @drawing, i, j
 
 extensionMap =
+  # Mappings
   '.txt': ASCIIMapping
   '.js': JSMapping
   '.jsx': JSMapping
   '.coffee': CoffeeMapping
   '.cjsx': CoffeeMapping
+  # Styles
+  '.css': CSSStyle
+  # Drawings
   '.asc': ASCIIDrawing
   '.ssv': SSVDrawing
   '.csv': CSVDrawing
@@ -1168,6 +1189,7 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 
 main = ->
   mappings = new Mappings
+  styles = new Styles
   args = process.argv[2..]
   files = skip = 0
   formats = []
@@ -1224,8 +1246,10 @@ main = ->
         input = Input.recognize arg
         if input instanceof Mapping
           mappings.push input
+        else if input instanceof Style
+          styles.push input
         else if input instanceof Drawing or input instanceof Drawings
-          filenames = input.writeSVG mappings
+          filenames = input.writeSVG mappings, styles
           input.writeTeX() if Symbol.texText
           for format in formats
             if typeof filenames == 'string'
