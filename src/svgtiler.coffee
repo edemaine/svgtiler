@@ -1226,7 +1226,7 @@ main = ->
           mappings.push input
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings
-          input.writeTeX mappings if Symbol.texText
+          input.writeTeX() if Symbol.texText
           for format in formats
             if typeof filenames == 'string'
               jobs.push convertSVG format, filenames, sync
