@@ -355,6 +355,7 @@ Demos
 * [Polyomino outline drawing and JSX](examples/polyomino)
 * [Auto width/height](examples/auto)
 * [Unicode](examples/unicode)
+* [Animations](examples/anim)
 
 ## Installation
 
