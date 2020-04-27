@@ -1,7 +1,7 @@
 # SVG Tiler
 **SVG Tiler** is a tool for drawing diagrams on a grid using text or
 spreadsheets, and then substituting SVG symbols to make a big SVG figure,
-and optionally convert it to PDF.
+and optionally convert it to PDF, PNG, and/or LaTeX for LaTeX text.
 
 To use SVG Tiler, you combine two types of files
 (possibly multiple of each type):
