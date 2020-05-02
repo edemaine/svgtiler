@@ -73,6 +73,9 @@ The object or function should map a symbol name to either
    (or its [CoffeeScript analog](https://coffeescript.org/#jsx))
    or via `preact.h` calls
    (see [the polyomino example](examples/polyomino)),
+   Be careful not to modify Preact nodes, as they get re-used; instead use
+   [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
+   to make a modified copy (or before modification).
 3. a filename with `.svg` extension containing SVG code,
 4. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension containing an
    image (which will get [processed](#image-processing) as an `<image>`), or
