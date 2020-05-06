@@ -1083,8 +1083,19 @@ postprocess = (format, filename) ->
   catch e
     console.log "Failed to postprocess '#{filename}': #{e}"
 
+inkscapeVersion = null
+
 convertSVG = (format, svg, sync) ->
   child_process = require 'child_process'
+  unless inkscapeVersion?
+    result = child_process.spawnSync 'inkscape', ['--version']
+    if result.error
+      console.log "inkscape --version failed: #{result.error.message}"
+    else if result.status or result.signal
+      console.log "inkscape --version failed: #{result.stderr.toString()}"
+    else
+      inkscapeVersion = result.stdout.toString().replace /^Inkscape\s*/, ''
+
   filename = path.parse svg
   if filename.ext == ".#{format}"
     filename.base += ".#{format}"
@@ -1097,11 +1108,19 @@ convertSVG = (format, svg, sync) ->
     preprocess = path.resolve
   else
     preprocess = (x) -> x
-  args = [
-    '-z'
-    "--file=#{preprocess svg}"
-    "--export-#{format}=#{preprocess output}"
-  ]
+  if inkscapeVersion.startsWith '0'
+    args = [
+      "-z"
+      "--file=#{preprocess svg}"
+      "--export-#{format}=#{preprocess output}"
+    ]
+  else ## Inkscape 1+
+    args = [
+      "--export-overwrite"
+      #"--export-type=#{format}"
+      "--export-filename=#{preprocess output}"
+      preprocess svg
+    ]
   if sync
     ## In sychronous mode, we let inkscape directly output its error messages,
     ## and add warnings about any failures that occur.
@@ -1119,7 +1138,7 @@ convertSVG = (format, svg, sync) ->
     ## mixing up messages from parallel executions.
     (resolve) ->
       console.log '=>', output
-      inkscape = require('child_process').spawn 'inkscape', args
+      inkscape = child_process.spawn 'inkscape', args
       out = ''
       inkscape.stdout.on 'data', (buf) -> out += buf
       inkscape.stderr.on 'data', (buf) -> out += buf
