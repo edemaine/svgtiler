@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 11" width="1" height="11" preserveAspectRatio="xMinYMin meet">
+  <symbol id=":30" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="purple"/>
+  </symbol>
+  <symbol id="_" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="red"/>
+  </symbol>
+  <symbol id=":2D" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="blue"/>
+  </symbol>
+  <symbol id="x0" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="purple"/>
+  </symbol>
+  <symbol id=":21" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="orange"/>
+  </symbol>
+  <symbol id=":7E" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="green"/>
+  </symbol>
+  <symbol id=":2A" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="yellow"/>
+  </symbol>
+  <symbol id=":27" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="black"/>
+  </symbol>
+  <symbol id=":28" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="gray"/>
+  </symbol>
+  <symbol id=":29" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="cyan"/>
+  </symbol>
+  <symbol id=":3A" viewBox="0 0 1 1" overflow="visible">
+    <rect width="1" height="1" fill="magenta"/>
+  </symbol>
+  <use xlink:href="#_" x="0" y="0" width="1" height="1"/>
+  <use xlink:href="#:2D" x="0" y="1" width="1" height="1"/>
+  <use xlink:href="#:30" x="0" y="2" width="1" height="1"/>
+  <use xlink:href="#x0" x="0" y="3" width="1" height="1"/>
+  <use xlink:href="#:21" x="0" y="4" width="1" height="1"/>
+  <use xlink:href="#:7E" x="0" y="5" width="1" height="1"/>
+  <use xlink:href="#:2A" x="0" y="6" width="1" height="1"/>
+  <use xlink:href="#:27" x="0" y="7" width="1" height="1"/>
+  <use xlink:href="#:28" x="0" y="8" width="1" height="1"/>
+  <use xlink:href="#:29" x="0" y="9" width="1" height="1"/>
+  <use xlink:href="#:3A" x="0" y="10" width="1" height="1"/>
+</svg>

@@ -1,0 +1,11 @@
+_ <rect width="1" height="1" fill="red"/>
+- <rect width="1" height="1" fill="blue"/>
+0 <rect width="1" height="1" fill="purple"/>
+x0 <rect width="1" height="1" fill="purple"/>
+! <rect width="1" height="1" fill="orange"/>
+~ <rect width="1" height="1" fill="green"/>
+* <rect width="1" height="1" fill="yellow"/>
+' <rect width="1" height="1" fill="black"/>
+( <rect width="1" height="1" fill="gray"/>
+) <rect width="1" height="1" fill="cyan"/>
+: <rect width="1" height="1" fill="magenta"/>
