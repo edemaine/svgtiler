@@ -24,7 +24,7 @@ dot = (solution) -> -> ## dynamic symbol
      (@neighbor(0,-1).includes('|') and @neighbor(0,+1).includes('|'))
     s += """<rect x="-10" y="-10" width="20" height="20" fill="#{gridColor}"/>"""
   else
-    s += """<circle x="0" y="0" r="10" fill="#{gridColor}"/>"""
+    s += """<circle cx="0" cy="0" r="10" fill="#{gridColor}"/>"""
     if @neighbor(-1,0).includes '-'
       s += """<rect x="-10" y="-10" width="10" height="20" fill="#{gridColor}"/>"""
     if @neighbor(+1,0).includes '-'
@@ -41,7 +41,7 @@ dot = (solution) -> -> ## dynamic symbol
        (@neighbor(0,-1).includes('|s') and @neighbor(0,+1).includes('|s'))
       s += """<rect x="-10" y="-10" width="20" height="20" fill="#{pathColor}"/>"""
     else
-      s += """<circle x="0" y="0" r="10" fill="#{pathColor}"/>"""
+      s += """<circle cx="0" cy="0" r="10" fill="#{pathColor}"/>"""
       if @neighbor(-1,0).includes '-s'
         s += """<rect x="-10" y="-10" width="10" height="20" fill="#{pathColor}"/>"""
       if @neighbor(+1,0).includes '-s'
@@ -85,7 +85,7 @@ start = (solution) -> ->
          (@neighbor(0,-1).includes('|s') and @neighbor(0,+1).includes('|s'))
         s += """<rect x="-10" y="-10" width="20" height="20" fill="#{pathColor}"/>"""
       else
-        s += """<circle x="0" y="0" r="10" fill="#{pathColor}"/>"""
+        s += """<circle cx="0" cy="0" r="10" fill="#{pathColor}"/>"""
         if @neighbor(-1,0).includes '-s'
           s += """<rect x="-10" y="-10" width="10" height="20" fill="#{pathColor}"/>"""
         if @neighbor(+1,0).includes '-s'
