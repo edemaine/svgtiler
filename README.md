@@ -1,10 +1,21 @@
 # SVG Tiler
-**SVG Tiler** is a tool for drawing diagrams on a grid using text or
-spreadsheets, and then substituting SVG symbols to make a big SVG figure,
-and optionally convert it to PDF, PNG, and/or LaTeX for LaTeX text.
-See the [examples below](#examples).
 
-To use SVG Tiler, you combine two types of files
+**SVG Tiler** is a command-line tool for drawing diagrams on a grid,
+where you draw ASCII art or spreadsheets and SVG Tiler automatically
+subsitutes each character or cell with a corresponding SVG symbol
+to make a big SVG figure
+(in an efficient representation that factors out repeated symbols),
+and optionally converts it to PDF, PNG, and/or LaTeX for LaTeX text.
+Here are a few examples of generated figures;
+see [more examples below](#examples).
+
+| [Super Mario Bros.](examples/mario) | [The Witness](examples/witness) |
+| --- | --- |
+| [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/solved-grid.svg)](examples/witness) |
+
+## Main Concepts
+
+To use SVG Tiler, you combine at least two types of files
 (possibly multiple of each type):
 
 1. A **mapping file** specifies how to map symbol names (strings) to
@@ -15,13 +26,64 @@ To use SVG Tiler, you combine two types of files
 2. A **drawing file** specifies a grid of symbol names (strings) which,
    combined with one or more mapping files to define the SVG associated
    with each symbol, compile to a single (tiled) SVG.
-   Drawing files can be specified as ASCII art (where each symbol is
-   limited to a single character), space-separated ASCII art
-   (where symbols are separated by whitespace), or standard CSV/TSV
-   formats such as those exported by Google Sheets or Excel.
+   Drawing files can be specified as
+   ASCII art (where each symbol is limited to a single character),
+   space-separated ASCII art (where symbols are separated by whitespace),
+   standard CSV/TSV (comma/tab-separated) tabular formats, or
+   standard multi-sheet spreadsheet formats XLSX/XLS/ODS
+   supported by Google Sheets and Excel.
 
-These input files are listed on the `svgtiler` command line,
-with mapping files typically before drawing files.
+3. An optional **style file** specifies global styling of SVG elements via
+   [CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS).
+
+Here's a simple full example from
+[Tetris in the pixel-art style of the NES game](examples/tetris):
+
+<table>
+<tr>
+<th>Input mapping
+<br>(.txt format)
+<th>Input drawing
+<br>(.asc format)
+<th>Output
+<br>(.png format)
+<tr>
+<td>
+
+```
+T NES_level7_empty.png
+O NES_level7_empty.png
+I NES_level7_empty.png
+J NES_level7_filled.png
+S NES_level7_filled.png
+L NES_level7_other.png
+Z NES_level7_other.png
+  <rect fill="black" width="8" height="8"/>
+```
+
+Image files: ![](examples/tetris/NES_level7_empty.png) ![](examples/tetris/NES_level7_filled.png) ![](examples/tetris/NES_level7_other.png)
+
+<td>
+
+```
+I           
+I          Z
+ILJJJOO SSZZ
+ILLLJOOSS Z 
+```
+
+<td>
+
+![Tetris custom level](examples/tetris/example.png)
+
+</table>
+
+## Usage
+
+All input files (mapping, drawing, and style files)
+are listed on the `svgtiler` command line,
+with mapping and style files listed before
+all drawing files they should apply to.
 File types and formats are distinguished automatically by their extension.
 For example:
 
@@ -164,6 +226,20 @@ multiple sheets in one file.  In this case, the output SVG files have
 filenames distinguished by an underscore followed by the sheet name.
 By default, **hidden** sheets are ignored, making it easy to "deprecate" old
 drafts, but if you prefer, you can process hidden sheets via `--hidden`.
+
+## Style Files: .css
+
+Any specified **.css file** gets inlined into an
+[SVG `<style>` tag](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/style).
+[Mixing SVG and CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS)
+lets you define global style rules for your SVG elements, for example,
+specifying `fill` and `stroke` for every `polygon` of class `purple`:
+
+```css
+polygon.purple { fill: hsl(276, 77%, 80%); stroke: hsl(276, 89%, 27%) }
+```
+
+See the [animation example](examples/anim) for sample usage of a .css file.
 
 ## Layout Algorithm
 
@@ -360,6 +436,7 @@ Demos
 * [Auto width/height](examples/auto)
 * [Unicode](examples/unicode)
 * [Animations](examples/anim)
+* [Escaping tests](examples/test)
 
 ## Installation
 

@@ -34,7 +34,7 @@
 
   | Palette     | PNG                       | SVG                       |
   | ----------- | ------------------------- | ------------------------- |
-  | castle      | ![](door_castle.png)      | ![](door_castle.png)      |
-  | overworld   | ![](door_overworld.png)   | ![](door_overworld.png)   |
-  | underground | ![](door_underground.png) | ![](door_underground.png) |
-  | underwater  | ![](door_underwater.png)  | ![](door_underwater.png)  |
+  | castle      | ![](door_castle.png)      | ![](door_castle.svg)      |
+  | overworld   | ![](door_overworld.png)   | ![](door_overworld.svg)   |
+  | underground | ![](door_underground.png) | ![](door_underground.svg) |
+  | underwater  | ![](door_underwater.png)  | ![](door_underwater.svg)  |
