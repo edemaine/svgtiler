@@ -61,7 +61,7 @@ Z NES_level7_other.png
   <rect fill="black" width="8" height="8"/>
 ```
 
-Image files: ![](examples/tetris/NES_level7_empty.png) ![](examples/tetris/NES_level7_filled.png) ![](examples/tetris/NES_level7_other.png)
+PNG image files referenced above: ![](examples/tetris/NES_level7_empty.png) ![](examples/tetris/NES_level7_filled.png) ![](examples/tetris/NES_level7_other.png)
 
 <td>
 
@@ -105,7 +105,7 @@ such a block.  For example, here is a mapping of `O` to black squares
 and both ` ` (space) and empty string to blank squares, all dimensioned
 50 &times; 50:
 
-```
+```svg
 O <symbol viewBox="0 0 50 50"><rect width="50" height="50"/></symbol>
   <symbol viewBox="0 0 50 50"></symbol>
  <symbol viewBox="0 0 50 50"></symbol>
