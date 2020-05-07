@@ -2,44 +2,44 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 272 128" width="272" height="128" preserveAspectRatio="xMinYMin meet">
   <symbol id="raised" viewBox="0 0 16 16" overflow="visible">
-    <use width="16" height="16" xlink:href="#:image:raised_overworld:2Epng:v0"/>
+    <use width="16" height="16" xlink:href="#_image_raised_5Foverworld_2Epng_v0"/>
   </symbol>
-  <symbol id=":blank" viewBox="0 0 16 16" overflow="visible">
+  <symbol id="_blank" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="#6b8cff"/>
   </symbol>
-  <symbol id=":2Cfire_se" viewBox="0 0 16 16" overflow="visible">
+  <symbol id="_2Cfire_5Fse" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="#6b8cff"/>
-    <use width="16" height="16" xlink:href="#:image:fire_se:2Epng:v0"/>
+    <use width="16" height="16" xlink:href="#_image_fire_5Fse_2Epng_v0"/>
   </symbol>
-  <symbol id=":2Cmario_small_right:2B4" viewBox="0 0 16 16" overflow="visible">
+  <symbol id="_2Cmario_5Fsmall_5Fright_2B4" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="#6b8cff"/>
     <g transform="translate(4,0)">
-      <use y="1" width="16" height="16" xlink:href="#:image:mario_small_right:2Epng:v0"/>
+      <use y="1" width="16" height="16" xlink:href="#_image_mario_5Fsmall_5Fright_2Epng_v0"/>
     </g>
   </symbol>
-  <symbol id=":2Cspiny_right:2B8" viewBox="0 0 16 16" overflow="visible">
+  <symbol id="_2Cspiny_5Fright_2B8" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="#6b8cff"/>
     <g transform="translate(8,0)">
-      <use y="1" width="16" height="16" xlink:href="#:image:spiny_right:2Epng:v0"/>
+      <use y="1" width="16" height="16" xlink:href="#_image_spiny_5Fright_2Epng_v0"/>
     </g>
   </symbol>
-  <symbol id="brick:2Cfire_se" viewBox="0 0 16 16" overflow="visible">
-    <use width="16" height="16" xlink:href="#:image:brick_overworld:2Epng:v0"/>
-    <use width="16" height="16" xlink:href="#:image:fire_se:2Epng:v0"/>
+  <symbol id="brick_2Cfire_5Fse" viewBox="0 0 16 16" overflow="visible">
+    <use width="16" height="16" xlink:href="#_image_brick_5Foverworld_2Epng_v0"/>
+    <use width="16" height="16" xlink:href="#_image_fire_5Fse_2Epng_v0"/>
   </symbol>
-  <symbol id=":image:fire_se:2Epng:v0" viewBox="0 0 16 16">
+  <symbol id="_image_fire_5Fse_2Epng_v0" viewBox="0 0 16 16">
     <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF+mlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAyLTIzVDE3OjA0OjM4LTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAyLTIzVDE3OjA0OjM4LTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wMi0yM1QxNzowNDozOC0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo0MGJkYzQ3Mi0zNjYxLTZjNGMtYjY3Ny02NjIxNWNiZTA0MTUiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo0ZjZlODBmMC0zNGRkLTdhNDMtODg3OS02OGRhMTU0ODk5NjkiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpkY2RhNjNhNC0wOTYyLTNiNDMtOWI2Ni05N2MxNzI5YTNmMjEiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmRjZGE2M2E0LTA5NjItM2I0My05YjY2LTk3YzE3MjlhM2YyMSIgc3RFdnQ6d2hlbj0iMjAyMC0wMi0yM1QxNzowNDozOC0wNTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTkgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo0MGJkYzQ3Mi0zNjYxLTZjNGMtYjY3Ny02NjIxNWNiZTA0MTUiIHN0RXZ0OndoZW49IjIwMjAtMDItMjNUMTc6MDQ6MzgtMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz5WbswfAAAAUklEQVQ4EWP4//8/AyWYYZgasNVQ8T+MhuEpU/4zgDDRLsBlCEEDYBqR+c/nIAwhyQUwDDIAZgjRYYCsEQRINgCbZrJdgOQdBrLCgKxoHEF5AQBQbtgpq0xhVAAAAABJRU5ErkJggg==" image-rendering="optimizeSpeed" style="image-rendering:pixelated" width="16" height="16"/>
   </symbol>
-  <symbol id=":image:brick_overworld:2Epng:v0" viewBox="0 0 16 16">
+  <symbol id="_image_brick_5Foverworld_2Epng_v0" viewBox="0 0 16 16">
     <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAF0WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAyLTEzVDE4OjIyOjM1LTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAyLTEzVDE4OjIyOjM1LTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wMi0xM1QxODoyMjozNS0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmMzUyZGFkYS0zYjExLWMyNDUtYTliMC0yOTI4M2FkZTg0OTAiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDphNmQ1MjU2Ny1iNTNiLTVkNGItOTA1My1jMzBkODZhYTM1ZDAiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoyMTFiMzYxOC1kZDlmLTc4NDEtYmFjNS0yODgyM2Q2MWYxNTUiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDoyMTFiMzYxOC1kZDlmLTc4NDEtYmFjNS0yODgyM2Q2MWYxNTUiIHN0RXZ0OndoZW49IjIwMjAtMDItMTNUMTg6MjI6MzUtMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZjM1MmRhZGEtM2IxMS1jMjQ1LWE5YjAtMjkyODNhZGU4NDkwIiBzdEV2dDp3aGVuPSIyMDIwLTAyLTEzVDE4OjIyOjM1LTA1OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+pDjQEgAAACVJREFUKBVjmOPFgImAAJc4A+01kAyIMRWFS3sN5PthNB4GMh4AalqW8V0cIF4AAAAASUVORK5CYII=" image-rendering="optimizeSpeed" style="image-rendering:pixelated" width="16" height="16"/>
   </symbol>
-  <symbol id=":image:spiny_right:2Epng:v0" viewBox="0 0 16 16">
+  <symbol id="_image_spiny_5Fright_2Epng_v0" viewBox="0 0 16 16">
     <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF0WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAyLTEzVDE4OjQyOjU2LTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAyLTEzVDE4OjQyOjU2LTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wMi0xM1QxODo0Mjo1Ni0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpiOTY4Zjc4Mi0xZmVmLWNiNDItODliYi02NmYyY2ZjYTA5MjUiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDoxODIzNDFkNi0xMWJhLWYxNGYtOTZiOS03MzNmYzVlZWUxODMiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo2ZTM3MjhkOS1jMWUzLThhNDUtODg0Ny0yMDM1ZThjN2JmN2EiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo2ZTM3MjhkOS1jMWUzLThhNDUtODg0Ny0yMDM1ZThjN2JmN2EiIHN0RXZ0OndoZW49IjIwMjAtMDItMTNUMTg6NDI6NTYtMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6Yjk2OGY3ODItMWZlZi1jYjQyLTg5YmItNjZmMmNmY2EwOTI1IiBzdEV2dDp3aGVuPSIyMDIwLTAyLTEzVDE4OjQyOjU2LTA1OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+PU4xAQAAAJ5JREFUOI2lk+sNhDAMgzMKOomVuhUb3O+uxDhB6V0q47qARCRLENlf6ANzd3ujO4Nzb98+14AwpBgA/UcADyHkCjCYbgC9183ZxDBD2NsAtdZhmgLMvmqYGPVdlxOA3x8BWBSO3g9QSjE0YADMrjwNEKTZNAX5B3sNYQaIqeg1Q9oMosL5jPdbgjCAsJQ8BVW0pNw7U5dG/pliXxrgAGl6oEZoJ5d/AAAAAElFTkSuQmCC" image-rendering="optimizeSpeed" style="image-rendering:pixelated" width="16" height="16"/>
   </symbol>
-  <symbol id=":image:mario_small_right:2Epng:v0" viewBox="0 0 16 16">
+  <symbol id="_image_mario_5Fsmall_5Fright_2Epng_v0" viewBox="0 0 16 16">
     <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF0WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAyLTEzVDE4OjUwOjQ4LTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAyLTEzVDE4OjUwOjQ4LTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wMi0xM1QxODo1MDo0OC0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpiN2I4MGYyZS01Mjk5LTcwNGItOGNmZS05ZTVjZTgzNjFlY2EiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo1ZjhiYjQ3ZC1jNWYwLWQyNGMtYjRkYy1mOTZiZWRmMmIzZjciIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo5MzY4YWQ1NC05YjJhLTgwNGMtYWYxYi1mNWMwZGQ2NmVlNzgiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MzY4YWQ1NC05YjJhLTgwNGMtYWYxYi1mNWMwZGQ2NmVlNzgiIHN0RXZ0OndoZW49IjIwMjAtMDItMTNUMTg6NTA6NDgtMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YjdiODBmMmUtNTI5OS03MDRiLThjZmUtOWU1Y2U4MzYxZWNhIiBzdEV2dDp3aGVuPSIyMDIwLTAyLTEzVDE4OjUwOjQ4LTA1OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+YCoLugAAAJNJREFUOI2Vk90JgDAMhPvgKsUFnEqHEXx3CGdykEiESLjmz4eDaHtf6x02ImqsY94/XUsnlF5nia8hwDJbMBewbhOJ7rO/kjm9gWzUZuu5BMggLgA3aqAozICFALx+KUROG08thWgBLNgAwO/E7nF9AOjA2MCzmGXWAbsAbUSFNWZmhJT+hehd2gLW9ruFCKBbeAB4fzF8FM+5dgAAAABJRU5ErkJggg==" image-rendering="optimizeSpeed" style="image-rendering:pixelated" width="16" height="16"/>
   </symbol>
-  <symbol id=":image:raised_overworld:2Epng:v0" viewBox="0 0 16 16">
+  <symbol id="_image_raised_5Foverworld_2Epng_v0" viewBox="0 0 16 16">
     <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAF0WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDUgNzkuMTYzNDk5LCAyMDE4LzA4LzEzLTE2OjQwOjIyICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAyLTEzVDE4OjMxOjE3LTA1OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIwLTAyLTEzVDE4OjMxOjE3LTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wMi0xM1QxODozMToxNy0wNTowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozODE0MWYwZC02YzhmLTM4NDItYWUyNS01MDU5NGNhZTBkZDEiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDoyM2FlOGE2OS04YTAwLTFmNDItOWM3NC1hZWU2MmEwMmVjOWUiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDphODRmOWUyOS1jM2Y4LTAxNGEtODBkMy1jYTI1MTVmOWMyMTIiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphODRmOWUyOS1jM2Y4LTAxNGEtODBkMy1jYTI1MTVmOWMyMTIiIHN0RXZ0OndoZW49IjIwMjAtMDItMTNUMTg6MzE6MTctMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MzgxNDFmMGQtNmM4Zi0zODQyLWFlMjUtNTA1OTRjYWUwZGQxIiBzdEV2dDp3aGVuPSIyMDIwLTAyLTEzVDE4OjMxOjE3LTA1OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+AdIJ0gAAAEJJREFUKBVjmOPF8P/cMSIRAxAAKSL1MEAAhENQDwMcwIXw6GFABsgSQD1Y0agGOmpgwA1Q9BBUja6HGNVY7CFeDwCYQyNIkC5u9gAAAABJRU5ErkJggg==" image-rendering="optimizeSpeed" style="image-rendering:pixelated" width="16" height="16"/>
   </symbol>
   <use xlink:href="#raised" x="0" y="0" width="16" height="16"/>
@@ -59,34 +59,34 @@
   <use xlink:href="#raised" x="224" y="0" width="16" height="16"/>
   <use xlink:href="#raised" x="240" y="0" width="16" height="16"/>
   <use xlink:href="#raised" x="256" y="0" width="16" height="16"/>
-  <use xlink:href="#:blank" x="0" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="16" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="32" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="48" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="64" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="80" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="96" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="0" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="16" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="32" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="48" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="64" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="80" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="96" y="16" width="16" height="16"/>
   <use xlink:href="#raised" x="112" y="16" width="16" height="16"/>
   <use xlink:href="#raised" x="128" y="16" width="16" height="16"/>
   <use xlink:href="#raised" x="144" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="160" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="176" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="192" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="208" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="224" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="240" y="16" width="16" height="16"/>
-  <use xlink:href="#:blank" x="256" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="160" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="176" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="192" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="208" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="224" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="240" y="16" width="16" height="16"/>
+  <use xlink:href="#_blank" x="256" y="16" width="16" height="16"/>
   <use xlink:href="#raised" x="0" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="16" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="32" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="48" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="64" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="80" y="32" width="16" height="16"/>
-  <use xlink:href="#:blank" x="96" y="32" width="16" height="16"/>
-  <use xlink:href="#:blank" x="112" y="32" width="16" height="16"/>
+  <use xlink:href="#_blank" x="96" y="32" width="16" height="16"/>
+  <use xlink:href="#_blank" x="112" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="128" y="32" width="16" height="16"/>
-  <use xlink:href="#:blank" x="144" y="32" width="16" height="16"/>
-  <use xlink:href="#:blank" x="160" y="32" width="16" height="16"/>
+  <use xlink:href="#_blank" x="144" y="32" width="16" height="16"/>
+  <use xlink:href="#_blank" x="160" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="176" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="192" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="208" y="32" width="16" height="16"/>
@@ -95,35 +95,35 @@
   <use xlink:href="#raised" x="256" y="32" width="16" height="16"/>
   <use xlink:href="#raised" x="0" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="16" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="32" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="48" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="64" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="32" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="48" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="64" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="80" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="96" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="112" y="48" width="16" height="16"/>
-  <use xlink:href="#:2Cfire_se" x="128" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="144" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="112" y="48" width="16" height="16"/>
+  <use xlink:href="#_2Cfire_5Fse" x="128" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="144" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="160" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="176" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="192" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="208" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="224" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="192" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="208" y="48" width="16" height="16"/>
+  <use xlink:href="#_blank" x="224" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="240" y="48" width="16" height="16"/>
   <use xlink:href="#raised" x="256" y="48" width="16" height="16"/>
-  <use xlink:href="#:blank" x="16" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="32" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="16" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="32" y="64" width="16" height="16"/>
   <use xlink:href="#raised" x="48" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="64" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="80" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="96" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="112" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="64" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="80" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="96" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="112" y="64" width="16" height="16"/>
   <use xlink:href="#raised" x="128" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="144" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="176" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="192" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="144" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="176" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="192" y="64" width="16" height="16"/>
   <use xlink:href="#raised" x="208" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="224" y="64" width="16" height="16"/>
-  <use xlink:href="#:blank" x="240" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="224" y="64" width="16" height="16"/>
+  <use xlink:href="#_blank" x="240" y="64" width="16" height="16"/>
   <use xlink:href="#raised" x="256" y="64" width="16" height="16"/>
   <use xlink:href="#raised" x="0" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="16" y="80" width="16" height="16"/>
@@ -132,32 +132,32 @@
   <use xlink:href="#raised" x="64" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="80" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="96" y="80" width="16" height="16"/>
-  <use xlink:href="#brick:2Cfire_se" x="112" y="80" width="16" height="16"/>
+  <use xlink:href="#brick_2Cfire_5Fse" x="112" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="128" y="80" width="16" height="16"/>
-  <use xlink:href="#brick:2Cfire_se" x="144" y="80" width="16" height="16"/>
+  <use xlink:href="#brick_2Cfire_5Fse" x="144" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="160" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="176" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="192" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="208" y="80" width="16" height="16"/>
   <use xlink:href="#raised" x="224" y="80" width="16" height="16"/>
-  <use xlink:href="#:blank" x="240" y="80" width="16" height="16"/>
-  <use xlink:href="#:blank" x="256" y="80" width="16" height="16"/>
-  <use xlink:href="#:blank" x="0" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="16" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="32" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="48" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="64" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="80" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="96" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="112" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="240" y="80" width="16" height="16"/>
+  <use xlink:href="#_blank" x="256" y="80" width="16" height="16"/>
+  <use xlink:href="#_blank" x="0" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="16" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="32" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="48" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="64" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="80" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="96" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="112" y="96" width="16" height="16"/>
   <use xlink:href="#raised" x="128" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="144" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="160" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="176" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="192" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="208" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="224" y="96" width="16" height="16"/>
-  <use xlink:href="#:blank" x="240" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="144" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="160" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="176" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="192" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="208" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="224" y="96" width="16" height="16"/>
+  <use xlink:href="#_blank" x="240" y="96" width="16" height="16"/>
   <use xlink:href="#raised" x="256" y="96" width="16" height="16"/>
   <use xlink:href="#raised" x="0" y="112" width="16" height="16"/>
   <use xlink:href="#raised" x="16" y="112" width="16" height="16"/>
@@ -176,6 +176,6 @@
   <use xlink:href="#raised" x="224" y="112" width="16" height="16"/>
   <use xlink:href="#raised" x="240" y="112" width="16" height="16"/>
   <use xlink:href="#raised" x="256" y="112" width="16" height="16"/>
-  <use xlink:href="#:2Cspiny_right:2B8" x="160" y="64" width="16" height="16"/>
-  <use xlink:href="#:2Cmario_small_right:2B4" x="0" y="64" width="16" height="16"/>
+  <use xlink:href="#_2Cspiny_5Fright_2B8" x="160" y="64" width="16" height="16"/>
+  <use xlink:href="#_2Cmario_5Fsmall_5Fright_2B4" x="0" y="64" width="16" height="16"/>
 </svg>

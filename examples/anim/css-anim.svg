@@ -16,61 +16,61 @@
   <symbol id="circle" viewBox="-50 -50 100 100" overflow="visible">
     <circle r="40"/>
   </symbol>
-  <symbol id="circle:20light" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="circle_20light" viewBox="-50 -50 100 100" overflow="visible">
     <circle class="light" r="40"/>
   </symbol>
-  <symbol id="circle:20dark" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="circle_20dark" viewBox="-50 -50 100 100" overflow="visible">
     <circle class="dark" r="40"/>
   </symbol>
-  <symbol id="circle:20light:20pulse" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="circle_20light_20pulse" viewBox="-50 -50 100 100" overflow="visible">
     <circle class="light pulse" r="40"/>
   </symbol>
-  <symbol id="circle:20dark:20pulse" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="circle_20dark_20pulse" viewBox="-50 -50 100 100" overflow="visible">
     <circle class="dark pulse" r="40"/>
   </symbol>
   <symbol id="square" viewBox="-10 -10 100 100" overflow="visible">
     <rect width="80" height="80"/>
   </symbol>
-  <symbol id="square:20light" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="square_20light" viewBox="-10 -10 100 100" overflow="visible">
     <rect class="light" width="80" height="80"/>
   </symbol>
-  <symbol id="square:20dark" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="square_20dark" viewBox="-10 -10 100 100" overflow="visible">
     <rect class="dark" width="80" height="80"/>
   </symbol>
-  <symbol id="square:20light:20pulse" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="square_20light_20pulse" viewBox="-10 -10 100 100" overflow="visible">
     <rect class="light pulse" width="80" height="80"/>
   </symbol>
-  <symbol id="square:20dark:20pulse" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="square_20dark_20pulse" viewBox="-10 -10 100 100" overflow="visible">
     <rect class="dark pulse" width="80" height="80"/>
   </symbol>
   <symbol id="triangle" viewBox="-50 -50 100 100" overflow="visible">
     <path d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <symbol id="triangle:20light" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="triangle_20light" viewBox="-50 -50 100 100" overflow="visible">
     <path class="light" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <symbol id="triangle:20dark" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="triangle_20dark" viewBox="-50 -50 100 100" overflow="visible">
     <path class="dark" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <symbol id="triangle:20light:20pulse" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="triangle_20light_20pulse" viewBox="-50 -50 100 100" overflow="visible">
     <path class="light pulse" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <symbol id="triangle:20dark:20pulse" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="triangle_20dark_20pulse" viewBox="-50 -50 100 100" overflow="visible">
     <path class="dark pulse" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
   <use xlink:href="#circle" x="0" y="0" width="100" height="100"/>
-  <use xlink:href="#circle:20light" x="100" y="0" width="100" height="100"/>
-  <use xlink:href="#circle:20dark" x="200" y="0" width="100" height="100"/>
-  <use xlink:href="#circle:20light:20pulse" x="300" y="0" width="100" height="100"/>
-  <use xlink:href="#circle:20dark:20pulse" x="400" y="0" width="100" height="100"/>
+  <use xlink:href="#circle_20light" x="100" y="0" width="100" height="100"/>
+  <use xlink:href="#circle_20dark" x="200" y="0" width="100" height="100"/>
+  <use xlink:href="#circle_20light_20pulse" x="300" y="0" width="100" height="100"/>
+  <use xlink:href="#circle_20dark_20pulse" x="400" y="0" width="100" height="100"/>
   <use xlink:href="#square" x="0" y="100" width="100" height="100"/>
-  <use xlink:href="#square:20light" x="100" y="100" width="100" height="100"/>
-  <use xlink:href="#square:20dark" x="200" y="100" width="100" height="100"/>
-  <use xlink:href="#square:20light:20pulse" x="300" y="100" width="100" height="100"/>
-  <use xlink:href="#square:20dark:20pulse" x="400" y="100" width="100" height="100"/>
+  <use xlink:href="#square_20light" x="100" y="100" width="100" height="100"/>
+  <use xlink:href="#square_20dark" x="200" y="100" width="100" height="100"/>
+  <use xlink:href="#square_20light_20pulse" x="300" y="100" width="100" height="100"/>
+  <use xlink:href="#square_20dark_20pulse" x="400" y="100" width="100" height="100"/>
   <use xlink:href="#triangle" x="0" y="200" width="100" height="100"/>
-  <use xlink:href="#triangle:20light" x="100" y="200" width="100" height="100"/>
-  <use xlink:href="#triangle:20dark" x="200" y="200" width="100" height="100"/>
-  <use xlink:href="#triangle:20light:20pulse" x="300" y="200" width="100" height="100"/>
-  <use xlink:href="#triangle:20dark:20pulse" x="400" y="200" width="100" height="100"/>
+  <use xlink:href="#triangle_20light" x="100" y="200" width="100" height="100"/>
+  <use xlink:href="#triangle_20dark" x="200" y="200" width="100" height="100"/>
+  <use xlink:href="#triangle_20light_20pulse" x="300" y="200" width="100" height="100"/>
+  <use xlink:href="#triangle_20dark_20pulse" x="400" y="200" width="100" height="100"/>
 </svg>
