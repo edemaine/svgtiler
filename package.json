@@ -25,7 +25,8 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "prepare": "coffee --no-header --bare -o lib -c src/svgtiler.coffee"
+    "prepare": "coffee --no-header --bare -o lib -c src/svgtiler.coffee",
+    "test": "make test"
   },
   "dependencies": {
     "@babel/core": "^7.7.7",
@@ -41,5 +42,7 @@
     "xlsx": "^0.15.4",
     "xmldom": "^0.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vnu-jar": "^20.3.17"
+  }
 }
