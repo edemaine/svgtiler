@@ -557,8 +557,8 @@ class ASCIIMapping extends Mapping
     @load map
 
 class JSMapping extends Mapping
-  @title: "JavaScript mapping file"
-  @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
+  @title: "JavaScript mapping file (including JSX notation)"
+  @help: "Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}"
   parse: (data) ->
     {code} = require('@babel/core').transform data,
       filename: @filename
@@ -585,7 +585,7 @@ class JSMapping extends Mapping
     @load eval code
 
 class CoffeeMapping extends JSMapping
-  @title: "CoffeeScript mapping file"
+  @title: "CoffeeScript mapping file (including JSX notation)"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
     #try
@@ -1048,8 +1048,6 @@ extensionMap =
   '.jsx': JSMapping
   '.coffee': CoffeeMapping
   '.cjsx': CoffeeMapping
-  # Styles
-  '.css': CSSStyle
   # Drawings
   '.asc': ASCIIDrawing
   '.ssv': SSVDrawing
@@ -1065,6 +1063,8 @@ extensionMap =
   '.dif': XLSXDrawings   ## Data Interchange Format (DIF)
   '.prn': XLSXDrawings   ## Lotus Formatted Text
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
+  # Styles
+  '.css': CSSStyle
 
 sanitize = true
 bufferSize = 16*1024

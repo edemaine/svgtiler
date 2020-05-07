@@ -480,9 +480,13 @@ Filename arguments:  (mappings before drawings!)
 
   *.txt        ASCII mapping file
                Each line is <symbol-name><space><raw SVG or filename.svg>
-  *.js         JavaScript mapping file
+  *.js         JavaScript mapping file (including JSX notation)
+               Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}
+  *.jsx        JavaScript mapping file (including JSX notation)
+               Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}
+  *.coffee     CoffeeScript mapping file (including JSX notation)
                Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'
-  *.coffee     CoffeeScript mapping file
+  *.cjsx       CoffeeScript mapping file (including JSX notation)
                Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'
   *.asc        ASCII drawing (one character per symbol)
   *.ssv        Space-delimiter drawing (one word per symbol)
@@ -497,6 +501,7 @@ Filename arguments:  (mappings before drawings!)
   *.dif        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.prn        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.dbf        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
+  *.css        CSS style file
 
 SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 
