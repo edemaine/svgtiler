@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="220" height="220" preserveAspectRatio="xMinYMin meet">
-  <symbol id=":2E:v0" viewBox="-10 -10 20 20" z-index="0" overflow="visible">
+  <symbol id=":2E:v0" viewBox="-10 -10 20 20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
     <rect x="0" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
   </symbol>
-  <symbol id=":2D" viewBox="10 -10 80 20" z-index="1" overflow="visible">
+  <symbol id=":2D" viewBox="10 -10 80 20" overflow="visible">
     <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="black"/>
   </symbol>
-  <symbol id=":2E:v1" viewBox="-10 -10 20 20" z-index="0" overflow="visible">
+  <symbol id=":2E:v1" viewBox="-10 -10 20 20" overflow="visible">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
   </symbol>
-  <symbol id=":2E:v2" viewBox="-10 -10 20 20" z-index="0" overflow="visible">
+  <symbol id=":2E:v2" viewBox="-10 -10 20 20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
   </symbol>
-  <symbol id=":7C" viewBox="-10 10 20 80" z-index="1" overflow="visible">
+  <symbol id=":7C" viewBox="-10 10 20 80" overflow="visible">
     <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="black"/>
   </symbol>
   <symbol id=":20:v0" viewBox="0 0 80 80" overflow="visible"/>
-  <symbol id=":2E:v3" viewBox="-10 -10 20 20" z-index="0" overflow="visible">
+  <symbol id=":2E:v3" viewBox="-10 -10 20 20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
     <rect x="0" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
   </symbol>
-  <symbol id=":2E:v4" viewBox="-10 -10 20 20" z-index="0" overflow="visible">
+  <symbol id=":2E:v4" viewBox="-10 -10 20 20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>

@@ -40,8 +40,12 @@ parseBox = (box) ->
   return null if null in box
   box
 
-overflowBox = (xml) ->
-  parseBox xml.documentElement.getAttribute 'overflowBox'
+extractOverflowBox = (xml) ->
+  ## Parse and return root overflowBox attribute.
+  ## Also remove it if present, so output is valid SVG.
+  box = xml.documentElement.getAttribute 'overflowBox'
+  xml.documentElement.removeAttribute 'overflowBox'
+  parseBox box
 
 parseNum = (x) ->
   parsed = parseFloat x
@@ -141,13 +145,15 @@ getHref = (node) ->
   key: null
   href: null
 
-zIndex = (node) ->
+extractZIndex = (node) ->
   ## Check whether DOM node has a specified z-index, defaulting to zero.
+  ## Also remove z-index attribute, so output is valid SVG.
   ## Note that z-index must be an integer.
   ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
   ## a z-index="..." attribute.  Check for this first.
   ## 2. Look for style="z-index:..." as in HTML.
   z = parseInt attributeOrStyle node, 'z-index'
+  node.removeAttribute 'z-index'
   if isNaN z
     0
   else
@@ -392,7 +398,7 @@ class StaticSymbol extends Symbol
           @viewBox[2] = zeroSizeReplacement
         if @height == 0
           @viewBox[3] = zeroSizeReplacement
-    @overflowBox = overflowBox @xml
+    @overflowBox = extractOverflowBox @xml
     if Symbol.forceWidth?
       @width = Symbol.forceWidth
     if Symbol.forceHeight?
@@ -412,7 +418,7 @@ class StaticSymbol extends Symbol
     @autoHeight = isAuto @xml, 'height'
     @xml.documentElement.removeAttribute 'width' if @autoWidth
     @xml.documentElement.removeAttribute 'height' if @autoHeight
-    @zIndex = zIndex @xml.documentElement
+    @zIndex = extractZIndex @xml.documentElement
     ## Optionally extract <text> nodes for LaTeX output
     if Symbol.texText
       @text = []

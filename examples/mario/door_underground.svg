@@ -11,13 +11,13 @@
     <rect width="16" height="16" fill="black"/>
     <use width="16" height="16" xlink:href="#:image:fire_se:2Epng:v0"/>
   </symbol>
-  <symbol id=":2Cmario_small_right:2B4" viewBox="0 0 16 16" z-index="2" overflow="visible">
+  <symbol id=":2Cmario_small_right:2B4" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="black"/>
     <g transform="translate(4,0)">
       <use y="1" width="16" height="16" xlink:href="#:image:mario_small_right:2Epng:v0"/>
     </g>
   </symbol>
-  <symbol id=":2Cspiny_right:2B8" viewBox="0 0 16 16" z-index="1" overflow="visible">
+  <symbol id=":2Cspiny_right:2B8" viewBox="0 0 16 16" overflow="visible">
     <rect width="16" height="16" fill="black"/>
     <g transform="translate(8,0)">
       <use y="1" width="16" height="16" xlink:href="#:image:spiny_right:2Epng:v0"/>
