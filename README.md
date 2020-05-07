@@ -74,7 +74,7 @@ ILLLJOOSS Z
 
 <td>
 
-![Tetris custom level](examples/tetris/example.png)
+<img alt="Tetris custom level" width="192" src="examples/tetris/example.png">
 
 </table>
 
