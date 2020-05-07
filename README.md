@@ -31,7 +31,7 @@ To use SVG Tiler, you combine at least two types of files
    space-separated ASCII art (where symbols are separated by whitespace),
    standard CSV/TSV (comma/tab-separated) tabular formats, or
    standard multi-sheet spreadsheet formats XLSX/XLS/ODS
-   supported by Google Sheets and Excel.
+   supported by Google Sheets, OfficeOffice, and Excel.
 
 3. An optional **style file** specifies global styling of SVG elements via
    [CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS).
@@ -206,7 +206,7 @@ to specify an array of symbol names.  In particular,
 and
 [.tsv (tab-separated)](https://en.wikipedia.org/wiki/Tab-separated_values)
 formats are exactly those exported by spreadsheet software such as
-Google Drive or Excel, enabling you to draw in that software.
+Google Drive, OpenOffice, or Excel, enabling you to draw in that software.
 The .ssv format is similar, but where the delimiter between symbol names
 is arbitrary whitespace.
 (Contrast this behavior with .csv which treats every comma as a delimiter.)
