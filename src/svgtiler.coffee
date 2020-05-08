@@ -502,6 +502,13 @@ class CSSStyle extends Style
   parse: (filedata) ->
     @load filedata
 
+class StylusStyle extends Style
+  @title: "Stylus style file (https://stylus-lang.com/)"
+  parse: (filedata) ->
+    styl = require('stylus') filedata,
+      filename: @filename
+    @load styl.render()
+
 class Styles
   constructor: (@styles = []) ->
   push: (map) ->
@@ -1066,6 +1073,7 @@ extensionMap =
   '.dbf': XLSXDrawings   ## dBASE II/III/IV / Visual FoxPro
   # Styles
   '.css': CSSStyle
+  '.styl': StylusStyle
 
 sanitize = true
 bufferSize = 16*1024

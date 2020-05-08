@@ -1,0 +1,18 @@
+circle, rect, path
+  stroke-width: 5
+
+.light
+  fill: hsl(58, 100%, 80%)
+  stroke: hsl(58, 35%, 25%)
+.dark
+  fill: hsl(272, 100%, 80%)
+  stroke: hsl(272, 35%, 25%)
+
+.pulse
+  animation: pulse 2s linear infinite
+
+@keyframes pulse
+  0%, 100%
+    stroke-opacity: 0.9; fill-opacity: 1; stroke-width: 7
+  50%
+    stroke-opacity: 0.4; fill-opacity: 0.2; stroke-width: 3

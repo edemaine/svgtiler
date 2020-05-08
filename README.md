@@ -34,7 +34,8 @@ To use SVG Tiler, you combine at least two types of files
    supported by Google Sheets, OfficeOffice, and Excel.
 
 3. An optional **style file** specifies global styling of SVG elements via
-   [CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS).
+   [CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS)
+   or [Stylus](https://stylus-lang.com/).
 
 Here's a simple full example from
 [Tetris in the pixel-art style of the NES game](examples/tetris):
@@ -227,9 +228,9 @@ filenames distinguished by an underscore followed by the sheet name.
 By default, **hidden** sheets are ignored, making it easy to "deprecate" old
 drafts, but if you prefer, you can process hidden sheets via `--hidden`.
 
-## Style Files: .css
+## Style Files: .css, .styl
 
-Any specified **.css file** gets inlined into an
+Any input file in **.css format** gets inlined into an
 [SVG `<style>` tag](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/style).
 [Mixing SVG and CSS](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/SVG_and_CSS)
 lets you define global style rules for your SVG elements, for example,
@@ -239,7 +240,18 @@ specifying `fill` and `stroke` for every `polygon` of class `purple`:
 polygon.purple { fill: hsl(276, 77%, 80%); stroke: hsl(276, 89%, 27%) }
 ```
 
-See the [animation example](examples/anim) for sample usage of a .css file.
+Instead of raw CSS, you can use the **.styl format** to write your styles
+in the indentation-based format [Stylus](https://stylus-lang.com/).
+The example above could be written as follows in .styl:
+
+```stylus
+polygon.purple
+  fill: hsl(276, 77%, 80%)
+  stroke: hsl(276, 89%, 27%)
+```
+
+See the [animation example](examples/anim) for sample usage of a .css or
+.styl file.
 
 ## Layout Algorithm
 
@@ -502,6 +514,7 @@ Filename arguments:  (mappings before drawings!)
   *.prn        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.dbf        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.css        CSS style file
+  *.styl       Stylus style file (https://stylus-lang.com/)
 
 SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 
