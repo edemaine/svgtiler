@@ -1287,13 +1287,18 @@ main = ->
     console.log 'Not enough filename arguments'
     help()
 
-exports = {Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
+svgtiler = {
+  Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
-  Input, Mappings, Context, SVGTilerException, SVGNS, XLINKNS, main}
-module?.exports ?= exports
-window?.svgtiler ?= exports
+  Style, CSSStyle, StylusStyle,
+  extensionMap, Input, Mappings, Context,
+  SVGTilerException, SVGNS, XLINKNS, escapeId,
+  main, convertSVG
+}
+module?.exports ?= svgtiler
+window?.svgtiler ?= svgtiler
 
 unless window?
   main()
