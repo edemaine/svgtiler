@@ -239,6 +239,7 @@ class Symbol
   includes: (substring) ->
     @key.indexOf(substring) >= 0
     ## ECMA6: @key.includes substring
+  match: (regex) -> @key.match regex
 
 escapeId = (key) ->
   ###

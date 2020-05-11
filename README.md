@@ -152,6 +152,8 @@ the following properties:
   of the drawing.
 * `this.includes(substring)` computes whether `this.key` contains the given
   `substring` (as would `this.key.includes(substring)` in ECMAScript 2015).
+* `this.match(regex)` matches `this.key` against the given regular
+  expression (a shortcut for `this.key.matches(regex)`).
 * `this.i` is the row number of the cell of this symbol occurrence (starting
   at 0).
 * `this.j` is the column number of the cell of this symbol occurrence
