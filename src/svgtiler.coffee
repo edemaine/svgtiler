@@ -564,6 +564,22 @@ class ASCIIMapping extends Mapping
       map[key] = line[separator.index + separator[0].length..]
     @load map
 
+## Babel plugin to add implicit return to last line of program, to simulate
+## the effect of `eval`.
+implicitFinalReturn = ({types}) ->
+  visitor:
+    Program: (path) ->
+      body = path.get('body')
+      return unless body.length
+      last = body[body.length-1]
+      if last.node.type == 'ExpressionStatement'
+        returnLast = types.returnStatement last.node.expression
+        returnLast.leadingComments = last.node.leadingComments
+        returnLast.innerComments = last.node.innerComments
+        returnLast.trailingComments = last.node.trailingComments
+        last.replaceWith returnLast
+      undefined
+
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
   @help: "Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}"
@@ -575,22 +591,28 @@ class JSMapping extends Mapping
         pragma: 'preact.h'
         pragmaFrag: 'preact.Fragment'
         throwIfNamespace: false
-      ]]
+      ], implicitFinalReturn]
       sourceMaps: 'inline'
       retainLines: true
-    if 0 <= code.indexOf 'preact.'
-      code = "var preact = require('preact'), h = preact.h; #{code}"
-    ## Mimick NodeJS module's __filename and __dirname variables.
+    #code = "#{code}\n//# sourceURL=#{@filename}"
+    ## Mimick NodeJS module's __filename and __dirname variables
+    ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
+    _filename = path.resolve @filename
+    _dirname = path.dirname _filename
     ## Redirect require() to use paths relative to the mapping file.
-    ## xxx should probably actually create a NodeJS module when possible
-    __filename = path.resolve @filename
-    code =
-      "var __filename = #{JSON.stringify __filename},
-           __dirname = #{JSON.stringify path.dirname __filename},
-           __require = require;
-       require = (module) => __require(module.startsWith('.') ? __require('path').resolve(__dirname, module) : module);
-       #{code}\n//@ sourceURL=#{@filename}"
-    @load eval code
+    _require = (module) ->
+      if module.startsWith '.'
+        require path.resolve _dirname, module
+      else
+        require module
+    ## Use `new Function` instead of `eval` for improved performance and to
+    ## restrict to passed arguments + global scope.  On NodeJS, we could
+    ## instead use `vm.runInThisContext` (like `CoffeeScript.eval` does).
+    #@load eval code
+    func = new Function \
+      '__filename', '__dirname', 'require', 'svgtiler', 'preact', code
+    @load func _filename, _dirname, _require, svgtiler,
+      (if 0 <= code.indexOf 'preact' then require 'preact')
 
 class CoffeeMapping extends JSMapping
   @title: "CoffeeScript mapping file (including JSX notation)"
