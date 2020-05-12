@@ -441,18 +441,45 @@ via one of the following options (any one will do):
 
 ## Examples
 
-Games
+This repository contains several examples to help you learn SVG Tiler
+by inspection.  Some examples aim to capture real-world games,
+while others are more demonstrations of particular SVG Tiler features.
+
+### Video/board games:
 * [Super Mario Bros.](examples/mario)
 * [Tetris](examples/tetris)
 * [The Witness](examples/witness)
 * [Tilt](examples/tilt)
 
-Demos
+### Demos:
 * [Polyomino outline drawing and JSX](examples/polyomino)
 * [Auto width/height](examples/auto)
 * [Unicode](examples/unicode)
 * [Animations](examples/anim)
 * [Escaping tests](examples/test)
+
+### Research that uses SVG Tiler:
+
+The following research papers that use SVG Tiler to generate (some of their)
+figures.  Open an issue or pull request to add yours!
+
+* &ldquo;[Who witnesses The Witness? Finding witnesses in The Witness is hard and sometimes impossible](https://arxiv.org/abs/1804.10193)&rdquo;
+* &ldquo;[Losing at Checkers is Hard](http://erikdemaine.org/papers/Checkers_MOVES2017/)&rdquo;
+* &ldquo;[Path Puzzles: Discrete Tomography with a Path Constraint is Hard](http://erikdemaine.org/papers/PathPuzzles_GC/)&rdquo;
+* &ldquo;[Tetris is NP-hard even with <i>O</i>(1) Columns](http://erikdemaine.org/papers/ThinTetris_JCDCGGG2019/)&rdquo;
+* &ldquo;[PSPACE-completeness of Pulling Blocks to Reach a Goal](http://erikdemaine.org/papers/PullingBlocks_JCDCGGG2019/)&rdquo;
+* &ldquo;[Tatamibari is NP-complete](http://erikdemaine.org/papers/Tatamibari_FUN2020/)&rdquo;
+  &mdash;
+  [Github repo with SVG Tiler inputs](https://github.com/jbosboom/tatamibari-solver)
+* &ldquo;[Recursed is not Recursive: A Jarring Result](https://arxiv.org/abs/2002.05131)&rdquo;
+  <!--
+  &mdash;
+  [Github repo with inputs](https://github.com/edemaine/recursed-xls2lua)
+  (generates both SVG Tiler inputs and actual game levels)
+  -->
+* &ldquo;[1 &times; 1 Rush Hour with Fixed Blocks is PSPACE-complete](https://arxiv.org/abs/2003.09914)&rdquo;
+* &ldquo;[Cube Folding Puzzles](http://erikdemaine.org/puzzles/CubeFolding/)&rdquo;
+  <!-- half-grid paper -->
 
 ## Installation
 
