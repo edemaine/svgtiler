@@ -458,9 +458,9 @@ while others are more demonstrations of particular SVG Tiler features.
 * [Animations](examples/anim)
 * [Escaping tests](examples/test)
 
-### Research that uses SVG Tiler:
+### Research using SVG Tiler:
 
-The following research papers that use SVG Tiler to generate (some of their)
+The following research papers use SVG Tiler to generate (some of their)
 figures.  Open an issue or pull request to add yours!
 
 * &ldquo;[Who witnesses The Witness? Finding witnesses in The Witness is hard and sometimes impossible](https://arxiv.org/abs/1804.10193)&rdquo;
@@ -468,8 +468,7 @@ figures.  Open an issue or pull request to add yours!
 * &ldquo;[Path Puzzles: Discrete Tomography with a Path Constraint is Hard](http://erikdemaine.org/papers/PathPuzzles_GC/)&rdquo;
 * &ldquo;[Tetris is NP-hard even with <i>O</i>(1) Columns](http://erikdemaine.org/papers/ThinTetris_JCDCGGG2019/)&rdquo;
 * &ldquo;[PSPACE-completeness of Pulling Blocks to Reach a Goal](http://erikdemaine.org/papers/PullingBlocks_JCDCGGG2019/)&rdquo;
-* &ldquo;[Tatamibari is NP-complete](http://erikdemaine.org/papers/Tatamibari_FUN2020/)&rdquo;
-  &mdash;
+* &ldquo;[Tatamibari is NP-complete](http://erikdemaine.org/papers/Tatamibari_FUN2020/)&rdquo;; see also
   [Github repo with SVG Tiler inputs](https://github.com/jbosboom/tatamibari-solver)
 * &ldquo;[Recursed is not Recursive: A Jarring Result](https://arxiv.org/abs/2002.05131)&rdquo;
   <!--
