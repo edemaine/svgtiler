@@ -375,12 +375,10 @@ class StaticSymbol extends Symbol
       else
         true
 
-    ## Set viewBox attribute if absent.
+    ## Compute viewBox attribute if absent.
     @viewBox = svgBBox @xml
-    if @viewBox? and not @xml.documentElement.hasAttribute 'viewBox'
-      @xml.documentElement.setAttribute 'viewBox', @viewBox.join ' '
 
-    # Overflow behavior
+    ## Overflow behavior
     overflow = attributeOrStyle @xml.documentElement, 'overflow'
     if @constructor.overflowDefault? and not overflow?
       @xml.documentElement.setAttribute 'overflow',
@@ -400,6 +398,9 @@ class StaticSymbol extends Symbol
           @viewBox[2] = zeroSizeReplacement
         if @height == 0
           @viewBox[3] = zeroSizeReplacement
+    ## Reset viewBox attribute in case either absent (and computed via svgBBox)
+    ## or changed to avoid zeroes.
+    @xml.documentElement.setAttribute 'viewBox', @viewBox.join ' '
     @overflowBox = extractOverflowBox @xml
     if Symbol.forceWidth?
       @width = Symbol.forceWidth
