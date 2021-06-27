@@ -464,11 +464,11 @@ The following research papers use SVG Tiler to generate (some of their)
 figures.  Open an issue or pull request to add yours!
 
 * &ldquo;[Who witnesses The Witness? Finding witnesses in The Witness is hard and sometimes impossible](https://arxiv.org/abs/1804.10193)&rdquo;
-* &ldquo;[Losing at Checkers is Hard](http://erikdemaine.org/papers/Checkers_MOVES2017/)&rdquo;
-* &ldquo;[Path Puzzles: Discrete Tomography with a Path Constraint is Hard](http://erikdemaine.org/papers/PathPuzzles_GC/)&rdquo;
-* &ldquo;[Tetris is NP-hard even with <i>O</i>(1) Columns](http://erikdemaine.org/papers/ThinTetris_JCDCGGG2019/)&rdquo;
-* &ldquo;[PSPACE-completeness of Pulling Blocks to Reach a Goal](http://erikdemaine.org/papers/PullingBlocks_JCDCGGG2019/)&rdquo;
-* &ldquo;[Tatamibari is NP-complete](http://erikdemaine.org/papers/Tatamibari_FUN2020/)&rdquo;; see also
+* &ldquo;[Losing at Checkers is Hard](https://erikdemaine.org/papers/Checkers_MOVES2017/)&rdquo;
+* &ldquo;[Path Puzzles: Discrete Tomography with a Path Constraint is Hard](https://erikdemaine.org/papers/PathPuzzles_GC/)&rdquo;
+* &ldquo;[Tetris is NP-hard even with <i>O</i>(1) Columns](https://erikdemaine.org/papers/ThinTetris_JCDCGGG2019/)&rdquo;
+* &ldquo;[PSPACE-completeness of Pulling Blocks to Reach a Goal](https://erikdemaine.org/papers/PullingBlocks_JCDCGGG2019/)&rdquo;
+* &ldquo;[Tatamibari is NP-complete](https://erikdemaine.org/papers/Tatamibari_FUN2020/)&rdquo;; see also
   [Github repo with SVG Tiler inputs](https://github.com/jbosboom/tatamibari-solver)
 * &ldquo;[Recursed is not Recursive: A Jarring Result](https://arxiv.org/abs/2002.05131)&rdquo;
   <!--
@@ -477,7 +477,8 @@ figures.  Open an issue or pull request to add yours!
   (generates both SVG Tiler inputs and actual game levels)
   -->
 * &ldquo;[1 &times; 1 Rush Hour with Fixed Blocks is PSPACE-complete](https://arxiv.org/abs/2003.09914)&rdquo;
-* &ldquo;[Cube Folding Puzzles](http://erikdemaine.org/puzzles/CubeFolding/)&rdquo;
+* &ldquo;[Complexity of Retrograde and Helpmate Chess Problems: Even Cooperative Chess is Hard](https://erikdemaine.org/papers/RetroChess_ISAAC2020/)&rdquo;
+* &ldquo;[Cube Folding Puzzles](https://erikdemaine.org/puzzles/CubeFolding/)&rdquo;
   <!-- half-grid paper -->
 
 ## Installation
