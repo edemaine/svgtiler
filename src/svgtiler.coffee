@@ -10,7 +10,7 @@ unless window?
   XMLSerializer = xmldom.XMLSerializer
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
-  svgtiler = require '../package.json'
+  metadata = require '../package.json'
   require 'coffeescript/register'
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
@@ -881,7 +881,7 @@ class Drawing extends Input
     ## LaTeX based loosely on Inkscape's PDF/EPS/PS + LaTeX output extension.
     ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
     lines = ["""
-      %% Creator: svgtiler #{svgtiler.version}, https://github.com/edemaine/svgtiler
+      %% Creator: svgtiler #{metadata.version}, https://github.com/edemaine/svgtiler
       %% This LaTeX file includes and overlays text on top of companion file
       %% #{basename}.pdf/.png
       %%
@@ -1199,7 +1199,7 @@ convertSVG = (format, svg, sync) ->
 
 help = ->
   console.log """
-svgtiler #{svgtiler.version ? "(web)"}
+svgtiler #{metadata.version ? "(web)"}
 Usage: #{process.argv[1]} (...options and filenames...)
 Documentation: https://github.com/edemaine/svgtiler
 
@@ -1317,7 +1317,7 @@ main = ->
     console.log 'Not enough filename arguments'
     help()
 
-exports = {
+svgtiler = {
   Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
@@ -1325,10 +1325,11 @@ exports = {
   Style, CSSStyle, StylusStyle,
   extensionMap, Input, Mappings, Context,
   SVGTilerException, SVGNS, XLINKNS, escapeId,
-  main, convertSVG
+  main, convertSVG,
+  version: metadata.version
 }
-module?.exports = exports
-window?.svgtiler = exports
+module?.exports = svgtiler
+window?.svgtiler = svgtiler
 
 unless window?
   main() if require?.main == module
