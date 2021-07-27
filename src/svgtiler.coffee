@@ -787,7 +787,7 @@ class Drawing extends Input
         svg.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
         symbol.setAttribute 'id', inlineImages[attributes]
         # If we don't have width/height set from data-width/height fields,
-        # we take the first used width/height as the master height.
+        # we take the first used width/height as the defining height.
         node.setAttribute 'width', width or use.getAttribute 'width'
         node.setAttribute 'height', height or use.getAttribute 'height'
         symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
