@@ -182,6 +182,11 @@ contentType =
   '.gif': 'image/gif'
   '.svg': 'image/svg+xml'
 
+renderPreact = (data) ->
+  if typeof data == 'object' and data.type? and data.props?
+    data = require('preact-render-to-string') data
+  data
+
 class Symbol
   @svgEncoding: 'utf8'
   @forceWidth: null   ## default: no size forcing
@@ -203,8 +208,7 @@ class Symbol
       ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
       ## Serialization + parsing shouldn't be necessary, but this lets us
       ## deal with one parsed format (xmldom).
-      if typeof data == 'object' and data.type? and data.props?
-        data = require('preact-render-to-string') data
+      data = renderPreact data
       new StaticSymbol key,
         if typeof data == 'string'
           if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
@@ -455,9 +459,11 @@ class DynamicSymbol extends Symbol
     result = @func.call context
     unless result?
       throw new Error "Function for symbol #{@key} returned #{result}"
+    ## Render Preact virtual dom elements (e.g. from JSX notation) to SVG now,
+    ## for better duplicate detection.
+    result = renderPreact result
     ## We use JSON serialization to detect duplicate symbols.  This enables
-    ## return values like {filename: ...} and JSX virtual dom elements,
-    ## in addition to raw SVG strings.
+    ## return values like {filename: ...}, in addition to raw SVG strings.
     string = JSON.stringify result
     unless string of @versions
       version = @nversions++
