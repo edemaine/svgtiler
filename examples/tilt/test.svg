@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" preserveAspectRatio="xMinYMin meet">
-  <symbol id="X" viewBox="0 0 50 50" overflow="visible">
+  <symbol id="X" overflow="visible" viewBox="0 0 50 50">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
   </symbol>
   <symbol id="_blank" overflow="visible">
@@ -10,7 +10,7 @@
   <symbol id="_20" overflow="visible">
     <g/>
   </symbol>
-  <symbol id="O" viewBox="0 0 50 50" overflow="visible">
+  <symbol id="O" overflow="visible" viewBox="0 0 50 50">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
       <circle cx="25" cy="25" r="24" fill="#9bcf51"/>

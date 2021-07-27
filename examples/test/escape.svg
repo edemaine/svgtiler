@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 11" width="1" height="11" preserveAspectRatio="xMinYMin meet">
-  <symbol id="_30" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_30" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="purple"/>
   </symbol>
-  <symbol id="_5F" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_5F" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="red"/>
   </symbol>
-  <symbol id="_2D" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_2D" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="blue"/>
   </symbol>
-  <symbol id="x0" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="x0" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="purple"/>
   </symbol>
-  <symbol id="_21" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_21" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="orange"/>
   </symbol>
-  <symbol id="_7E" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_7E" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="green"/>
   </symbol>
-  <symbol id="_2A" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_2A" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="yellow"/>
   </symbol>
-  <symbol id="_27" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_27" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="black"/>
   </symbol>
-  <symbol id="_28" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_28" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="gray"/>
   </symbol>
-  <symbol id="_29" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_29" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="cyan"/>
   </symbol>
-  <symbol id="_3A" viewBox="0 0 1 1" overflow="visible">
+  <symbol id="_3A" overflow="visible" viewBox="0 0 1 1">
     <rect width="1" height="1" fill="magenta"/>
   </symbol>
   <use xlink:href="#_5F" x="0" y="0" width="1" height="1"/>

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 32" width="96" height="32" preserveAspectRatio="xMinYMin meet">
-  <symbol id="I" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="I" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Fempty_2Epng_v0"/>
   </symbol>
-  <symbol id="_20" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="_20" overflow="visible" viewBox="0 0 8 8">
     <rect fill="black" width="8" height="8"/>
   </symbol>
-  <symbol id="Z" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="Z" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Fother_2Epng_v0"/>
   </symbol>
-  <symbol id="L" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="L" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Fother_2Epng_v0"/>
   </symbol>
-  <symbol id="J" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="J" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Ffilled_2Epng_v0"/>
   </symbol>
-  <symbol id="O" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="O" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Fempty_2Epng_v0"/>
   </symbol>
-  <symbol id="S" viewBox="0 0 8 8" overflow="visible">
+  <symbol id="S" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Ffilled_2Epng_v0"/>
   </symbol>
   <symbol id="_image_NES_5Flevel7_5Ffilled_2Epng_v0" viewBox="0 0 8 8">

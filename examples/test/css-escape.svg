@@ -4,7 +4,7 @@
   <style>/* &lt;foo> is not valid */
     g > rect { fill: purple }
   </style>
-  <symbol id="x" viewBox="0 0 10 10" overflow="visible">
+  <symbol id="x" overflow="visible" viewBox="0 0 10 10">
     <g>
       <rect width="10" height="10"/>
     </g>
