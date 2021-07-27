@@ -1317,7 +1317,7 @@ main = ->
     console.log 'Not enough filename arguments'
     help()
 
-svgtiler = {
+exports = {
   Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
@@ -1327,10 +1327,10 @@ svgtiler = {
   SVGTilerException, SVGNS, XLINKNS, escapeId,
   main, convertSVG
 }
-module?.exports ?= svgtiler
-window?.svgtiler ?= svgtiler
+module?.exports = exports
+window?.svgtiler = exports
 
 unless window?
-  main()
+  main() if require?.main == module
 
 `}).call(this)`
