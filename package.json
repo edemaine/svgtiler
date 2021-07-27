@@ -29,21 +29,21 @@
     "test": "make test"
   },
   "dependencies": {
-    "@babel/core": "7.9.6",
-    "@babel/plugin-transform-react-jsx": "7.9.4",
+    "@babel/core": "7.14.8",
+    "@babel/plugin-transform-react-jsx": "7.14.5",
     "async-limiter": "2.0.0",
     "coffeescript": "2.5.1",
-    "csv-parse": "4.9.1",
+    "csv-parse": "4.16.0",
     "grapheme-splitter": "1.0.4",
-    "image-size": "0.8.3",
-    "preact": "10.1.1",
-    "preact-render-to-string": "5.1.8",
+    "image-size": "1.0.0",
+    "preact": "10.5.14",
+    "preact-render-to-string": "5.1.19",
     "prettify-xml": "1.2.0",
-    "stylus": "0.54.7",
-    "xlsx": "0.15.6",
+    "stylus": "0.54.8",
+    "xlsx": "0.17.0",
     "xmldom": "0.6.0"
   },
   "devDependencies": {
-    "vnu-jar": "20.3.17"
+    "vnu-jar": "21.6.11"
   }
 }
