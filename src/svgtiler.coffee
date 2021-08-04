@@ -822,8 +822,8 @@ class Drawing extends Input
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
         use.setAttribute 'xlink:href', '#' + symbol.id
-        use.setAttributeNS SVGNS, 'x', x
-        use.setAttributeNS SVGNS, 'y', y
+        use.setAttribute 'x', x
+        use.setAttribute 'y', y
         scaleX = scaleY = 1
         if symbol.autoWidth
           colWidths[j] ?= Math.max 0, ...(
@@ -837,9 +837,9 @@ class Drawing extends Input
           scaleX = scaleY unless symbol.autoWidth
         ## Scaling of symbol is relative to viewBox, so use that to define
         ## width and height attributes:
-        use.setAttributeNS SVGNS, 'width',
+        use.setAttribute 'width',
           (symbol.viewBox?[2] ? symbol.width) * scaleX
-        use.setAttributeNS SVGNS, 'height',
+        use.setAttribute 'height',
           (symbol.viewBox?[3] ? symbol.height) * scaleY
         if symbol.overflowBox?
           dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
