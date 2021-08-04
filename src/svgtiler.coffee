@@ -723,7 +723,8 @@ class Drawing extends Input
     DynamicSymbol.resetAll()
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
-    svg.setAttribute 'xmlns:xlink', XLINKNS
+    svg.setAttribute 'xmlns:xlink', XLINKNS unless Drawing.useHref
+    href = if Drawing.useHref then 'href' else 'xlink:href'
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## <style> tags for CSS
@@ -801,7 +802,7 @@ class Drawing extends Input
         node.setAttribute 'height', height or use.getAttribute 'height'
         symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
         symbol.appendChild node
-      use.setAttribute 'xlink:href', '#' + inlineImages[attributes]
+      use.setAttribute href, '#' + inlineImages[attributes]
       false
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
@@ -821,7 +822,7 @@ class Drawing extends Input
         continue unless symbol?
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
-        use.setAttribute 'xlink:href', '#' + symbol.id
+        use.setAttribute href, '#' + symbol.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
         scaleX = scaleY = 1
