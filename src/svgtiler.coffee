@@ -727,7 +727,7 @@ class Drawing extends Input
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## <style> tags for CSS
-    for style in styles.styles
+    for style in styles?.styles ? []
       svg.appendChild styleTag = doc.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
     ## Look up all symbols in the drawing.
