@@ -15,9 +15,12 @@ unless window?
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
   domImplementation = document.implementation
+  XMLSerializer = window.XMLSerializer # escape CoffeeScript scope
   path =
     extname: (x) -> /\.[^/]+$/.exec(x)[0]
     dirname: (x) -> /[^]*\/|/.exec(x)[0]
+  graphemeSplitter = splitGraphemes: (x) -> x.split ''
+  metadata = version: '(web)'
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -857,18 +860,19 @@ class Drawing extends Input
     for level in levelOrder
       for node in levels[level]
         svg.appendChild node
-    svg.setAttributeNS SVGNS, 'viewBox', viewBox.join ' '
-    svg.setAttributeNS SVGNS, 'width', @width = viewBox[2]
-    svg.setAttributeNS SVGNS, 'height', @height = viewBox[3]
-    svg.setAttributeNS SVGNS, 'preserveAspectRatio', 'xMinYMin meet'
+    svg.setAttribute 'viewBox', viewBox.join ' '
+    svg.setAttribute 'width', @width = viewBox[2]
+    svg.setAttribute 'height', @height = viewBox[3]
+    svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
     doc
   renderSVG: (mappings, styles) ->
     out = new XMLSerializer().serializeToString @renderSVGDOM mappings, styles
     ## Parsing xlink:href in user's SVG fragments, and then serializing,
     ## can lead to these null namespace definitions.  Remove.
     out = out.replace /\sxmlns:xlink=""/g, ''
-    out = prettyXML out,
-      newline: '\n'  ## force consistent line endings, not require('os').EOL
+    if prettyXML?
+      out = prettyXML out,
+        newline: '\n'  ## force consistent line endings, not require('os').EOL
     '''
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -1199,7 +1203,7 @@ convertSVG = (format, svg, sync) ->
 
 help = ->
   console.log """
-svgtiler #{metadata.version ? "(web)"}
+svgtiler #{metadata.version}
 Usage: #{process.argv[1]} (...options and filenames...)
 Documentation: https://github.com/edemaine/svgtiler
 
