@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 32" width="96" height="32" preserveAspectRatio="xMinYMin meet">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 96 32" width="96" height="32" xmlns="http://www.w3.org/2000/svg">
   <symbol id="I" overflow="visible" viewBox="0 0 8 8">
     <use width="8" height="8" xlink:href="#_image_NES_5Flevel7_5Fempty_2Epng_v0"/>
   </symbol>
