@@ -864,7 +864,7 @@ class Drawing extends Input
     svg.setAttribute 'viewBox', viewBox.join ' '
     svg.setAttribute 'width', @width = viewBox[2]
     svg.setAttribute 'height', @height = viewBox[3]
-    svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
+    #svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
     doc
   renderSVG: (mappings, styles) ->
     out = new XMLSerializer().serializeToString @renderSVGDOM mappings, styles
