@@ -229,7 +229,7 @@ class Symbol
               when '.png', '.jpg', '.jpeg', '.gif'
                 dirname: dirname
                 svg: """
-                  <image xlink:href="#{encodeURI data}"/>
+                  <image #{Drawing.hrefAttr()}="#{encodeURI data}"/>
                 """
               when '.svg'
                 dirname: path.dirname filename
@@ -676,6 +676,7 @@ allBlank = (list) ->
 
 class Drawing extends Input
   @inlineImages: not window?
+  @hrefAttr: -> if @useHref then 'href' else 'xlink:href'
   load: (data) ->
     ## Turn strings into arrays
     data = for row in data
@@ -724,7 +725,6 @@ class Drawing extends Input
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
     svg.setAttribute 'xmlns:xlink', XLINKNS unless Drawing.useHref
-    href = if Drawing.useHref then 'href' else 'xlink:href'
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## <style> tags for CSS
@@ -802,7 +802,7 @@ class Drawing extends Input
         node.setAttribute 'height', height or use.getAttribute 'height'
         symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
         symbol.appendChild node
-      use.setAttribute href, '#' + inlineImages[attributes]
+      use.setAttribute Drawing.hrefAttr(), '#' + inlineImages[attributes]
       false
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
@@ -822,7 +822,7 @@ class Drawing extends Input
         continue unless symbol?
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
-        use.setAttribute href, '#' + symbol.id
+        use.setAttribute Drawing.hrefAttr(), '#' + symbol.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
         scaleX = scaleY = 1
