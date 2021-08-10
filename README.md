@@ -481,7 +481,9 @@ figures.  Open an issue or pull request to add yours!
 * &ldquo;[Folding Small Polyominoes into a Unit Cube](https://erikdemaine.org/papers/CubeFolding_CCCG2020/)&rdquo;
 * &ldquo;[Yin-Yang Puzzles are NP-complete](http://erikdemaine.org/papers/YinYang_CCCG2021/)&rdquo;
   &mdash;
-  [GitHub repo with SVG Tiler inputs](https://github.com/edemaine/yin-yang-svgtiler)
+  [GitHub repo with SVG Tiler inputs](https://github.com/edemaine/yin-yang-svgtiler);
+  the [associated talk](https://github.com/edemaine/talk-yin-yang)
+  directly embeds SVG Tiler into reveal.js slides
 
 ## Installation
 
