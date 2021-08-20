@@ -29,8 +29,8 @@
     "test": "make test"
   },
   "dependencies": {
-    "@babel/core": "7.14.8",
-    "@babel/plugin-transform-react-jsx": "7.14.5",
+    "@babel/core": "7.15.0",
+    "@babel/plugin-transform-react-jsx": "7.14.9",
     "@xmldom/xmldom": "^0.7.2",
     "async-limiter": "2.0.0",
     "coffeescript": "2.5.1",
@@ -41,7 +41,7 @@
     "preact-render-to-string": "5.1.19",
     "prettify-xml": "1.2.0",
     "stylus": "0.54.8",
-    "xlsx": "0.17.0"
+    "xlsx": "0.17.1"
   },
   "devDependencies": {
     "vnu-jar": "21.6.11"
