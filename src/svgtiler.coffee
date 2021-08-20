@@ -4,7 +4,7 @@
 unless window?
   path = require 'path'
   fs = require 'fs'
-  xmldom = require 'xmldom'
+  xmldom = require '@xmldom/xmldom'
   DOMParser = xmldom.DOMParser
   domImplementation = new xmldom.DOMImplementation()
   XMLSerializer = xmldom.XMLSerializer
