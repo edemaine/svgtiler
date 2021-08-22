@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: If you use this software e.g. to draw figures for your papers, please cite it as below.
+title: SVG Tiler
+authors:
+  - family-names: Demaine
+    given-names: Erik D.
+    orcid: https://orcid.org/0000-0003-3803-5703
+license: MIT
+url: https://github.com/edemaine/svgtiler
+#version: 2.0.1
+#date-released: 2021-08-20
