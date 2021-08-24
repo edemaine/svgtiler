@@ -526,8 +526,11 @@ class Styles
     @styles.push map
 
 class Mapping extends Input
-  load: (data) ->
+  constructor: (data) ->
+    super()
     @map = {}
+    @load data if data?
+  load: (data) ->
     if typeof data == 'function'
       @function = data
     else
