@@ -1,6 +1,6 @@
 # SVG Tiler
 
-**SVG Tiler** is a command-line tool for drawing diagrams on a grid,
+**SVG Tiler** is a tool for drawing diagrams on a grid,
 where you draw ASCII art or spreadsheets and SVG Tiler automatically
 subsitutes each character or cell with a corresponding SVG symbol
 to make a big SVG figure
@@ -81,20 +81,24 @@ ILLLJOOSS Z
 
 ## Usage
 
-All input files (mapping, drawing, and style files)
-are listed on the `svgtiler` command line,
-with mapping and style files listed before
-all drawing files they should apply to.
-File types and formats are distinguished automatically by their extension.
+Normally, you run `svgtiler` on the command line, listing
+all input files (mapping, drawing, and style files) as arguments.
+Mapping and style files apply to all drawing files listed later.
+File types and formats are distinguished automatically by their extension,
+as listed below.
 For example:
 
 ```
-svgtiler map1.txt map2.coffee drawing.asc drawings.xls
+svgtiler map1.txt map2.coffee drawing.asc drawings.xlsx
 ```
 
 will generate `drawing.svg` using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `drawings.xlsx`.
+
+Alternatively, you can use the [SVG Tiler API](#api) to render SVG from your
+own JavaScript code, e.g., converting ASCII art embedded within a webpage
+into SVG drawings.
 
 ## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
 
@@ -439,6 +443,36 @@ via one of the following options (any one will do):
 * instead of `\import{filename.svg_tex}`.
 * `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
 
+## API
+
+SVG Tiler provides an API for rendering SVG directly from your JavaScript code.
+On NodeJS, you can `npm install svgtiler` and `require('svgtiler')`.
+On a web browser, you can include a `<script>` tag that points to
+`lib/svgtiler.js`, and the interface is available via `window.svgtiler`,
+though not all features are available or fully functional in this mode.
+While the full API is still in flux, the following subset should be stable:
+
+* `new Mapping(data)`: Create a mapping from `data` which is either an object
+  mapping keys to SVG strings or functions, or a function `data(key)` doing
+  such a mapping, similar to
+  [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
+* `renderDOM(mappings, elts, options)`: Use the provided `mappings`
+  (which can be a `Mapping` object or an array of `Mapping` objects)
+  to convert drawings embedded in the DOM via elements matching `elts`
+  (which can be a query selector string like `'.svgtiler'`, or a DOM element,
+  or an iterable of DOM elements).
+  * Each drawing can have a `data-filename` attribute to define its name and
+    extension, which determines its format; or you can set `options` to an
+    object with specifying a default `filename`.
+    The default filename is `drawing.asc`, which implies ASCII art.
+  * By default, the rendered SVG replaces the original drawing element, but
+    the element can specify `data-keep-parent="true"` (or `options` can specify
+    `keepParent: true`) to make it a sole child element instead; or the element
+    can specify `data-keep-class="true"` (or `options` can specify
+    `keepClass: true`) for the rendered SVG to keep the same `class` attribute
+    as the drawing element.
+* `version`: SVG Tiler version number as a string, or `'(web)'` in the browser.
+
 ## Examples
 
 This repository contains several examples to help you learn SVG Tiler
@@ -483,7 +517,7 @@ figures.  Open an issue or pull request to add yours!
   &mdash;
   [GitHub repo with SVG Tiler inputs](https://github.com/edemaine/yin-yang-svgtiler);
   the [associated talk](https://github.com/edemaine/talk-yin-yang)
-  directly embeds SVG Tiler into reveal.js slides
+  directly embeds SVG Tiler into reveal.js slides via the API
 
 ## Installation
 
