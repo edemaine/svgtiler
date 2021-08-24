@@ -658,6 +658,15 @@ class CoffeeMapping extends JSMapping
 
 class Mappings
   constructor: (@maps = []) ->
+  @from: (data) ->
+    if data instanceof Mappings
+      data
+    else if data instanceof Mapping
+      new Mappings [data]
+    else if Array.isArray data
+      new Mappings data
+    else
+      throw new SVGTilerException "Could not convert into Mapping(s): #{data}"
   push: (map) ->
     @maps.push map
   lookup: (key) ->
@@ -1113,6 +1122,53 @@ extensionMap =
   '.css': CSSStyle
   '.styl': StylusStyle
 
+renderDOMDefaults =
+  filename: 'drawing.asc'
+  keepParent: false
+  keepClass: false
+
+renderDOM = (mappings, elts, options) ->
+  mappings = Mappings.from mappings
+  if typeof elts == 'string'
+    elts = document.querySelectorAll elts
+  else if elts instanceof HTMLElement
+    elts = [elts]
+  option = (key) ->
+    elt.dataset[key] ? options?[key] ? renderDOMDefaults[key]
+  boolOption = (key) ->
+    switch value = option key
+      #when 'true', 'on', 'yes'
+      #  true
+      when 'false', 'off', 'no'#, ''
+        false
+      else
+        Boolean value
+  oldUseHref = Drawing.useHref
+  Drawing.useHref = true
+  try
+    for elt from elts
+      elt.style.whiteSpace = 'pre'
+      filename = option 'filename'
+      drawing = Input.recognize filename, elt.innerText
+      if drawing instanceof Drawing
+        dom = drawing.renderSVGDOM(mappings).documentElement
+        if boolOption 'keepParent'
+          elt.innerHTML = ''
+          elt.appendChild dom
+        else
+          elt.replaceWith dom
+          if boolOption 'keepClass'
+            dom.setAttribute 'class', elt.className
+      else
+        console.warn "Parsed element with filename '#{filename}' into #{drawing.constructor.name} instead of Drawing:", elt
+        dom = null
+      input: elt
+      output: dom
+      drawing: drawing
+      filename: filename
+  finally
+    Drawing.useHref = oldUseHref
+
 sanitize = true
 bufferSize = 16*1024
 
@@ -1333,7 +1389,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   extensionMap, Input, Mappings, Context,
   SVGTilerException, SVGNS, XLINKNS, escapeId,
-  main, convertSVG,
+  main, convertSVG, renderDOM, renderDOMDefaults,
   version: metadata.version
 }
 module?.exports = svgtiler
