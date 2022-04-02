@@ -26,7 +26,10 @@ SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
 
 splitIntoLines = (data) ->
-  data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+  data
+  .replace /\r\n/g, '\n'
+  .replace /\r/g, '\n'
+  .split '\n'
 whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
 
 extensionOf = (filename) -> path.extname(filename).toLowerCase()
