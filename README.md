@@ -328,7 +328,7 @@ drawing bounding box will be set as if the symbol occupies the
 [&minus;5, 15] &times; [&minus;5, 15] square.
 
 Even zero-width and zero-height symbols will get rendered (unless
-`overflow="hidden").  This can be useful for drawing grid
+`overflow="hidden"`).  This can be useful for drawing grid
 outlines without affecting the overall grid layout, for example.
 (SVG defines that [symbols are invisible if they have zero width or
 height](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox),
