@@ -138,8 +138,8 @@ The object or function should map a symbol name to either
 2. [Preact](https://preactjs.com/) (React-style) Virtual DOM elements, via
    [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax
    (or its [CoffeeScript analog](https://coffeescript.org/#jsx))
-   or via `preact.h` calls
-   (see [the polyomino example](examples/polyomino)),
+   or via `preact.h` calls;
+   see [the polyomino example](examples/polyomino).
    Be careful not to modify Preact nodes, as they get re-used; instead use
    [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
    to make a modified copy (or before modification).
