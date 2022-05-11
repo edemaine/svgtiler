@@ -562,7 +562,7 @@ Optional arguments:
                         Force all symbol tiles to have specified height
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
-  -t / --tex            Move <text> from SVG to accompanying LaTeX file.tex
+  -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
