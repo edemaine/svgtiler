@@ -25,24 +25,37 @@ else
 ## Register `require` hooks of Babel and CoffeeScript,
 ## so that imported/required modules are similarly processed.
 unless window?
-  ## Babel plugin to add implicit return to last line of program, to simulate
-  ## the effect of `eval`.
-  implicitFinalReturn = ({types}) ->
+  ## Babel plugin to add implicit `export default` to last line of program,
+  ## to simulate the effect of `eval` but in a module context.
+  implicitFinalExportDefault = ({types}) ->
     visitor:
       Program: (path) ->
         body = path.get('body')
-        return unless body.length
+        return unless body.length  # empty program
+        for part in body
+          if types.isExportDefaultDeclaration part
+            return  # already an export default, so don't add one
         last = body[body.length-1]
         if last.node.type == 'ExpressionStatement'
-          returnLast = types.returnStatement last.node.expression
-          returnLast.leadingComments = last.node.leadingComments
-          returnLast.innerComments = last.node.innerComments
-          returnLast.trailingComments = last.node.trailingComments
-          last.replaceWith returnLast
+          exportLast = types.exportDefaultDeclaration last.node.expression
+          exportLast.leadingComments = last.node.leadingComments
+          exportLast.innerComments = last.node.innerComments
+          exportLast.trailingComments = last.node.trailingComments
+          last.replaceWith exportLast
         undefined
 
   babelConfig =
     plugins: [
+      implicitFinalExportDefault
+      [require.resolve('babel-plugin-auto-import'),
+        declarations: [
+          default: 'preact'
+          path: 'preact'
+        ,
+          default: 'svgtiler'
+          path: 'svgtiler'
+        ]
+      ]
       require.resolve '@babel/plugin-transform-modules-commonjs'
       [require.resolve('@babel/plugin-transform-react-jsx'),
         useBuiltIns: true
@@ -52,17 +65,21 @@ unless window?
         #pragmaFrag: 'preact.Fragment'
         throwIfNamespace: false
       ]
-      implicitFinalReturn
     ]
-    inputSourceMap: true
+    #inputSourceMap: true  # CoffeeScript sets this to its own source map
     sourceMaps: 'inline'
     retainLines: true
 
   ## Tell CoffeeScript's register to transpile with our Babel config.
-  module.options = transpile: babelConfig
+  module.options =
+    bare: true  # needed for implicitFinalExportDefault
+    #inlineMap: true  # rely on Babel's source map
+    transpile: babelConfig
 
   require('@babel/register') babelConfig
-  require 'coffeescript/register'
+  CoffeeScript = require 'coffeescript'
+  CoffeeScript.FILE_EXTENSIONS = ['.coffee', '.cjsx']
+  CoffeeScript.register()
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -538,7 +555,7 @@ class Input
     ## Generic method to parse file once we're already in the right class.
     input = new @
     input.filename = filename
-    unless filedata?
+    unless filedata? or @skipRead
       filedata = fs.readFileSync filename, encoding: @encoding
     input.parse filedata
     input
@@ -626,62 +643,48 @@ class ASCIIMapping extends Mapping
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
   @help: "Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}"
+  @skipRead: true  # require loads file contents for us
   parse: (data) ->
-    {code} = require('@babel/core').transform data, {
-      ...babelConfig
-      filename: @filename
-    }
-    #code = "#{code}\n//# sourceURL=#{@filename}"
-    exports = {}
-    ## Mimick NodeJS module's __filename and __dirname variables
-    ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
-    _filename = path.resolve @filename
-    _dirname = path.dirname _filename
-    ## Redirect require() to use paths relative to the mapping file.
-    ## This also overrides `import` thanks to
-    ## @babel/plugin-transform-modules-commonjs
-    _require = (module) ->
-      if module.startsWith '.'
-        require path.resolve _dirname, module
-      else
-        require module
-    ## Use `new Function` instead of `eval` for improved performance and to
-    ## restrict to passed arguments + global scope.  On NodeJS, we could
-    ## instead use `vm.runInThisContext` (like `CoffeeScript.eval` does).
-    #@load eval code
-    func = new Function \
-      'exports', '__filename', '__dirname', 'require', 'svgtiler', 'preact',
-      code
-    @load func exports, _filename, _dirname, _require, svgtiler,
-      (if 0 <= code.indexOf 'preact' then require 'preact')
+    unless data?
+      ## Normally use `require` to load code as a real NodeJS module
+      filename = path.resolve @filename
+      @load require(filename).default ? {}
+    else
+      ## But if file has been explicitly loaded (e.g. in browser),
+      ## compile manually and simulate module.
+      {code} = require('@babel/core').transform data, {
+        ...babelConfig
+        filename: @filename
+      }
+      exports = {}
+      ## Mimick NodeJS module's __filename and __dirname variables
+      ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
+      _filename = path.resolve @filename
+      _dirname = path.dirname _filename
+      ## Use `new Function` instead of `eval` for improved performance and to
+      ## restrict to passed arguments + global scope.
+      #@load eval code
+      func = new Function \
+        'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
+      func exports, _filename, _dirname, svgtiler,
+        (if 0 <= code.indexOf 'preact' then require 'preact')
+      @load exports.default
 
 class CoffeeMapping extends JSMapping
   @title: "CoffeeScript mapping file (including JSX notation)"
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
-    #try
+    unless data?
+      ## Normally rely on `require` and `CoffeeScript.register` to load code.
+      super.parse data
+    else
+      ## But if file has been explicitly loaded (e.g. in browser),
+      ## compile manually.
       super.parse require('coffeescript').compile data,
         bare: true
+        inlineMap: true
         filename: @filename
         sourceFiles: [@filename]
-        inlineMap: true
-    #catch err
-    #  throw err
-    #  if err.stack? and err.stack.startsWith "#{@filename}:"
-    #    sourceMap = require('coffeescript').compile(data,
-    #      bare: true
-    #      filename: @filename
-    #      sourceFiles: [@filename]
-    #      sourceMap: true
-    #    ).sourceMap
-    #    err.stack = err.stack.replace /:([0-9]*)/, (m, line) ->
-    #      ## sourceMap starts line numbers at 0, but we want to work from 1
-    #      for col in sourceMap?.lines[line-1]?.columns ? [] when col?.sourceLine?
-    #        unless sourceLine? and sourceLine < col.sourceLine
-    #          sourceLine = col.sourceLine
-    #          line = sourceLine + 1
-    #      ":#{line}"
-    #  throw err
 
 class Mappings
   constructor: (@maps = []) ->
@@ -1422,7 +1425,12 @@ svgtiler = {
 module?.exports = svgtiler
 window?.svgtiler = svgtiler
 
-unless window?
-  main() if require?.main == module
+if require?.main == module and not window?
+  ## Enable require('svgtiler') (as autoimported by `svgtiler` access)
+  ## to load this module (needed if the module is installed globally).
+  process.env.NODE_PATH = path.join __dirname, '..', '..'
+  require('module').Module._initPaths()
+
+  main()
 
 `}).call(this)`

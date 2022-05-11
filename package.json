@@ -35,6 +35,7 @@
     "@babel/register": "7.17.7",
     "@xmldom/xmldom": "0.7.2",
     "async-limiter": "2.0.0",
+    "babel-plugin-auto-import": "1.1.0",
     "coffeescript": "2.7.0",
     "csv-parse": "4.16.0",
     "grapheme-splitter": "1.0.4",
