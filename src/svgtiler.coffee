@@ -1455,9 +1455,21 @@ module?.exports = svgtiler
 window?.svgtiler = svgtiler
 
 if require?.main == module and not window?
-  ## Enable require('svgtiler') (as autoimported by `svgtiler` access)
-  ## to load this module (needed if the module is installed globally).
-  process.env.NODE_PATH = path.join __dirname, '..', '..'
+  paths = [
+    ## Enable require('svgtiler') (as autoimported by `svgtiler` access)
+    ## to load this module (needed if the module is installed globally).
+    path.join __dirname, '..', '..'
+    ## Enable require('preact') (as autoimported by `preact` access)
+    ## to load SVG Tiler's copy of preact.
+    path.join __dirname, '..', 'node_modules'
+  ]
+  paths.push process.env.NODE_PATH if process.env.NODE_PATH
+  process.env.NODE_PATH = paths.join (
+    if require('process').platform == 'win32'
+      ';'
+    else
+      ':'
+  )
   require('module').Module._initPaths()
 
   main()
