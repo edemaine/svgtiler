@@ -1187,23 +1187,23 @@ renderDOM = (mappings, elts, settings) ->
   else if elts instanceof HTMLElement
     elts = [elts]
 
-  ## Default to href attribute which works better in DOM.
-  settings = {...defaultSettings, useHref: true, ...settings}
-  ## Override settings via data-* attributes.
-  for key, value of elt.dataset
-    continue unless key of settings
-    if typeof settings[key] == 'boolean'
-      switch value = setting key
-        #when 'true', 'on', 'yes'
-        #  settings[key] = true
-        when 'false', 'off', 'no'#, ''
-          settings[key] = false
-        else
-          settings[key] = Boolean value
-    else
-      settings[key] = value
-
   for elt from elts
+    ## Default to href attribute which works better in DOM.
+    settings = {...defaultSettings, useHref: true, ...settings}
+    ## Override settings via data-* attributes.
+    for key, value of elt.dataset
+      continue unless key of settings
+      if typeof settings[key] == 'boolean'
+        switch value = setting key
+          #when 'true', 'on', 'yes'
+          #  settings[key] = true
+          when 'false', 'off', 'no'#, ''
+            settings[key] = false
+          else
+            settings[key] = Boolean value
+      else
+        settings[key] = value
+
     try
       elt.style.whiteSpace = 'pre'
       filename = settings.filename
