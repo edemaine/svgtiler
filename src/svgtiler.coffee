@@ -1454,7 +1454,7 @@ svgtiler = {
 module?.exports = svgtiler
 window?.svgtiler = svgtiler
 
-if require?.main == module and not window?
+if module? and require?.main == module and not window?
   paths = [
     ## Enable require('svgtiler') (as autoimported by `svgtiler` access)
     ## to load this module (needed if the module is installed globally).
