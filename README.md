@@ -125,7 +125,14 @@ O O.svg
 ```
 
 In the **.js / .coffee / .jsx / .cjsx formats**, the file consists of
-JavaScript / CoffeeScript code, the last line of which should evaluate to either
+JavaScript / CoffeeScript code that gets loaded as a NodeJS module.
+The code specifies a `mapping` in one of three ways:
+
+1. Writing a `mapping` expression at the end of the file (implicit export).
+2. `export default mapping` (ECMAScript modules style)
+3. `exports.default = mapping` (CommonJS modules style)
+
+In any case, `mapping` should be an expression evaluating to either
 
 1. an *object* whose keys are symbol names, or
 2. a *function* in one argument, a symbol name (string).
@@ -180,15 +187,14 @@ the following properties:
 * `this.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the input format does allow multiple sheets.
 
-Like regular NodeJS modules, .js and .coffee files can access `__dirname`
+
+Like other NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
 In addition to the preloaded module `preact`, they have access to the
 SVG Tiler API (not yet documented) via `svgtiler`.
 You can also use `import ... from './filename'` or `require('./filename')`
 to import local modules relative to the mapping file,
 which is useful for sharing code among mapping files.
-(Note, however, that imported modules do not have access to `preact` or
-`svgtiler` globals.)
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
