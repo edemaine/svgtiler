@@ -528,6 +528,8 @@ you can install this tool via
 npm install -g svgtiler
 ```
 
+SVG Tiler requires Node v10+.
+
 ## Command-Line Usage
 
 The command-line arguments consist mostly of mapping and/or drawing files.

@@ -1,6 +1,7 @@
-`#!/usr/bin/env node
+`#!/usr/bin/env node --enable-source-maps
 (function() {
 `
+
 unless window?
   path = require 'path'
   fs = require 'fs'

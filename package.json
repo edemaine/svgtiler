@@ -31,9 +31,9 @@
   "dependencies": {
     "@babel/core": "7.15.0",
     "@babel/plugin-transform-react-jsx": "7.14.9",
-    "@xmldom/xmldom": "^0.7.2",
+    "@xmldom/xmldom": "0.7.2",
     "async-limiter": "2.0.0",
-    "coffeescript": "2.5.1",
+    "coffeescript": "2.7.0",
     "csv-parse": "4.16.0",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.0",
