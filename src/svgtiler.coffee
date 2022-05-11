@@ -81,6 +81,38 @@ unless window?
   CoffeeScript.FILE_EXTENSIONS = ['.coffee', '.cjsx']
   CoffeeScript.register()
 
+defaultSettings =
+  ## Force all symbol tiles to have specified width or height.
+  forceWidth: null   ## default: no size forcing
+  forceHeight: null  ## default: no size forcing
+  ## Inline <image>s into output SVG (replacing URLs to other files).
+  inlineImages: not window?
+  ## Process hidden sheets within spreadsheet files.
+  keepHidden: false
+  ## Don't delete blank extreme rows/columns.
+  keepMargins: false
+  ## Default overflow behavior is 'visible' unless --no-overflow specified;
+  ## use `overflow:hidden` to restore normal SVG behavior of keeping each tile
+  ## within its bounding box.
+  overflowDefault: 'visible'
+  ## When a mapping refers to an SVG filename, assume this encoding.
+  svgEncoding: 'utf8'
+  ## Move <text> from SVG to accompanying LaTeX file.tex.
+  texText: false
+  ## Use `href` instead of `xlink:href` attribute in <use> and <image>.
+  ## `href` behaves better in web browsers, but `xlink:href` is more
+  ## compatible with older SVG drawing programs.
+  useHref: window?
+  ## renderDOM-specific
+  filename: 'drawing.asc'  # default filename when not otherwise specified
+  keepParent: false
+  keepClass: false
+
+getSetting = (settings, key) ->
+  settings?[key] ? defaultSettings[key]
+class HasSettings
+  getSetting: (key) -> getSetting @settings, key
+
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
 
@@ -252,59 +284,48 @@ renderPreact = (data) ->
     data = require('preact-render-to-string') data
   data
 
-class Symbol
-  @svgEncoding: 'utf8'
-  @forceWidth: null   ## default: no size forcing
-  @forceHeight: null  ## default: no size forcing
-  @texText: false
-  # Set default overflow behavior to visible unless --no-overflow specified;
-  # use overflow:hidden to restore normal SVG behavior of keeping each tile
-  # within its bounding box.
-  @overflowDefault: 'visible'
-
-  @parse: (key, data, dirname) ->
+class Symbol extends HasSettings
+  @parse: (key, data, settings) ->
     unless data?
       throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
     else if typeof data == 'function'
-      new DynamicSymbol key, data, dirname
+      new DynamicSymbol key, data, settings
     else if data.function?
-      new DynamicSymbol key, data.function, dirname
+      new DynamicSymbol key, data.function, settings
     else
       ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
       ## Serialization + parsing shouldn't be necessary, but this lets us
       ## deal with one parsed format (xmldom).
       data = renderPreact data
-      new StaticSymbol key,
-        if typeof data == 'string'
-          if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
-            svg: '<symbol viewBox="0 0 0 0"/>'
-          else if data.indexOf('<') < 0  ## No <'s -> interpret as filename
-            if dirname?
-              filename = path.join dirname, data
-            else
-              filename = data
-            extension = extensionOf data
-            ## <image> tag documentation: "Conforming SVG viewers need to
-            ## support at least PNG, JPEG and SVG format files."
-            ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
+      if typeof data == 'string'
+        if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
+          data = svg: '<symbol viewBox="0 0 0 0"/>'
+        else if data.indexOf('<') < 0  ## No <'s -> interpret as filename
+          if settings?.dirname?
+            filename = path.join settings.dirname, data
+          else
+            filename = data
+          extension = extensionOf data
+          ## <image> tag documentation: "Conforming SVG viewers need to
+          ## support at least PNG, JPEG and SVG format files."
+          ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
+          data =
             switch extension
               when '.png', '.jpg', '.jpeg', '.gif'
-                dirname: dirname
                 svg: """
-                  <image #{Drawing.hrefAttr()}="#{encodeURI data}"/>
+                  <image #{hrefAttr settings}="#{encodeURI data}"/>
                 """
               when '.svg'
-                dirname: path.dirname filename
-                filename: filename
-                svg: fs.readFileSync filename,
-                       encoding: @svgEncoding
+                settings = {...settings, dirname: path.dirname filename}
+                data =
+                  filename: filename
+                  svg: fs.readFileSync filename,
+                         encoding: getSetting settings, 'svgEncoding'
               else
                 throw new SVGTilerException "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
-          else
-            dirname: dirname
-            svg: data
         else
-          data
+          data = svg: data
+      new StaticSymbol key, {...data, settings}
   includes: (substring) ->
     @key.indexOf(substring) >= 0
     ## ECMA6: @key.includes substring
@@ -406,7 +427,8 @@ class StaticSymbol extends Symbol
         ## Read file for width/height detection and/or inlining
         {href, key} = getHref node
         filename = href
-        filename = path.join @dirname, filename if @dirname? and filename
+        if (dirname = @getSetting 'dirname')? and filename
+          filename = path.join dirname, filename
         if filename? and not /^data:|file:|[a-z]+:\/\//.test filename # skip URLs
           filedata = null
           try
@@ -431,7 +453,7 @@ class StaticSymbol extends Symbol
               node.setAttribute 'width', size.width
               node.setAttribute 'height', size.height
           ## Inline
-          if filedata? and Drawing.inlineImages
+          if filedata? and @getSetting 'inlineImages'
             type = contentType[extensionOf filename]
             if type?
               node.setAttribute "data-filename", filename
@@ -449,9 +471,9 @@ class StaticSymbol extends Symbol
 
     ## Overflow behavior
     overflow = attributeOrStyle @xml.documentElement, 'overflow'
-    if @constructor.overflowDefault? and not overflow?
+    if not overflow? and (overflowDefault = @getSetting 'overflowDefault')?
       @xml.documentElement.setAttribute 'overflow',
-        overflow = @constructor.overflowDefault
+        overflow = overflowDefault
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
     @width = @height = null
     if @viewBox?
@@ -471,10 +493,8 @@ class StaticSymbol extends Symbol
       ## svgBBox) or changed to avoid zeroes.
       @xml.documentElement.setAttribute 'viewBox', @viewBox.join ' '
     @overflowBox = extractOverflowBox @xml
-    if Symbol.forceWidth?
-      @width = Symbol.forceWidth
-    if Symbol.forceHeight?
-      @height = Symbol.forceHeight
+    @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
+    @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
     warnings = []
     unless @width?
       warnings.push 'width'
@@ -492,7 +512,7 @@ class StaticSymbol extends Symbol
     @xml.documentElement.removeAttribute 'height' if @autoHeight
     @zIndex = extractZIndex @xml.documentElement
     ## Optionally extract <text> nodes for LaTeX output
-    if Symbol.texText
+    if @getSetting 'texText'
       @text = []
       domRecurse @xml.documentElement, (node, parent) =>
         if node.nodeName == 'text'
@@ -509,7 +529,7 @@ class StaticSymbol extends Symbol
 
 class DynamicSymbol extends Symbol
   @all: []
-  constructor: (@key, @func, @dirname) ->
+  constructor: (@key, @func, @settings) ->
     super()
     @versions = {}
     @nversions = 0
@@ -533,7 +553,7 @@ class DynamicSymbol extends Symbol
     unless string of @versions
       version = @nversions++
       @versions[string] =
-        Symbol.parse "#{@key}_v#{version}", result, @dirname
+        Symbol.parse "#{@key}_v#{version}", result, @settings
       @versions[string].setId "#{escapeId @key}_v#{version}"
     @versions[string]
   usesContext: true
@@ -549,21 +569,22 @@ unrecognizedSymbol = new StaticSymbol '_unrecognized', svg: '''
 '''
 unrecognizedSymbol.setId '_unrecognized' # cannot be output of escapeId()
 
-class Input
+class Input extends HasSettings
   @encoding: 'utf8'
-  @parseFile: (filename, filedata) ->
+  @parseFile: (filename, filedata, settings) ->
     ## Generic method to parse file once we're already in the right class.
     input = new @
     input.filename = filename
+    input.settings = settings
     unless filedata? or @skipRead
       filedata = fs.readFileSync filename, encoding: @encoding
     input.parse filedata
     input
-  @recognize: (filename, filedata) ->
+  @recognize: (filename, filedata, settings) ->
     ## Recognize type of file and call corresponding class's `parseFile`.
     extension = extensionOf filename
     if extension of extensionMap
-      extensionMap[extension].parseFile filename, filedata
+      extensionMap[extension].parseFile filename, filedata, settings
     else
       throw new SVGTilerException "Unrecognized extension in filename #{filename}"
 
@@ -598,13 +619,13 @@ class Mapping extends Input
     else
       @merge data
   merge: (data) ->
-    dirname = path.dirname @filename if @filename?
+    settings = @settings
+    settings = {...settings, dirname: path.dirname @filename} if @filename?
     for own key, value of data
       unless value instanceof Symbol
-        value = Symbol.parse key, value, dirname
+        value = Symbol.parse key, value, settings
       @map[key] = value
   lookup: (key) ->
-    dirname = path.dirname @filename if @filename?
     key = key.toString()  ## Sometimes get a number, e.g., from XLSX
     if key of @map
       @map[key]
@@ -614,7 +635,9 @@ class Mapping extends Input
       ## it to make multiple versions, but keep track of which are the same.
       value = @function key
       if value?
-        @map[key] = Symbol.parse key, value, dirname
+        settings = @settings
+        settings = {...settings, dirname: path.dirname @filename} if @filename?
+        @map[key] = Symbol.parse key, value, settings
       else
         value
     else
@@ -716,15 +739,20 @@ allBlank = (list) ->
       return false
   true
 
+hrefAttr = (settings) ->
+  if getSetting settings, 'useHref'
+    'href'
+  else
+    'xlink:href'
+
 class Drawing extends Input
-  @inlineImages: not window?
-  @hrefAttr: -> if @useHref then 'href' else 'xlink:href'
+  hrefAttr: -> hrefAttr @settings
   load: (data) ->
     ## Turn strings into arrays
     data = for row in data
              for cell in row
                cell
-    unless Drawing.keepMargins
+    unless @getSetting 'keepMargins'
       ## Top margin
       while data.length > 0 and allBlank data[0]
         data.shift()
@@ -766,7 +794,7 @@ class Drawing extends Input
     DynamicSymbol.resetAll()
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
-    svg.setAttribute 'xmlns:xlink', XLINKNS unless Drawing.useHref
+    svg.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
     ## <style> tags for CSS
@@ -808,7 +836,7 @@ class Drawing extends Input
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = {}
     inlineImageVersions = {}
-    domRecurse svg, (node, parent) ->
+    domRecurse svg, (node, parent) =>
       return true unless node.nodeName == 'image'
       {href} = getHref node
       return true unless href?.startsWith 'data:'
@@ -844,7 +872,7 @@ class Drawing extends Input
         node.setAttribute 'height', height or use.getAttribute 'height'
         symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
         symbol.appendChild node
-      use.setAttribute Drawing.hrefAttr(), '#' + inlineImages[attributes]
+      use.setAttribute @hrefAttr(), '#' + inlineImages[attributes]
       false
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
@@ -864,7 +892,7 @@ class Drawing extends Input
         continue unless symbol?
         levels[symbol.zIndex] ?= []
         levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
-        use.setAttribute Drawing.hrefAttr(), '#' + symbol.id
+        use.setAttribute @hrefAttr(), '#' + symbol.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
         scaleX = scaleY = 1
@@ -1095,7 +1123,7 @@ class XLSXDrawings extends Drawings
         sheet = workbook.Sheets[subname]
         ## 0 = Visible, 1 = Hidden, 2 = Very Hidden
         ## https://sheetjs.gitbooks.io/docs/#sheet-visibility
-        if sheetInfo.Hidden and not Drawings.keepHidden
+        if sheetInfo.Hidden and not @getSetting 'keepHidden'
           continue
         if subname.length == 31
           console.warn "Warning: Sheet '#{subname}' has length exactly 31, which may be caused by Google Sheets export truncation"
@@ -1152,42 +1180,42 @@ extensionMap =
   '.css': CSSStyle
   '.styl': StylusStyle
 
-renderDOMDefaults =
-  filename: 'drawing.asc'
-  keepParent: false
-  keepClass: false
-
-renderDOM = (mappings, elts, options) ->
+renderDOM = (mappings, elts, settings) ->
   mappings = Mappings.from mappings
   if typeof elts == 'string'
     elts = document.querySelectorAll elts
   else if elts instanceof HTMLElement
     elts = [elts]
-  option = (key) ->
-    elt.dataset[key] ? options?[key] ? renderDOMDefaults[key]
-  boolOption = (key) ->
-    switch value = option key
-      #when 'true', 'on', 'yes'
-      #  true
-      when 'false', 'off', 'no'#, ''
-        false
-      else
-        Boolean value
-  oldUseHref = Drawing.useHref
-  Drawing.useHref = true
-  try
-    for elt from elts
+
+  ## Default to href attribute which works better in DOM.
+  settings = {...defaultSettings, useHref: true, ...settings}
+  ## Override settings via data-* attributes.
+  for key, value of elt.dataset
+    continue unless key of settings
+    if typeof settings[key] == 'boolean'
+      switch value = setting key
+        #when 'true', 'on', 'yes'
+        #  settings[key] = true
+        when 'false', 'off', 'no'#, ''
+          settings[key] = false
+        else
+          settings[key] = Boolean value
+    else
+      settings[key] = value
+
+  for elt from elts
+    try
       elt.style.whiteSpace = 'pre'
-      filename = option 'filename'
-      drawing = Input.recognize filename, elt.innerText
+      filename = settings.filename
+      drawing = Input.recognize filename, elt.innerText, settings
       if drawing instanceof Drawing
         dom = drawing.renderSVGDOM(mappings).documentElement
-        if boolOption 'keepParent'
+        if settings.keepParent
           elt.innerHTML = ''
           elt.appendChild dom
         else
           elt.replaceWith dom
-          if boolOption 'keepClass'
+          if settings.keepClass
             dom.setAttribute 'class', elt.className
       else
         console.warn "Parsed element with filename '#{filename}' into #{drawing.constructor.name} instead of Drawing:", elt
@@ -1196,8 +1224,9 @@ renderDOM = (mappings, elts, options) ->
       output: dom
       drawing: drawing
       filename: filename
-  finally
-    Drawing.useHref = oldUseHref
+    catch err
+      console.error 'svgtiler.renderDOM failed to parse element:', elt
+      console.error err
 
 sanitize = true
 bufferSize = 16*1024
@@ -1337,14 +1366,14 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
   #object with one or more attributes
   process.exit()
 
-main = ->
+main = (args = process.argv[2..]) ->
   mappings = new Mappings
   styles = new Styles
-  args = process.argv[2..]
   files = skip = 0
   formats = []
   jobs = []
   sync = true
+  settings = {...defaultSettings}
   for arg, i in args
     if skip
       skip--
@@ -1353,21 +1382,21 @@ main = ->
       when '-h', '--help'
         help()
       when '-m', '--margin'
-        Drawing.keepMargins = true
+        settings.keepMargins = true
       when '--hidden'
-        Drawings.keepHidden = true
+        settings.keepHidden = true
       when '--tw', '--tile-width'
         skip = 1
         arg = parseFloat args[i+1]
         if arg
-          Symbol.forceWidth = arg
+          settings.forceWidth = arg
         else
           console.warn "Invalid argument to --tile-width: #{args[i+1]}"
       when '--th', '--tile-height'
         skip = 1
         arg = parseFloat args[i+1]
         if arg
-          Symbol.forceHeight = arg
+          settings.forceHeight = arg
         else
           console.warn "Invalid argument to --tile-height: #{args[i+1]}"
       when '-p', '--pdf'
@@ -1375,13 +1404,13 @@ main = ->
       when '-P', '--png'
         formats.push 'png'
       when '-t', '--tex'
-        Symbol.texText = true
+        settings.texText = true
       when '--no-sanitize'
         sanitize = false
       when '--no-overflow'
-        Symbol.overflowDefault = null # no default
+        settings.overflowDefault = null  # no default
       when '--no-inline'
-        Drawing.inlineImages = false
+        settings.inlineImages = false
       when '-j', '--jobs'
         skip = 1
         arg = parseInt args[i+1]
@@ -1393,14 +1422,14 @@ main = ->
       else
         files++
         console.log '*', arg
-        input = Input.recognize arg
+        input = Input.recognize arg, undefined, settings
         if input instanceof Mapping
           mappings.push input
         else if input instanceof Style
           styles.push input
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings, styles
-          input.writeTeX() if Symbol.texText
+          input.writeTeX() if settings.texText
           for format in formats
             if typeof filenames == 'string'
               jobs.push convertSVG format, filenames, sync
@@ -1419,7 +1448,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   extensionMap, Input, Mappings, Context,
   SVGTilerException, SVGNS, XLINKNS, escapeId,
-  main, convertSVG, renderDOM, renderDOMDefaults,
+  main, convertSVG, renderDOM, defaultSettings,
   version: metadata.version
 }
 module?.exports = svgtiler
