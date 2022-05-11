@@ -29,8 +29,10 @@
     "test": "make test"
   },
   "dependencies": {
-    "@babel/core": "7.15.0",
-    "@babel/plugin-transform-react-jsx": "7.14.9",
+    "@babel/core": "7.17.10",
+    "@babel/plugin-transform-modules-commonjs": "7.17.9",
+    "@babel/plugin-transform-react-jsx": "7.17.3",
+    "@babel/register": "7.17.7",
     "@xmldom/xmldom": "0.7.2",
     "async-limiter": "2.0.0",
     "coffeescript": "2.7.0",

@@ -4,7 +4,7 @@ where "shape" is one of "circle" or "square" or "triangle",
 and "class" are CSS classes.
 ###
 
-shapes =
+export shapes =
   circle: (attrs) ->
     <symbol viewBox="-50 -50 100 100">
       <circle {...attrs} r="40"/>

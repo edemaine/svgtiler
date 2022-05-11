@@ -12,7 +12,6 @@ unless window?
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
   metadata = require '../package.json'
-  require 'coffeescript/register'
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
   domImplementation = document.implementation
@@ -22,6 +21,48 @@ else
     dirname: (x) -> /[^]*\/|/.exec(x)[0]
   graphemeSplitter = splitGraphemes: (x) -> x.split ''
   metadata = version: '(web)'
+
+## Register `require` hooks of Babel and CoffeeScript,
+## so that imported/required modules are similarly processed.
+unless window?
+  ## Babel plugin to add implicit return to last line of program, to simulate
+  ## the effect of `eval`.
+  implicitFinalReturn = ({types}) ->
+    visitor:
+      Program: (path) ->
+        body = path.get('body')
+        return unless body.length
+        last = body[body.length-1]
+        if last.node.type == 'ExpressionStatement'
+          returnLast = types.returnStatement last.node.expression
+          returnLast.leadingComments = last.node.leadingComments
+          returnLast.innerComments = last.node.innerComments
+          returnLast.trailingComments = last.node.trailingComments
+          last.replaceWith returnLast
+        undefined
+
+  babelConfig =
+    plugins: [
+      require.resolve '@babel/plugin-transform-modules-commonjs'
+      [require.resolve('@babel/plugin-transform-react-jsx'),
+        useBuiltIns: true
+        runtime: 'automatic'
+        importSource: 'preact'
+        #pragma: 'preact.h'
+        #pragmaFrag: 'preact.Fragment'
+        throwIfNamespace: false
+      ]
+      implicitFinalReturn
+    ]
+    inputSourceMap: true
+    sourceMaps: 'inline'
+    retainLines: true
+
+  ## Tell CoffeeScript's register to transpile with our Babel config.
+  module.options = transpile: babelConfig
+
+  require('@babel/register') babelConfig
+  require 'coffeescript/register'
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -582,42 +623,23 @@ class ASCIIMapping extends Mapping
       map[key] = line[separator.index + separator[0].length..]
     @load map
 
-## Babel plugin to add implicit return to last line of program, to simulate
-## the effect of `eval`.
-implicitFinalReturn = ({types}) ->
-  visitor:
-    Program: (path) ->
-      body = path.get('body')
-      return unless body.length
-      last = body[body.length-1]
-      if last.node.type == 'ExpressionStatement'
-        returnLast = types.returnStatement last.node.expression
-        returnLast.leadingComments = last.node.leadingComments
-        returnLast.innerComments = last.node.innerComments
-        returnLast.trailingComments = last.node.trailingComments
-        last.replaceWith returnLast
-      undefined
-
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
   @help: "Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}"
   parse: (data) ->
-    {code} = require('@babel/core').transform data,
+    {code} = require('@babel/core').transform data, {
+      ...babelConfig
       filename: @filename
-      plugins: [[require.resolve('@babel/plugin-transform-react-jsx'),
-        useBuiltIns: true
-        pragma: 'preact.h'
-        pragmaFrag: 'preact.Fragment'
-        throwIfNamespace: false
-      ], implicitFinalReturn]
-      sourceMaps: 'inline'
-      retainLines: true
+    }
     #code = "#{code}\n//# sourceURL=#{@filename}"
+    exports = {}
     ## Mimick NodeJS module's __filename and __dirname variables
     ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
     _filename = path.resolve @filename
     _dirname = path.dirname _filename
     ## Redirect require() to use paths relative to the mapping file.
+    ## This also overrides `import` thanks to
+    ## @babel/plugin-transform-modules-commonjs
     _require = (module) ->
       if module.startsWith '.'
         require path.resolve _dirname, module
@@ -628,8 +650,9 @@ class JSMapping extends Mapping
     ## instead use `vm.runInThisContext` (like `CoffeeScript.eval` does).
     #@load eval code
     func = new Function \
-      '__filename', '__dirname', 'require', 'svgtiler', 'preact', code
-    @load func _filename, _dirname, _require, svgtiler,
+      'exports', '__filename', '__dirname', 'require', 'svgtiler', 'preact',
+      code
+    @load func exports, _filename, _dirname, _require, svgtiler,
       (if 0 <= code.indexOf 'preact' then require 'preact')
 
 class CoffeeMapping extends JSMapping

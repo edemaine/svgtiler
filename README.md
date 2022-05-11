@@ -182,10 +182,13 @@ the following properties:
 
 Like regular NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
-They can also use `require('./filename')` to import local modules relative to
-the mapping file, which is useful for sharing code among mapping files.
 In addition to the preloaded module `preact`, they have access to the
 SVG Tiler API (not yet documented) via `svgtiler`.
+You can also use `import ... from './filename'` or `require('./filename')`
+to import local modules relative to the mapping file,
+which is useful for sharing code among mapping files.
+(Note, however, that imported modules do not have access to `preact` or
+`svgtiler` globals.)
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
