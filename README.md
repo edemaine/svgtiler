@@ -560,6 +560,11 @@ Optional arguments:
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
+  -o DIR / --output DIR Write all output files to directory DIR
+  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
+  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
+  --oP DIR / --output-png DIR   Write all .png files to directory DIR
+  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex

@@ -91,6 +91,13 @@ defaultSettings =
   keepHidden: false
   ## Don't delete blank extreme rows/columns.
   keepMargins: false
+  ## Directories to output all or some files.
+  outputDir: null  ## default: same directory as input
+  outputDirExt:  ## by extension; default is to use outputDir
+    '.svg': null
+    '.pdf': null
+    '.png': null
+    '.svg_tex': null
   ## Default overflow behavior is 'visible' unless --no-overflow specified;
   ## use `overflow:hidden` to restore normal SVG behavior of keeping each tile
   ## within its bounding box.
@@ -110,8 +117,18 @@ defaultSettings =
 
 getSetting = (settings, key) ->
   settings?[key] ? defaultSettings[key]
+getOutputDir = (settings, extension) ->
+  dir = getSetting(settings, 'outputDirExt')?[extension] ?
+        getSetting settings, 'outputDir'
+  if dir
+    try
+      fs.mkdirSync dir, recursive: true
+    catch err
+      console.warn "Failed to make directory '#{dir}': #{err}"
+  dir
 class HasSettings
   getSetting: (key) -> getSetting @settings, key
+  getOutputDir: (extension) -> getOutputDir @settings, extension
 
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
@@ -780,6 +797,8 @@ class Drawing extends Input
         filename.base += '.svg'
       else
         filename.base = filename.base[...-filename.ext.length] + '.svg'
+      if (outputDir = @getOutputDir '.svg')?
+        filename.dir = outputDir
       filename = path.format filename
     console.log '->', filename
     fs.writeFileSync filename, @renderSVG mappings, styles
@@ -949,10 +968,15 @@ class Drawing extends Input
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
 ''' + out
-  renderTeX: (filename) ->
+  renderTeX: (filename, relativeDir) ->
     ## Must be called *after* `renderSVG` (or `renderSVGDOM`)
     filename = path.parse filename
     basename = filename.base[...-filename.ext.length]
+    if relativeDir
+      relativeDir += '/'
+      ## TeX uses forward slashes for path separators
+      if require('process').platform == 'win32'
+        relativeDir = relativeDir.replace /\\/g, '/'
     ## LaTeX based loosely on Inkscape's PDF/EPS/PS + LaTeX output extension.
     ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
     lines = ["""
@@ -1006,7 +1030,7 @@ class Drawing extends Input
         \\fi
         \\def\\clap#1{\\hbox to 0pt{\\hss#1\\hss}}%
         \\begin{picture}(#{@width},#{@height})%
-          \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{basename}}}%
+          \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{relativeDir ? ''}#{basename}}}%
     """]
     for row, i in @symbols
       for symbol, j in row
@@ -1032,7 +1056,7 @@ class Drawing extends Input
       \\endgroup
     """, '' # trailing newline
     lines.join '\n'
-  writeTeX: (filename) ->
+  writeTeX: (filename, relativeDir) ->
     ###
     Must be called *after* `writeSVG`.
     Default filename is the input filename with extension replaced by .svg_tex
@@ -1046,9 +1070,14 @@ class Drawing extends Input
         filename.base += '.svg_tex'
       else
         filename.base = filename.base[...-filename.ext.length] + '.svg_tex'
+      if (outputDir = @getOutputDir '.svg_tex')?
+        filename.dir = outputDir
+      if (graphicDir = @getOutputDir('.pdf') ? @getOutputDir('.png'))? or
+         outputDir?
+        relativeDir = path.relative (outputDir ? '.'), (graphicDir ? '.')
       filename = path.format filename
     console.log ' &', filename
-    fs.writeFileSync filename, @renderTeX filename
+    fs.writeFileSync filename, @renderTeX filename, relativeDir
     filename
 
 class ASCIIDrawing extends Drawing
@@ -1102,13 +1131,18 @@ class Drawings extends Input
     if @drawings.length > 1
       filename2.base += @constructor.filenameSeparator + drawing.subname
     filename2.base += extension
+    if (outputDir = @getOutputDir extension)?
+      filename2.dir = outputDir
     path.format filename2
   writeSVG: (mappings, styles, filename) ->
     for drawing in @drawings
       drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
   writeTeX: (filename) ->
     for drawing in @drawings
-      drawing.writeTeX @subfilename '.svg_tex', drawing
+      subfilename = @subfilename '.svg_tex', drawing
+      relativeDir = path.relative path.dirname(subfilename),
+        @getOutputDir('.pdf') ? @getOutputDir('.png') ? '.'
+      drawing.writeTeX subfilename, relativeDir
 
 class XLSXDrawings extends Drawings
   @encoding: 'binary'
@@ -1253,7 +1287,7 @@ postprocess = (format, filename) ->
 
 inkscapeVersion = null
 
-convertSVG = (format, svg, sync) ->
+convertSVG = (format, svg, sync, settings) ->
   child_process = require 'child_process'
   unless inkscapeVersion?
     result = child_process.spawnSync 'inkscape', ['--version']
@@ -1264,11 +1298,14 @@ convertSVG = (format, svg, sync) ->
     else
       inkscapeVersion = result.stdout.toString().replace /^Inkscape\s*/, ''
 
+  extension = ".#{format}"
   filename = path.parse svg
-  if filename.ext == ".#{format}"
-    filename.base += ".#{format}"
+  if filename.ext == extension
+    filename.base += extension
   else
-    filename.base = "#{filename.base[...-filename.ext.length]}.#{format}"
+    filename.base = "#{filename.base[...-filename.ext.length]}#{extension}"
+  if (outputDir = getOutputDir settings, extension)?
+    filename.dir = outputDir
   output = path.format filename
   ## Workaround relative paths not working in MacOS distribution of Inkscape
   ## [https://bugs.launchpad.net/inkscape/+bug/181639]
@@ -1290,7 +1327,7 @@ convertSVG = (format, svg, sync) ->
       preprocess svg
     ]
   if sync
-    ## In sychronous mode, we let inkscape directly output its error messages,
+    ## In synchronous mode, we let inkscape directly output its error messages,
     ## and add warnings about any failures that occur.
     console.log '=>', output
     result = child_process.spawnSync 'inkscape', args, stdio: 'inherit'
@@ -1301,7 +1338,7 @@ convertSVG = (format, svg, sync) ->
     else
       postprocess format, output
   else
-    ## In asychronous mode, we capture inkscape's outputs, and print them only
+    ## In asynchronous mode, we capture inkscape's outputs, and print them only
     ## when the process has finished, along with which file failed, to avoid
     ## mixing up messages from parallel executions.
     (resolve) ->
@@ -1334,6 +1371,11 @@ Optional arguments:
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
+  -o DIR / --output DIR Write all output files to directory DIR
+  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
+  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
+  --oP DIR / --output-png DIR   Write all .png files to directory DIR
+  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
@@ -1399,6 +1441,21 @@ main = (args = process.argv[2..]) ->
           settings.forceHeight = arg
         else
           console.warn "Invalid argument to --tile-height: #{args[i+1]}"
+      when '-o', '--output'
+        skip = 1
+        settings.outputDir = args[i+1]
+      when '--os', '--output-svg'
+        skip = 1
+        settings.outputDirExt['.svg'] = args[i+1]
+      when '--op', '--output-pdf'
+        skip = 1
+        settings.outputDirExt['.pdf'] = args[i+1]
+      when '--oP', '--output-png'
+        skip = 1
+        settings.outputDirExt['.png'] = args[i+1]
+      when '--ot', '--output-tex'
+        skip = 1
+        settings.outputDirExt['.svg_tex'] = args[i+1]
       when '-p', '--pdf'
         formats.push 'pdf'
       when '-P', '--png'
@@ -1432,10 +1489,10 @@ main = (args = process.argv[2..]) ->
           input.writeTeX() if settings.texText
           for format in formats
             if typeof filenames == 'string'
-              jobs.push convertSVG format, filenames, sync
+              jobs.push convertSVG format, filenames, sync, settings
             else
               for filename in filenames
-                jobs.push convertSVG format, filename, sync
+                jobs.push convertSVG format, filename, sync, settings
   unless files
     console.log 'Not enough filename arguments'
     help()
