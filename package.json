@@ -33,20 +33,20 @@
     "@babel/plugin-transform-modules-commonjs": "7.17.9",
     "@babel/plugin-transform-react-jsx": "7.17.3",
     "@babel/register": "7.17.7",
-    "@xmldom/xmldom": "0.7.2",
+    "@xmldom/xmldom": "0.8.2",
     "async-limiter": "2.0.0",
     "babel-plugin-auto-import": "1.1.0",
     "coffeescript": "2.7.0",
-    "csv-parse": "4.16.0",
+    "csv-parse": "5.0.4",
     "grapheme-splitter": "1.0.4",
-    "image-size": "1.0.0",
-    "preact": "10.5.14",
-    "preact-render-to-string": "5.1.19",
+    "image-size": "1.0.1",
+    "preact": "10.7.2",
+    "preact-render-to-string": "5.2.0",
     "prettify-xml": "1.2.0",
-    "stylus": "0.54.8",
-    "xlsx": "0.17.1"
+    "stylus": "0.57.0",
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
-    "vnu-jar": "21.6.11"
+    "vnu-jar": "21.10.12"
   }
 }

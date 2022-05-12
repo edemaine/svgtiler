@@ -1096,7 +1096,7 @@ class DSVDrawing extends Drawing
     else if data[-1..] in ['\r', '\n']
       data = data[...-1]
     ## CSV parser.
-    @load require('csv-parse/lib/sync') data,
+    @load require('csv-parse/sync').parse data,
       delimiter: @constructor.delimiter
       relax_column_count: true
 
