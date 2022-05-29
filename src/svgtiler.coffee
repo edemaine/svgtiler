@@ -142,10 +142,10 @@ whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/
 
 extensionOf = (filename) -> path.extname(filename).toLowerCase()
 
-class SVGTilerException
-  constructor: (@message) ->
-  toString: ->
-    "svgtiler: #{@message}"
+class SVGTilerError extends Error
+  constructor: (message) ->
+    super message
+    @name = 'SVGTilerError'
 
 parseBox = (box) ->
   return null unless box
@@ -304,7 +304,7 @@ renderPreact = (data) ->
 class Symbol extends HasSettings
   @parse: (key, data, settings) ->
     unless data?
-      throw new SVGTilerException "Attempt to create symbol '#{key}' without data"
+      throw new SVGTilerError "Attempt to create symbol '#{key}' without data"
     else if typeof data == 'function'
       new DynamicSymbol key, data, settings
     else if data.function?
@@ -339,7 +339,7 @@ class Symbol extends HasSettings
                   svg: fs.readFileSync filename,
                          encoding: getSetting settings, 'svgEncoding'
               else
-                throw new SVGTilerException "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
+                throw new SVGTilerError "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
         else
           data = svg: data
       new StaticSymbol key, {...data, settings}
@@ -560,7 +560,7 @@ class DynamicSymbol extends Symbol
   use: (context) ->
     result = @func.call context
     unless result?
-      throw new Error "Function for symbol #{@key} returned #{result}"
+      throw new SVGTilerError "Function for symbol #{@key} returned #{result}"
     ## Render Preact virtual dom elements (e.g. from JSX notation) to SVG now,
     ## for better duplicate detection.
     result = renderPreact result
@@ -603,7 +603,7 @@ class Input extends HasSettings
     if extension of extensionMap
       extensionMap[extension].parseFile filename, filedata, settings
     else
-      throw new SVGTilerException "Unrecognized extension in filename #{filename}"
+      throw new SVGTilerError "Unrecognized extension in filename #{filename}"
 
 class Style extends Input
   load: (@css) ->
@@ -736,7 +736,7 @@ class Mappings
     else if Array.isArray data
       new Mappings data
     else
-      throw new SVGTilerException "Could not convert into Mapping(s): #{data}"
+      throw new SVGTilerError "Could not convert into Mapping(s): #{data}"
   push: (map) ->
     @maps.push map
   lookup: (key) ->
@@ -1504,7 +1504,7 @@ svgtiler = {
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle,
   extensionMap, Input, Mappings, Context,
-  SVGTilerException, SVGNS, XLINKNS, escapeId,
+  SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, convertSVG, renderDOM, defaultSettings,
   version: metadata.version
 }
