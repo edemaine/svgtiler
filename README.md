@@ -553,7 +553,7 @@ Here is the output of `svgtiler --help`:
 Usage: svgtiler (...options and filenames...)
 
 Optional arguments:
-  --help                Show this help message and exit.
+  -h / --help           Show this help message and exit.
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH

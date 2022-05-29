@@ -1364,7 +1364,7 @@ Usage: #{process.argv[1]} (...options and filenames...)
 Documentation: https://github.com/edemaine/svgtiler
 
 Optional arguments:
-  --help                Show this help message and exit.
+  -h / --help           Show this help message and exit.
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
