@@ -98,6 +98,8 @@ defaultSettings =
     '.pdf': null
     '.png': null
     '.svg_tex': null
+  ## Path to inkscape.  Default searches PATH.
+  inkscape: 'inkscape'
   ## Default overflow behavior is 'visible' unless --no-overflow specified;
   ## use `overflow:hidden` to restore normal SVG behavior of keeping each tile
   ## within its bounding box.
@@ -1262,101 +1264,6 @@ renderDOM = (mappings, elts, settings) ->
       console.error 'svgtiler.renderDOM failed to parse element:', elt
       console.error err
 
-sanitize = true
-bufferSize = 16*1024
-
-postprocess = (format, filename) ->
-  return unless sanitize
-  try
-    switch format
-      when 'pdf'
-        ## Blank out /CreationDate in PDF for easier version control.
-        ## Replace these commands with spaces to avoid in-file pointer errors.
-        buffer = Buffer.alloc bufferSize
-        fileSize = fs.statSync(filename).size
-        position = Math.max 0, fileSize - bufferSize
-        file = fs.openSync filename, 'r+'
-        readSize = fs.readSync file, buffer, 0, bufferSize, position
-        string = buffer.toString 'binary'  ## must use single-byte encoding!
-        match = /\/CreationDate\s*\((?:[^()\\]|\\[^])*\)/.exec string
-        if match?
-          fs.writeSync file, ' '.repeat(match[0].length), position + match.index
-        fs.closeSync file
-  catch e
-    console.log "Failed to postprocess '#{filename}': #{e}"
-
-inkscapeVersion = null
-
-convertSVG = (format, svg, sync, settings) ->
-  child_process = require 'child_process'
-  unless inkscapeVersion?
-    result = child_process.spawnSync 'inkscape', ['--version']
-    if result.error
-      console.log "inkscape --version failed: #{result.error.message}"
-    else if result.status or result.signal
-      console.log "inkscape --version failed: #{result.stderr.toString()}"
-    else
-      inkscapeVersion = result.stdout.toString().replace /^Inkscape\s*/, ''
-
-  extension = ".#{format}"
-  filename = path.parse svg
-  if filename.ext == extension
-    filename.base += extension
-  else
-    filename.base = "#{filename.base[...-filename.ext.length]}#{extension}"
-  if (outputDir = getOutputDir settings, extension)?
-    filename.dir = outputDir
-  output = path.format filename
-  ## Workaround relative paths not working in MacOS distribution of Inkscape
-  ## [https://bugs.launchpad.net/inkscape/+bug/181639]
-  if process.platform == 'darwin'
-    preprocess = path.resolve
-  else
-    preprocess = (x) -> x
-  if inkscapeVersion.startsWith '0'
-    args = [
-      "-z"
-      "--file=#{preprocess svg}"
-      "--export-#{format}=#{preprocess output}"
-    ]
-  else ## Inkscape 1+
-    args = [
-      "--export-overwrite"
-      #"--export-type=#{format}"
-      "--export-filename=#{preprocess output}"
-      preprocess svg
-    ]
-  if sync
-    ## In synchronous mode, we let inkscape directly output its error messages,
-    ## and add warnings about any failures that occur.
-    console.log '=>', output
-    result = child_process.spawnSync 'inkscape', args, stdio: 'inherit'
-    if result.error
-      console.log result.error.message
-    else if result.status or result.signal
-      console.log ":-( #{output} FAILED"
-    else
-      postprocess format, output
-  else
-    ## In asynchronous mode, we capture inkscape's outputs, and print them only
-    ## when the process has finished, along with which file failed, to avoid
-    ## mixing up messages from parallel executions.
-    (resolve) ->
-      console.log '=>', output
-      inkscape = child_process.spawn 'inkscape', args
-      out = ''
-      inkscape.stdout.on 'data', (buf) -> out += buf
-      inkscape.stderr.on 'data', (buf) -> out += buf
-      inkscape.on 'error', (error) ->
-        console.log error.message
-      inkscape.on 'exit', (status, signal) ->
-        if status or signal
-          console.log ":-( #{output} FAILED:"
-          console.log out
-        else
-          postprocess format, output
-        resolve()
-
 help = ->
   console.log """
 svgtiler #{metadata.version}
@@ -1365,24 +1272,25 @@ Documentation: https://github.com/edemaine/svgtiler
 
 Optional arguments:
   -h / --help           Show this help message and exit.
+  -p / --pdf            Convert output SVG files to PDF via Inkscape
+  -P / --png            Convert output SVG files to PNG via Inkscape
+  -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
+  -o DIR / --output DIR Write all output files to directory DIR
+  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
+  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
+  --oP DIR / --output-png DIR   Write all .png files to directory DIR
+  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
+  -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
+  -j N / --jobs N       Run up to N Inkscape jobs in parallel
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
-  -o DIR / --output DIR Write all output files to directory DIR
-  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
-  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
-  --oP DIR / --output-png DIR   Write all .png files to directory DIR
-  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
-  -p / --pdf            Convert output SVG files to PDF via Inkscape
-  -P / --png            Convert output SVG files to PNG via Inkscape
-  -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
-  -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)
 
@@ -1413,8 +1321,6 @@ main = (args = process.argv[2..]) ->
   styles = new Styles
   files = skip = 0
   formats = []
-  jobs = []
-  sync = true
   settings = {...defaultSettings}
   for arg, i in args
     if skip
@@ -1456,6 +1362,9 @@ main = (args = process.argv[2..]) ->
       when '--ot', '--output-tex'
         skip = 1
         settings.outputDirExt['.svg_tex'] = args[i+1]
+      when '-i', '--inkscape'
+        skip = 1
+        settings.inkscape = args[i+1]
       when '-p', '--pdf'
         formats.push 'pdf'
       when '-P', '--png'
@@ -1463,7 +1372,7 @@ main = (args = process.argv[2..]) ->
       when '-t', '--tex'
         settings.texText = true
       when '--no-sanitize'
-        sanitize = false
+        settings.sanitize = false
       when '--no-overflow'
         settings.overflowDefault = null  # no default
       when '--no-inline'
@@ -1472,8 +1381,7 @@ main = (args = process.argv[2..]) ->
         skip = 1
         arg = parseInt args[i+1]
         if arg
-          jobs = new require('async-limiter') concurrency: arg
-          sync = false
+          settings.jobs = arg
         else
           console.warn "Invalid argument to --jobs: #{args[i+1]}"
       else
@@ -1487,12 +1395,28 @@ main = (args = process.argv[2..]) ->
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings, styles
           input.writeTeX() if settings.texText
-          for format in formats
-            if typeof filenames == 'string'
-              jobs.push convertSVG format, filenames, sync, settings
-            else
+          ## Convert to any additional formats
+          if formats.length
+            unless processor?
+              svgink = require 'svgink'
+              settings = {...svgink.defaultSettings, ...settings}
+              processor = new svgink.SVGProcessor settings
+              .on 'converted', (data) =>
+                console.log "   #{data.input} -> #{data.output}"
+                console.warn "?? svgink skipped conversion" if data.skip
+                console.log data.stdout if data.stdout
+                console.log data.stderr if data.stderr
+              .on 'error', (error) =>
+                if error.input?
+                  console.log "!! #{error.input} -> #{error.output} FAILED"
+                else
+                  console.log "!! svgink conversion error"
+                console.log error
+            if Array.isArray filenames
               for filename in filenames
-                jobs.push convertSVG format, filename, sync, settings
+                processor.convertTo filename, formats
+            else
+              processor.convertTo filenames, formats
   unless files
     console.log 'Not enough filename arguments'
     help()
@@ -1505,7 +1429,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   extensionMap, Input, Mappings, Context,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, convertSVG, renderDOM, defaultSettings,
+  main, renderDOM, defaultSettings,
   version: metadata.version
 }
 module?.exports = svgtiler

@@ -554,24 +554,25 @@ Usage: svgtiler (...options and filenames...)
 
 Optional arguments:
   -h / --help           Show this help message and exit.
+  -p / --pdf            Convert output SVG files to PDF via Inkscape
+  -P / --png            Convert output SVG files to PNG via Inkscape
+  -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
+  -o DIR / --output DIR Write all output files to directory DIR
+  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
+  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
+  --oP DIR / --output-png DIR   Write all .png files to directory DIR
+  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
+  -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
+  -j N / --jobs N       Run up to N Inkscape jobs in parallel
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
                         Force all symbol tiles to have specified height
-  -o DIR / --output DIR Write all output files to directory DIR
-  --os DIR / --output-svg DIR   Write all .svg files to directory DIR
-  --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
-  --oP DIR / --output-png DIR   Write all .png files to directory DIR
-  --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
-  -p / --pdf            Convert output SVG files to PDF via Inkscape
-  -P / --png            Convert output SVG files to PNG via Inkscape
-  -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
-  -j N / --jobs N       Run up to N Inkscape jobs in parallel
 
 Filename arguments:  (mappings before drawings!)
 

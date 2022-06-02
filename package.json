@@ -34,7 +34,6 @@
     "@babel/plugin-transform-react-jsx": "7.17.3",
     "@babel/register": "7.17.7",
     "@xmldom/xmldom": "0.8.2",
-    "async-limiter": "2.0.0",
     "babel-plugin-auto-import": "1.1.0",
     "coffeescript": "2.7.0",
     "csv-parse": "5.0.4",
@@ -44,6 +43,7 @@
     "preact-render-to-string": "5.2.0",
     "prettify-xml": "1.2.0",
     "stylus": "0.57.0",
+    "svgink": "^0.2.2",
     "xlsx": "0.18.5"
   },
   "devDependencies": {
