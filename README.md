@@ -409,18 +409,41 @@ processing:
 
 ## Converting SVG to PDF/PNG
 
-SVG Tiler can automatically convert all exported SVG files into PDF and/or PNG,
-if you have [Inkscape](https://inkscape.org/) installed, via the `-p`/`--pdf`
-and/or `-P` or `--png` command-line options.
+SVG Tiler can automatically convert all exported SVG files (and any
+`.svg` files specified directly on the command line) into PDF and/or PNG,
+if you have [Inkscape](https://inkscape.org/) v1+ installed,
+via the `-p`/`--pdf` and/or `-P` or `--png` command-line options.
 For example: `svgtiler -p map.coffee drawings.xls`
 will generate both `drawings_sheet.svg` and `drawings_sheet.pdf`.
 PNG conversion is intended for pixel art; see the
 [Tetris example](examples/tetris/).
 
-You can speed up multiple Inkscape conversions process on a multithreaded CPU
-via the `-j`/`--jobs` command-line option.
-For example, `svgtiler -j 4 -p map.coffee drawings.xls`
-will run up to four Inkscape jobs at once.
+SVG Tiler uses [svgink](https://github.com/edemaine/svgink) as an efficient
+interface to Inkscape's conversion from SVG to PDF or PNG.
+If you just want to convert SVG files, consider using svgink directly.
+If you want to do a mix of SVG tiling and SVG export with a shared pool of
+Inkscape processes, you can run `svgtiler` with a mix of drawings and raw
+`.svg` files that you want to convert.
+Any `.svg` files on the command line are passed through to svgink.
+
+svgink has some
+[command-line options](https://github.com/edemaine/svgink#command-line-interface)
+that SVG Tiler also accepts:
+
+* svgink [automatically runs](https://github.com/edemaine/svgink#efficiency)
+  multiple Inkscape processes to exploit multicore CPUs.
+  You can change the number of Inkscape processes to run
+  via the `-j`/`--jobs` command-line option.
+  For example, `svgtiler -j 4 -p map.coffee drawings.xls`
+  will run up to four Inkscape jobs at once.
+* svgink automatically detects whether the PDF/PNG files are newer than
+  the input SVG files, in which case it skips conversion.
+  You can override this behavior via the `-f`/`--force` command-line option.
+* You can change where to put converted files via the
+  `--op`/`--output-pdf` and `--oP`/`--output-png` command-line options.
+  In addition, SVG Tiler supports `--os`/`--output-svg` to control where
+  to put generated SVG files, and `-o`/`--output` to control the default
+  place to put all generated/converted files.
 
 ## LaTeX Text
 
@@ -557,6 +580,7 @@ Optional arguments:
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
+  -f / --force          Force conversion of SVG to PDF/PNG even if SVG newer
   -o DIR / --output DIR Write all output files to directory DIR
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
@@ -574,7 +598,7 @@ Optional arguments:
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
 
-Filename arguments:  (mappings before drawings!)
+Filename arguments:  (mappings and styles before relevant drawings!)
 
   *.txt        ASCII mapping file
                Each line is <symbol-name><space><raw SVG or filename.svg>
@@ -601,6 +625,7 @@ Filename arguments:  (mappings before drawings!)
   *.dbf        Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.css        CSS style file
   *.styl       Stylus style file (https://stylus-lang.com/)
+  *.svg        SVG file (convert to PDF/PNG without any tiling)
 
 SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
 

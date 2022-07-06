@@ -1170,6 +1170,13 @@ class XLSXDrawings extends Drawings
         rows
     )
 
+class DummyInput extends Input
+  parse: ->
+
+class SVGFile extends DummyInput
+  @title: "SVG file (convert to PDF/PNG without any tiling)"
+  @skipRead: true  # svgink/Inkscape will do actual file reading
+
 class Context
   constructor: (@drawing, @i, @j) ->
     @symbols = @drawing.symbols
@@ -1215,6 +1222,8 @@ extensionMap =
   # Styles
   '.css': CSSStyle
   '.styl': StylusStyle
+  # Other
+  '.svg': SVGFile
 
 renderDOM = (mappings, elts, settings) ->
   mappings = Mappings.from mappings
@@ -1275,6 +1284,7 @@ Optional arguments:
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
+  -f / --force          Force conversion of SVG to PDF/PNG even if SVG newer
   -o DIR / --output DIR Write all output files to directory DIR
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
@@ -1292,7 +1302,7 @@ Optional arguments:
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
 
-Filename arguments:  (mappings before drawings!)
+Filename arguments:  (mappings and styles before relevant drawings!)
 
 """
   for extension, klass of extensionMap
@@ -1316,6 +1326,30 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
   #object with one or more attributes
   process.exit()
 
+processor = null
+convert = (filenames, formats, settings) ->
+  return unless formats.length
+  unless processor?
+    svgink = require 'svgink'
+    settings = {...svgink.defaultSettings, ...settings}
+    processor = new svgink.SVGProcessor settings
+    .on 'converted', (data) =>
+      console.log "   #{data.input} -> #{data.output}" +
+                  (if data.skip then ' (SKIPPED)' else '')
+      console.log data.stdout if data.stdout
+      console.log data.stderr if data.stderr
+    .on 'error', (error) =>
+      if error.input?
+        console.log "!! #{error.input} -> #{error.output} FAILED"
+      else
+        console.log "!! svgink conversion error"
+      console.log error
+  if Array.isArray filenames
+    for filename in filenames
+      processor.convertTo filename, formats
+  else
+    processor.convertTo filenames, formats
+
 main = (args = process.argv[2..]) ->
   mappings = new Mappings
   styles = new Styles
@@ -1329,6 +1363,8 @@ main = (args = process.argv[2..]) ->
     switch arg
       when '-h', '--help'
         help()
+      when '-f', '--force'
+        settings.force = true
       when '-m', '--margin'
         settings.keepMargins = true
       when '--hidden'
@@ -1396,27 +1432,9 @@ main = (args = process.argv[2..]) ->
           filenames = input.writeSVG mappings, styles
           input.writeTeX() if settings.texText
           ## Convert to any additional formats
-          if formats.length
-            unless processor?
-              svgink = require 'svgink'
-              settings = {...svgink.defaultSettings, ...settings}
-              processor = new svgink.SVGProcessor settings
-              .on 'converted', (data) =>
-                console.log "   #{data.input} -> #{data.output}"
-                console.warn "?? svgink skipped conversion" if data.skip
-                console.log data.stdout if data.stdout
-                console.log data.stderr if data.stderr
-              .on 'error', (error) =>
-                if error.input?
-                  console.log "!! #{error.input} -> #{error.output} FAILED"
-                else
-                  console.log "!! svgink conversion error"
-                console.log error
-            if Array.isArray filenames
-              for filename in filenames
-                processor.convertTo filename, formats
-            else
-              processor.convertTo filenames, formats
+          convert filenames, formats, settings
+        else if input instanceof SVGFile
+          convert input.filename, formats, settings
   unless files
     console.log 'Not enough filename arguments'
     help()
@@ -1427,9 +1445,10 @@ svgtiler = {
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle,
-  extensionMap, Input, Mappings, Context,
+  SVGFile,
+  extensionMap, Input, DummyInput, Mappings, Context,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, defaultSettings,
+  main, renderDOM, defaultSettings, convert,
   version: metadata.version
 }
 module?.exports = svgtiler
