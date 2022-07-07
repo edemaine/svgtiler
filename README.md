@@ -22,7 +22,7 @@ To use SVG Tiler, you combine at least two types of files
    SVG content (either embedded in the same file or in separate files).
    Mapping files can be specified in a simple ASCII format, or
    as a dynamic mapping defined by JavaScript or CoffeeScript code.
-   
+
 2. A **drawing file** specifies a grid of symbol names (strings) which,
    combined with one or more mapping files to define the SVG associated
    with each symbol, compile to a single (tiled) SVG.
@@ -62,7 +62,7 @@ Z NES_level7_other.png
   <rect fill="black" width="8" height="8"/>
 ```
 
-PNG image files referenced above: ![](examples/tetris/NES_level7_empty.png) ![](examples/tetris/NES_level7_filled.png) ![](examples/tetris/NES_level7_other.png)
+PNG image files referenced above: ![NES_level7_empty.png](examples/tetris/NES_level7_empty.png) ![NES_level7_filled.png](examples/tetris/NES_level7_filled.png) ![NES_level7_other.png](examples/tetris/NES_level7_other.png)
 
 <td>
 
@@ -186,7 +186,6 @@ the following properties:
 * `this.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
 * `this.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the input format does allow multiple sheets.
-
 
 Like other NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
