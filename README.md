@@ -472,7 +472,7 @@ you need to help the `.svg_tex` file find its auxiliary `.pdf`/`.png` file
 via one of the following options (any one will do):
 * `\usepackage{currfile}` to enable finding the figure's directory.
 * `\usepackage{import}` and `\import{path/to/file/}{filename.svg_tex}`
-* instead of `\import{filename.svg_tex}`.
+  instead of `\import{filename.svg_tex}`.
 * `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
 
 ## API
