@@ -162,9 +162,11 @@ the following properties:
 * `this.key` is the symbol name, or `null` if the `Context` is out of bounds
   of the drawing.
 * `this.includes(substring)` computes whether `this.key` contains the given
-  `substring` (as would `this.key.includes(substring)` in ECMAScript 2015).
+  `substring` (a shortcut for `this.key.includes(substring)` in ECMAScript 2015,
+  but handling the case when `this.key` is `null`).
 * `this.match(regex)` matches `this.key` against the given regular
-  expression (a shortcut for `this.key.matches(regex)`).
+  expression (a shortcut for `this.key.match(regex)`,
+  but handling the case when `this.key` is `null`).
 * `this.i` is the row number of the cell of this symbol occurrence (starting
   at 0).
 * `this.j` is the column number of the cell of this symbol occurrence
