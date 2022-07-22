@@ -561,7 +561,7 @@ you can install this tool via
 npm install -g svgtiler
 ```
 
-SVG Tiler requires Node v10+.
+SVG Tiler requires Node v14+.
 
 ## Command-Line Usage
 
