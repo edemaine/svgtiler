@@ -338,8 +338,7 @@ class Symbol extends HasSettings
                 settings = {...settings, dirname: path.dirname filename}
                 data =
                   filename: filename
-                  svg: fs.readFileSync filename,
-                         encoding: getSetting settings, 'svgEncoding'
+                  svg: loadSVG filename, settings
               else
                 throw new SVGTilerError "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
         else
@@ -349,6 +348,11 @@ class Symbol extends HasSettings
     @key.indexOf(substring) >= 0
     ## ECMA6: @key.includes substring
   match: (regex) -> @key.match regex
+
+loadSVG = (filename, settings) ->
+  fs.readFileSync filename,
+    encoding: getSetting settings, 'svgEncoding'
+  ## TODO: Handle <?xml encoding="..."?> or BOM to override svgEncoding.
 
 escapeId = (key) ->
   ###
@@ -380,10 +384,15 @@ class StaticSymbol extends Symbol
     super()
     for own key, value of options
       @[key] = value
+    @svg = @svg
+    ## Remove initial SVG/XML comments such as <?xml...?> and <!DOCTYPE>
+    ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
+    ## for the next replace rule.
+    .replace /^\s*|^<\?[^]*?\?>\s*|<![^-][^]*?>|<!--[^]*?-->/g, ''
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
     ## (This is especially important on the browser, so the results can be
     ## reparented into an HTML Document.)
-    @svg = @svg.replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
+    .replace /^<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
       (match, end) ->
         unless 'xmlns' in match
           match = match[...match.length-end.length] +
