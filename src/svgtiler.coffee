@@ -1010,7 +1010,7 @@ class Drawing extends Input
     ## LaTeX based loosely on Inkscape's PDF/EPS/PS + LaTeX output extension.
     ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
     lines = ["""
-      %% Creator: svgtiler #{metadata.version}, https://github.com/edemaine/svgtiler
+      %% Creator: svgtiler, https://github.com/edemaine/svgtiler
       %% This LaTeX file includes and overlays text on top of companion file
       %% #{basename}.pdf/.png
       %%
