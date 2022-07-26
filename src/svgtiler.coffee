@@ -219,12 +219,12 @@ svgBBox = (xml) ->
                        parseFloat coord
           xs = (point[0] for point in points)
           ys = (point[1] for point in points)
-          xmin = Math.min xs...
-          ymin = Math.min ys...
+          xmin = Math.min ...xs
+          ymin = Math.min ...ys
           if isNaN(xmin) or isNaN(ymin) # invalid points attribute; don't render
             null
           else
-            [xmin, ymin, Math.max(xs...) - xmin, Math.max(ys...) - ymin]
+            [xmin, ymin, Math.max(...xs) - xmin, Math.max(...ys) - ymin]
         else
           viewBoxes = (recurse(child) for child in node.childNodes)
           viewBoxes = (viewBox for viewBox in viewBoxes when viewBox?)
@@ -1198,8 +1198,10 @@ class Context
     @key = @symbol?.key
   neighbor: (dj, di) ->
     new Context @drawing, @i + di, @j + dj
-  includes: (args...) ->
-    @symbol? and @symbol.includes args...
+  includes: (...args) ->
+    @symbol? and @symbol.includes ...args
+  match: (...args) ->
+    @symbol? and @symbol.match ...args
   row: (di = 0) ->
     i = @i + di
     for symbol, j in @symbols[i] ? []
