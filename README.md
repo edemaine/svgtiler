@@ -445,6 +445,8 @@ that SVG Tiler also accepts:
   In addition, SVG Tiler supports `--os`/`--output-svg` to control where
   to put generated SVG files, and `-o`/`--output` to control the default
   place to put all generated/converted files.
+* If Inkscape isn't on your PATH, you can specify its location via
+  `-i`/`--inkscape`.
 
 ## LaTeX Text
 
