@@ -776,6 +776,15 @@ hrefAttr = (settings) ->
   else
     'xlink:href'
 
+maybeWrite = (filename, data) ->
+  ## Writes data to filename, unless the file is already identical to data.
+  ## Returns whether the write actually happened.
+  try
+    if data == fs.readFileSync filename, encoding: 'utf8'
+      return false
+  fs.writeFileSync filename, data
+  true
+
 class Drawing extends Input
   hrefAttr: -> hrefAttr @settings
   load: (data) ->
@@ -804,7 +813,11 @@ class Drawing extends Input
           j--
     @data = data
   writeSVG: (mappings, styles, filename) ->
-    ## Default filename is the input filename with extension replaced by .svg
+    ## Generates SVG and writes to filename.
+    ## Default filename is the input filename with extension replaced by .svg.
+    ## Returns generated .svg filename, but only if it actually changed
+    ## (and thus needs to be converted to other desired formats);
+    ## otherwise returns null.
     unless filename?
       filename = path.parse @filename
       if filename.ext == '.svg'
@@ -814,9 +827,12 @@ class Drawing extends Input
       if (outputDir = @getOutputDir '.svg')?
         filename.dir = outputDir
       filename = path.format filename
-    console.log '->', filename
-    fs.writeFileSync filename, @renderSVG mappings, styles
-    filename
+    if maybeWrite filename, @renderSVG mappings, styles
+      console.log '->', filename
+      filename
+    else
+      console.log '->', filename, '(unchanged)'
+      null
   renderSVGDOM: (mappings, styles) ->
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1090,9 +1106,12 @@ class Drawing extends Input
          outputDir?
         relativeDir = path.relative (outputDir ? '.'), (graphicDir ? '.')
       filename = path.format filename
-    console.log ' &', filename
-    fs.writeFileSync filename, @renderTeX filename, relativeDir
-    filename
+    if maybeWrite filename, @renderTeX filename, relativeDir
+      console.log ' &', filename
+      filename
+    else
+      console.log ' &', filename, '(unchanged)'
+      null
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
@@ -1150,7 +1169,9 @@ class Drawings extends Input
     path.format filename2
   writeSVG: (mappings, styles, filename) ->
     for drawing in @drawings
-      drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
+      filename = drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
+      continue unless filename?  # don't list unchanged .svg files
+      filename
   writeTeX: (filename) ->
     for drawing in @drawings
       subfilename = @subfilename '.svg_tex', drawing
@@ -1446,7 +1467,8 @@ main = (args = process.argv[2..]) ->
           filenames = input.writeSVG mappings, styles
           input.writeTeX() if settings.texText
           ## Convert to any additional formats
-          convert filenames, formats, settings
+          if filenames? and filenames.length
+            convert filenames, formats, settings
         else if input instanceof SVGFile
           convert input.filename, formats, settings
   unless files
