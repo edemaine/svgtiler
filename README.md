@@ -62,7 +62,10 @@ Z NES_level7_other.png
   <rect fill="black" width="8" height="8"/>
 ```
 
-PNG image files referenced above: ![NES_level7_empty.png](examples/tetris/NES_level7_empty.png) ![NES_level7_filled.png](examples/tetris/NES_level7_filled.png) ![NES_level7_other.png](examples/tetris/NES_level7_other.png)
+PNG image files referenced above:
+<img width=16 alt="NES_level7_empty.png" src="examples/tetris/NES_level7_empty.png">
+<img width=16 alt="NES_level7_filled.png" src="examples/tetris/NES_level7_filled.png">
+<img width=16 alt="NES_level7_other.png" src="examples/tetris/NES_level7_other.png">
 
 <td>
 
@@ -75,7 +78,7 @@ ILLLJOOSS Z
 
 <td>
 
-<img alt="Tetris custom level" width="192" src="examples/tetris/example.png">
+<img alt="Tetris custom level" width=192 src="examples/tetris/example.png">
 
 </table>
 
