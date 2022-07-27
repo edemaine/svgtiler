@@ -19,6 +19,7 @@ else
   domImplementation = document.implementation
   XMLSerializer = window.XMLSerializer # escape CoffeeScript scope
   path =
+    basename: (x) -> /[^/]*$/.exec(x)[0]
     extname: (x) -> /\.[^/]+$/.exec(x)[0]
     dirname: (x) -> /[^]*\/|/.exec(x)[0]
   graphemeSplitter = splitGraphemes: (x) -> x.split ''
@@ -301,6 +302,18 @@ contentType =
   '.gif': 'image/gif'
   '.svg': 'image/svg+xml'
 
+## Support for `require`/`import`ing images.
+unless window?
+  pirates = require 'pirates'
+  pirates.settings = defaultSettings
+  pirates.addHook (code, filename) ->
+    href = hrefAttr pirates.settings
+    """
+    module.exports = require('preact').h('image', #{JSON.stringify "#{href}": filename});
+    module.exports.svg = '<image #{href}="'+#{JSON.stringify filename.replace /"/g, '&quot;'}+'"/>';
+    """
+  , exts: Object.keys contentType
+
 renderPreact = (data) ->
   if typeof data == 'object' and data.type? and data.props?
     data = require('preact-render-to-string') data
@@ -490,7 +503,7 @@ class StaticSymbol extends Symbol
           if filedata? and @getSetting 'inlineImages'
             type = contentType[extensionOf filename]
             if type?
-              node.setAttribute "data-filename", filename
+              node.setAttribute "data-filename", path.basename filename
               if size?
                 node.setAttribute "data-width", size.width
                 node.setAttribute "data-height", size.height
@@ -722,6 +735,7 @@ class JSMapping extends Mapping
       #  filename: @filename
       #}
       #console.log code
+      pirates?.settings = @settings
       @load require(filename).default ? {}
       @walkDeps filename
     else

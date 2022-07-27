@@ -40,6 +40,7 @@
     "csv-parse": "5.0.4",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.1",
+    "pirates": "4.0.5",
     "preact": "10.7.2",
     "preact-render-to-string": "5.2.0",
     "prettify-xml": "1.2.0",

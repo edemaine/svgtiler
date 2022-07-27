@@ -3,6 +3,7 @@
 ## Input:
 
 * [ASCII mapping file](NES_level7.txt)
+  * Equivalent [CoffeeScript mapping file](NES_level7.coffee)
 * Sprites ![](NES_level7_empty.png) ![](NES_level7_filled.png) ![](NES_level7_other.png) thanks to [The Spriters Resource](https://www.spriters-resource.com/nes/tetris/sheet/32943/).
 * [ASCII art](example.asc)
 
