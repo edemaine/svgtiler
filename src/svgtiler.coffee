@@ -832,9 +832,7 @@ class Drawing extends Input
   writeSVG: (mappings, styles, filename) ->
     ## Generates SVG and writes to filename.
     ## Default filename is the input filename with extension replaced by .svg.
-    ## Returns generated .svg filename, but only if it actually changed
-    ## (and thus needs to be converted to other desired formats);
-    ## otherwise returns null.
+    ## Returns generated .svg filename (even if it didn't changed).
     unless filename?
       filename = path.parse @filename
       if filename.ext == '.svg'
@@ -846,10 +844,9 @@ class Drawing extends Input
       filename = path.format filename
     if maybeWrite filename, @renderSVG mappings, styles
       console.log '->', filename
-      filename
     else
-      console.log '->', filename, '(unchanged)'
-      null
+      console.log '->', filename, '(UNCHANGED)'
+    filename
   renderSVGDOM: (mappings, styles) ->
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1125,10 +1122,9 @@ class Drawing extends Input
       filename = path.format filename
     if maybeWrite filename, @renderTeX filename, relativeDir
       console.log ' &', filename
-      filename
     else
-      console.log ' &', filename, '(unchanged)'
-      null
+      console.log ' &', filename, '(UNCHANGED)'
+    filename
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
@@ -1186,9 +1182,7 @@ class Drawings extends Input
     path.format filename2
   writeSVG: (mappings, styles, filename) ->
     for drawing in @drawings
-      filename = drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
-      continue unless filename?  # don't list unchanged .svg files
-      filename
+      drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
   writeTeX: (filename) ->
     for drawing in @drawings
       subfilename = @subfilename '.svg_tex', drawing
@@ -1483,9 +1477,10 @@ main = (args = process.argv[2..]) ->
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings, styles
           input.writeTeX() if settings.texText
-          ## Convert to any additional formats
-          if filenames? and filenames.length
-            convert filenames, formats, settings
+          ## Convert to any additional formats.  Even if SVG files didn't
+          ## change, we may not have done these conversions before or in the
+          ## last run of SVG Tiler, so let svgink compare mod times and decide.
+          convert filenames, formats, settings
         else if input instanceof SVGFile
           convert input.filename, formats, settings
   unless files
