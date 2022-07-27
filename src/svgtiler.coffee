@@ -12,6 +12,8 @@ unless window?
   prettyXML = require 'prettify-xml'
   graphemeSplitter = new require('grapheme-splitter')()
   metadata = require '../package.json'
+  try
+    metadata.modified = (fs.statSync __filename).mtimeMs
 else
   DOMParser = window.DOMParser # escape CoffeeScript scope
   domImplementation = document.implementation
@@ -65,6 +67,7 @@ unless window?
         #pragmaFrag: 'preact.Fragment'
         throwIfNamespace: false
       ]
+      require.resolve 'babel-plugin-module-deps'
     ]
     #inputSourceMap: true  # CoffeeScript sets this to its own source map
     sourceMaps: 'inline'
@@ -606,6 +609,9 @@ class Input extends HasSettings
     ## Generic method to parse file once we're already in the right class.
     input = new @
     input.filename = filename
+    input.modified = -Infinity
+    try
+      input.modified = (fs.statSync filename).mtimeMs
     input.settings = settings
     unless filedata? or @skipRead
       filedata = fs.readFileSync filename, encoding: @encoding
@@ -618,6 +624,12 @@ class Input extends HasSettings
       extensionMap[extension].parseFile filename, filedata, settings
     else
       throw new SVGTilerError "Unrecognized extension in filename #{filename}"
+  dependsOn: (@deps) ->
+    for dep in @deps
+      try
+        modified = (fs.statSync dep).mtimeMs
+      continue unless modified?
+      @modified = Math.max @modified, modified
 
 class Style extends Input
   load: (@css) ->
@@ -638,6 +650,8 @@ class Styles
   constructor: (@styles = []) ->
   push: (map) ->
     @styles.push map
+  values: ->
+    @styles.values()
 
 class Mapping extends Input
   constructor: (data) ->
@@ -709,6 +723,7 @@ class JSMapping extends Mapping
       #}
       #console.log code
       @load require(filename).default ? {}
+      @walkDeps filename
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually and simulate module.
@@ -730,6 +745,15 @@ class JSMapping extends Mapping
       func exports, _filename, _dirname, svgtiler,
         (if 0 <= code.indexOf 'preact' then require 'preact')
       @load exports.default
+  walkDeps: (filename) ->
+    deps = {}
+    recurse = (modname) =>
+      deps[modname] = true
+      for dep in require.cache[modname]?.deps ? []
+        unless dep of deps
+          recurse dep
+    recurse filename
+    @dependsOn (dep for dep of deps)
 
 class CoffeeMapping extends JSMapping
   @title: "CoffeeScript mapping file (including JSX notation)"
@@ -776,6 +800,8 @@ class Mappings
       value = @maps[i].lookup key
       return value if value?
     undefined
+  values: ->
+    @maps.values()
 
 blankCells =
   '': true
@@ -801,6 +827,22 @@ maybeWrite = (filename, data) ->
       return false
   fs.writeFileSync filename, data
   true
+
+###
+This was a possible replacement for calls to maybeWrite, to prevent future
+calls from running the useless job again, but it doesn't interact well with
+PDF/PNG conversion: svgink will think it needs to convert.
+
+writeOrTouch = (filename, data) ->
+  ## Writes data to filename, unless the file is already identical to data,
+  ## in which case it touches the file (so that we don't keep regenerating it).
+  ## Returns whether the write actually happened.
+  wrote = maybeWrite filename, data
+  unless wrote
+    now = new Date
+    fs.utimesSync filename, now, now
+  wrote
+###
 
 class Drawing extends Input
   hrefAttr: -> hrefAttr @settings
@@ -842,7 +884,9 @@ class Drawing extends Input
       if (outputDir = @getOutputDir '.svg')?
         filename.dir = outputDir
       filename = path.format filename
-    if maybeWrite filename, @renderSVG mappings, styles
+    unless @shouldGenerate filename, @filename, mappings, styles
+      console.log '->', filename, '(SKIPPED)'
+    else if maybeWrite filename, @renderSVG mappings, styles
       console.log '->', filename
     else
       console.log '->', filename, '(UNCHANGED)'
@@ -1100,7 +1144,7 @@ class Drawing extends Input
       \\endgroup
     """, '' # trailing newline
     lines.join '\n'
-  writeTeX: (filename, relativeDir) ->
+  writeTeX: (mappings, filename, relativeDir) ->
     ###
     Must be called *after* `writeSVG`.
     Default filename is the input filename with extension replaced by .svg_tex
@@ -1120,11 +1164,30 @@ class Drawing extends Input
          outputDir?
         relativeDir = path.relative (outputDir ? '.'), (graphicDir ? '.')
       filename = path.format filename
-    if maybeWrite filename, @renderTeX filename, relativeDir
+    unless @shouldGenerate filename, @filename, mappings
+      console.log '->', filename, '(SKIPPED)'
+    else if maybeWrite filename, @renderTeX filename, relativeDir
       console.log ' &', filename
     else
       console.log ' &', filename, '(UNCHANGED)'
     filename
+  shouldGenerate: (filename, ...depGroups) ->
+    return true if @settings.force
+    try
+      modified = (fs.statSync filename).mtimeMs
+    ## If file doesn't exist or can't be stat, need to generate it.
+    return true unless modified?
+    ## If SVG Tiler is newer than file, need to generate it.
+    return true if metadata.modified? and metadata.modified > modified
+    ## If dependency is newer than file, need to generate it.
+    for depGroup in depGroups
+      ## `depGroup` may be a single string (input filename),
+      ## or a `Mappings` or `Styles` object (which both implement `values`).
+      if typeof depGroup == 'string'
+        depGroup = [depGroup]
+      for dep from depGroup.values()
+        return true if dep.modified? and dep.modified > modified
+    false
 
 class ASCIIDrawing extends Drawing
   @title: "ASCII drawing (one character per symbol)"
@@ -1167,6 +1230,7 @@ class Drawings extends Input
     @drawings =
       for data in datas
         drawing = new Drawing
+        drawing.settings = @settings
         drawing.filename = @filename
         drawing.subname = data.subname
         drawing.load data
@@ -1183,12 +1247,12 @@ class Drawings extends Input
   writeSVG: (mappings, styles, filename) ->
     for drawing in @drawings
       drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
-  writeTeX: (filename) ->
+  writeTeX: (mappings, filename) ->
     for drawing in @drawings
       subfilename = @subfilename '.svg_tex', drawing
       relativeDir = path.relative path.dirname(subfilename),
         @getOutputDir('.pdf') ? @getOutputDir('.png') ? '.'
-      drawing.writeTeX subfilename, relativeDir
+      drawing.writeTeX mappings, subfilename, relativeDir
 
 class XLSXDrawings extends Drawings
   @encoding: 'binary'
@@ -1330,7 +1394,7 @@ Optional arguments:
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
-  -f / --force          Force conversion of SVG to PDF/PNG even if SVG newer
+  -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
@@ -1476,7 +1540,7 @@ main = (args = process.argv[2..]) ->
           styles.push input
         else if input instanceof Drawing or input instanceof Drawings
           filenames = input.writeSVG mappings, styles
-          input.writeTeX() if settings.texText
+          input.writeTeX mappings if settings.texText
           ## Convert to any additional formats.  Even if SVG files didn't
           ## change, we may not have done these conversions before or in the
           ## last run of SVG Tiler, so let svgink compare mod times and decide.

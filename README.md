@@ -96,6 +96,12 @@ will generate `drawing.svg` using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `drawings.xlsx`.
 
+`svgtiler` automatically skips conversions when it detects all dependencies
+(including the input drawing, all style files, all mapping files,
+and anything `require`d by JavaScript/CoffeeScript mapping files)
+are older than the SVG file.  You can override this behavior
+via the `-f`/`--force` command-line option.
+
 Alternatively, you can use the [SVG Tiler API](#api) to render SVG from your
 own JavaScript code, e.g., converting ASCII art embedded within a webpage
 into SVG drawings.
@@ -583,7 +589,7 @@ Optional arguments:
   -p / --pdf            Convert output SVG files to PDF via Inkscape
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
-  -f / --force          Force conversion of SVG to PDF/PNG even if SVG newer
+  -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
