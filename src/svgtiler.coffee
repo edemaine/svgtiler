@@ -30,7 +30,7 @@ unless window?
   implicitFinalExportDefault = ({types}) ->
     visitor:
       Program: (path) ->
-        body = path.get('body')
+        body = path.get 'body'
         return unless body.length  # empty program
         for part in body
           if types.isExportDefaultDeclaration part
@@ -702,6 +702,12 @@ class JSMapping extends Mapping
     unless data?
       ## Normally use `require` to load code as a real NodeJS module
       filename = path.resolve @filename
+      ## Debug Babel output
+      #{code} = require('@babel/core').transform fs.readFileSync(filename), {
+      #  ...babelConfig
+      #  filename: @filename
+      #}
+      #console.log code
       @load require(filename).default ? {}
     else
       ## But if file has been explicitly loaded (e.g. in browser),
@@ -710,6 +716,7 @@ class JSMapping extends Mapping
         ...babelConfig
         filename: @filename
       }
+      #console.log code
       exports = {}
       ## Mimick NodeJS module's __filename and __dirname variables
       ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
@@ -729,6 +736,16 @@ class CoffeeMapping extends JSMapping
   @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
   parse: (data) ->
     unless data?
+      ## Debug CoffeeScript output
+      #{code} = require('@babel/core').transform(
+      #  require('coffeescript').compile(
+      #    fs.readFileSync(@filename, encoding: 'utf8'),
+      #    bare: true
+      #    inlineMap: true
+      #    filename: @filename
+      #    sourceFiles: [@filename])
+      #  {...babelConfig, filename: @filename})
+      #console.log code
       ## Normally rely on `require` and `CoffeeScript.register` to load code.
       super.parse data
     else
