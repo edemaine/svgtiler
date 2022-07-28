@@ -303,15 +303,27 @@ contentType =
   '.svg': 'image/svg+xml'
 
 ## Support for `require`/`import`ing images.
+## SVG files get parsed into Preact Virtual DOM so you can manipulate them,
+## while raster images get converted into <image> Preact Virtual DOM elements.
+## In either case, DOM gets `svg` attribute with raw SVG string.
 unless window?
   pirates = require 'pirates'
   pirates.settings = defaultSettings
   pirates.addHook (code, filename) ->
-    href = hrefAttr pirates.settings
-    """
-    module.exports = require('preact').h('image', #{JSON.stringify "#{href}": filename});
-    module.exports.svg = '<image #{href}="'+#{JSON.stringify filename.replace /"/g, '&quot;'}+'"/>';
-    """
+    if '.svg' == extensionOf filename
+      code = removeSVGComments code
+      domCode = require('@babel/core').transform "module.exports = #{code}",
+        {...babelConfig, filename}
+      """
+      #{domCode.code}
+      module.exports.svg = #{JSON.stringify code};
+      """
+    else
+      href = hrefAttr pirates.settings
+      """
+      module.exports = require('preact').h('image', #{JSON.stringify "#{href}": filename});
+      module.exports.svg = '<image #{href}="'+#{JSON.stringify filename.replace /"/g, '&quot;'}+'"/>';
+      """
   , exts: Object.keys contentType
 
 renderPreact = (data) ->
@@ -395,20 +407,22 @@ escapeId = (key) ->
 
 zeroSizeReplacement = 1
 
+removeSVGComments = (svg) ->
+  ## Remove SVG/XML comments such as <?xml...?> and <!DOCTYPE>
+  ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
+  svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
+
 class StaticSymbol extends Symbol
   constructor: (@key, options) ->
     super()
     for own key, value of options
       @[key] = value
-    @svg = @svg
-    ## Remove initial SVG/XML comments such as <?xml...?> and <!DOCTYPE>
-    ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
-    ## for the next replace rule.
-    .replace /^\s*|^<\?[^]*?\?>\s*|<![^-][^]*?>|<!--[^]*?-->/g, ''
+    ## Remove initial SVG/XML comments for the next replace rule.
+    @svg = removeSVGComments @svg
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
     ## (This is especially important on the browser, so the results can be
     ## reparented into an HTML Document.)
-    .replace /^<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
+    .replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
       (match, end) ->
         unless 'xmlns' in match
           match = match[...match.length-end.length] +

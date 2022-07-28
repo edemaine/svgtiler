@@ -154,9 +154,10 @@ The object or function should map a symbol name to either
 2. [Preact](https://preactjs.com/) (React-style) Virtual DOM elements, via
    [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax
    (or its [CoffeeScript analog](https://coffeescript.org/#jsx))
-   or via `preact.h` calls;
-   see [the polyomino example](examples/polyomino).
-   Be careful not to modify Preact nodes, as they get re-used; instead use
+   or via
+   [`preact.h`](https://preactjs.com/guide/v10/api-reference/#h--createelement)
+   calls; see [the polyomino example](examples/polyomino).
+   Be careful not to modify Preact nodes, in case they get re-used; instead use
    [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
    to make a modified copy (or before modification).
 3. a filename with `.svg` extension containing SVG code,
@@ -204,12 +205,26 @@ In addition to the preloaded module `preact`, they have access to the
 SVG Tiler API (not yet documented) via `svgtiler`.
 
 You can also use `import ... from './filename'` or `require('./filename')`
-to import local modules relative to the mapping file.
-In particular, you can share .js/.coffee code among mapping files.
-If you `import`/`require` a filename with `.png`, `.jpg`, `.jpeg`, or `.gif`
-extension, you obtain an `image` object representing an `<image>` tag for
-the file's inclusion.  You can include `image` in a JSX template via `{image}`;
-or if you want to inline/manipulate the SVG string, use `image.svg`.
+to import local modules or files relative to the mapping file.
+
+* In particular, you can share .js/.coffee code among mapping files.
+* If you `import`/`require` a filename with `.svg` extension, you obtain an
+  Preact Virtual DOM object `svg` representing the SVG file, which you can
+  include in a JSX template via `{svg}`.
+  You can also easily manipulate the SVG before inclusion.
+  For example, `svg.props.children` strips off the outermost tag,
+  allowing you to rewrap as in `<symbol>{svg.props.children}</symbol>`.
+  Or [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
+  lets you override certain attributes or add children; for example,
+  `preact.cloneElement(svg, {class: 'foo'}, <rect width="5" height="5"/>, svg.props.children)`
+  adds a `class` attribute and prepends a `<rect>` child.
+  Alternatively, use `svg.svg` (the `svg` attribute of the returned object)
+  to get the SVG string (with comments removed).
+* If you `import`/`require` a filename with `.png`, `.jpg`, `.jpeg`, or `.gif`
+  extension, you obtain an Preact Virtual DOM object `image`
+  representing an `<image>` tag for the file's inclusion,
+  which you can include in a JSX template via `{image}`.
+  Or if you want to inline/manipulate the SVG string, use `image.svg`.
 
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
