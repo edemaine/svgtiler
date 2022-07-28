@@ -912,7 +912,7 @@ class Drawing extends Input
       if (outputDir = @getOutputDir '.svg')?
         filename.dir = outputDir
       filename = path.format filename
-    unless @shouldGenerate filename, @filename, mappings, styles
+    unless @shouldGenerate filename, mappings, styles
       console.log '->', filename, '(SKIPPED)'
     else if maybeWrite filename, @renderSVG mappings, styles
       console.log '->', filename
@@ -1192,7 +1192,7 @@ class Drawing extends Input
          outputDir?
         relativeDir = path.relative (outputDir ? '.'), (graphicDir ? '.')
       filename = path.format filename
-    unless @shouldGenerate filename, @filename, mappings
+    unless @shouldGenerate filename, mappings
       console.log '->', filename, '(SKIPPED)'
     else if maybeWrite filename, @renderTeX filename, relativeDir
       console.log ' &', filename
@@ -1207,12 +1207,12 @@ class Drawing extends Input
     return true unless modified?
     ## If SVG Tiler is newer than file, need to generate it.
     return true if metadata.modified? and metadata.modified > modified
+    ## If this input is newer than file, need to generate it.
+    return true if @modified? and @modified > modified
     ## If dependency is newer than file, need to generate it.
     for depGroup in depGroups
-      ## `depGroup` may be a single string (input filename),
-      ## or a `Mappings` or `Styles` object (which both implement `values`).
-      if typeof depGroup == 'string'
-        depGroup = [depGroup]
+      ## `depGroup` may be a a `Mappings` or `Styles` object
+      ## (which both implement `values`).
       for dep from depGroup.values()
         return true if dep.modified? and dep.modified > modified
     false

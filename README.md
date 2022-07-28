@@ -102,7 +102,7 @@ and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `svgtiler` automatically skips conversions when it detects all dependencies
 (including the input drawing, all style files, all mapping files,
 and anything `require`d by JavaScript/CoffeeScript mapping files)
-are older than the SVG file.  You can override this behavior
+are older than the SVG file, similar to `make`.  You can override this behavior
 via the `-f`/`--force` command-line option.
 
 Alternatively, you can use the [SVG Tiler API](#api) to render SVG from your
