@@ -13,6 +13,31 @@ see [more examples below](#examples).
 | --- | --- | --- |
 | [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/solved-grid.svg)](examples/witness) | [![Immortal Game chessboard](examples/chess/board-immortal.svg)](examples/chess)
 
+## Table of Contents
+
+- [Main Concepts](#main-concepts)
+- [Usage](#usage)
+- [Mapping Files: .txt, .js, .coffee, .jsx, .cjsx](#mapping-files-txt-js-coffee-jsx-cjsx)
+- [Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods](#drawing-files-asc-ssv-csv-tsv-xlsx-xls-ods)
+- [Style Files: .css, .styl](#style-files-css-styl)
+- [Layout Algorithm](#layout-algorithm)
+- [z-index: Stacking Order of Symbols](#z-index-stacking-order-of-symbols)
+- [Overflow and Bounding Box](#overflow-and-bounding-box)
+- [Autosizing Symbols](#autosizing-symbols)
+- [Unrecognized Symbols](#unrecognized-symbols)
+- [Automatic `<symbol>` Wrapping](#automatic-symbol-wrapping)
+- [`<image>` Processing](#image-processing)
+- [Converting SVG to PDF/PNG](#converting-svg-to-pdfpng)
+- [LaTeX Text](#latex-text)
+- [API](#api)
+- [Examples](#examples)
+  - [Video/board games](#videoboard-games)
+  - [Demos](#demos)
+  - [Research using SVG Tiler](#research-using-svg-tiler)
+- [Installation](#installation)
+- [Command-Line Usage](#command-line-usage)
+- [History](#history)
+
 ## Main Concepts
 
 To use SVG Tiler, you combine at least two types of files
@@ -672,7 +697,7 @@ SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
                     and supporting `neighbor`/`includes`/`row`/`column` methods
 ```
 
-## About
+## History
 
 This take on SVG Tiler was written by Erik Demaine, in discussions with
 Jeffrey Bosboom and others, with the intent of subsuming his
