@@ -688,8 +688,10 @@ class Mapping extends Input
   load: (data) ->
     if typeof data == 'function'
       @function = data
-    else
+    else if typeof data == 'object'
       @merge data
+    else
+      console.warn "Mapping file #{@filename} returned invalid mapping data of type #{typeof data}"
   merge: (data) ->
     settings = @settings
     settings = {...settings, dirname: path.dirname @filename} if @filename?
