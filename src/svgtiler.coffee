@@ -56,6 +56,7 @@ unless window?
           path: 'preact'
         ,
           default: 'svgtiler'
+          members: ['share']
           path: 'svgtiler'
         ]
       ]
@@ -1591,6 +1592,7 @@ svgtiler = {
   extensionMap, Input, DummyInput, Mappings, Context,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
+  share: {}  # for shared data between mapping modules
   version: metadata.version
 }
 module?.exports = svgtiler

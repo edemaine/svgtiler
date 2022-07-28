@@ -227,7 +227,9 @@ the following properties:
 Like other NodeJS modules, .js and .coffee files can access `__dirname`
 and `__filename`, e.g., to use paths relative to the mapping file.
 In addition to the preloaded module `preact`, they have access to the
-SVG Tiler API (not yet documented) via `svgtiler`.
+SVG Tiler API (not yet documented) via `svgtiler`, and a global shared object
+`share` that you can add properties to for communication between mapping
+files (e.g., for one mapping file to provide settings to another mapping file).
 
 You can also use `import ... from './filename'` or `require('./filename')`
 to import local modules or files relative to the mapping file.
