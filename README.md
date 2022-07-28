@@ -9,9 +9,9 @@ and optionally converts it to PDF, PNG, and/or LaTeX for LaTeX text.
 Here are a few examples of generated figures;
 see [more examples below](#examples).
 
-| [Super Mario Bros.](examples/mario) | [The Witness](examples/witness) |
-| --- | --- |
-| [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/solved-grid.svg)](examples/witness) |
+| [Super Mario Bros.](examples/mario) | [The Witness](examples/witness) | [Chess](examples/chess) |
+| --- | --- | --- |
+| [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/solved-grid.svg)](examples/witness) | [![Immortal Game chessboard](examples/chess/board-immortal.svg)](examples/chess)
 
 ## Main Concepts
 
@@ -546,6 +546,7 @@ while others are more demonstrations of particular SVG Tiler features.
 ### Video/board games:
 * [Super Mario Bros.](examples/mario)
 * [Tetris](examples/tetris)
+* [Chess](examples/chess)
 * [The Witness](examples/witness)
 * [Tilt](examples/tilt)
 
