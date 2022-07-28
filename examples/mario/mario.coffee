@@ -1,4 +1,4 @@
-palette = require './palette.json'
+palette = share.palette ? 'overworld'
 console.log "Using Mario #{palette} palette"
 
 background =

@@ -237,7 +237,8 @@ and `__filename`, e.g., to use paths relative to the mapping file.
 In addition to the preloaded module `preact`, they have access to the
 SVG Tiler API (not yet documented) via `svgtiler`, and a global shared object
 `share` that you can add properties to for communication between mapping
-files (e.g., for one mapping file to provide settings to another mapping file).
+files (e.g., for one mapping file to provide settings to another mapping file,
+as in [the Mario example](examples/mario)).
 
 You can also use `import ... from './filename'` or `require('./filename')`
 to import local modules or files relative to the mapping file.
@@ -248,7 +249,8 @@ to import local modules or files relative to the mapping file.
   include in a JSX template via `{svg}`.
   You can also easily manipulate the SVG before inclusion.
   For example, `svg.props.children` strips off the outermost tag,
-  allowing you to rewrap as in `<symbol>{svg.props.children}</symbol>`.
+  allowing you to rewrap as in `<symbol>{svg.props.children}</symbol>`;
+  see [the Chess example](examples/chess).
   Or [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
   lets you override certain attributes or add children; for example,
   `preact.cloneElement(svg, {class: 'foo'}, <rect width="5" height="5"/>, svg.props.children)`

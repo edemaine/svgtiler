@@ -1,0 +1,2 @@
+share.palette = 'overworld'
+null
