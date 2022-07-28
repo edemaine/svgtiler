@@ -124,11 +124,19 @@ will generate `drawing.svg` using the mappings in `map1.txt` and `map2.coffee`,
 and will generate `drawings_<sheet>.svg` for each unhidden sheet in
 `drawings.xlsx`.
 
-`svgtiler` automatically skips conversions when it detects all dependencies
-(including the input drawing, all style files, all mapping files,
+`svgtiler` automatically skips building when it detects all dependencies
+(including the input drawing file, all style files, all mapping files,
 and anything `require`d by JavaScript/CoffeeScript mapping files)
-are older than the SVG file, similar to `make`.  You can override this behavior
-via the `-f`/`--force` command-line option.
+are older than the SVG file, similar to `make`.
+In these cases, you will see the message `(SKIPPED)` in the output.
+In addition, `svgtiler` will avoid writing a `.svg` or `.tex` file
+(and changing their timestamp) if the contents haven't changed;
+in these cases, you will see the message `(UNCHANGED)` in the output.
+In particular, this will prevent these files from getting
+[converted to PDF or PNG](#converting-svg-to-pdfpng)
+(unless those files are out-of-date).
+You can override this behavior via the `-f`/`--force` command-line option,
+which forces all building and conversions to take place.
 
 Alternatively, you can use the [SVG Tiler API](#api) to render SVG from your
 own JavaScript code, e.g., converting ASCII art embedded within a webpage
