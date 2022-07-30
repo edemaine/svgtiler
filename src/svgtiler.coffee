@@ -943,13 +943,12 @@ class Drawing extends Input
     missing = {}
     @symbols =
       for row in @data
-        for cell in row
-          symbol = mappings.lookup cell
-          if symbol?
-            lastSymbol = symbol
-          else
-            missing[cell] = true
-            unrecognizedSymbol
+        for key in row
+          symbol = mappings.lookup key
+          unless symbol?
+            missing[key] = true
+            symbol = unrecognizedSymbol
+          symbol
     missing = ("'#{key}'" for own key of missing)
     if missing.length
       console.warn "Failed to recognize symbols:", missing.join ', '
