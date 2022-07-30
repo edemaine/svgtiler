@@ -232,8 +232,9 @@ the following properties:
 * `this.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the input format does allow multiple sheets.
 
-Like other NodeJS modules, .js and .coffee files can access `__dirname`
-and `__filename`, e.g., to use paths relative to the mapping file.
+Like other [NodeJS modules](https://nodejs.org/api/modules.html),
+.js and .coffee files can access `__dirname` and `__filename`,
+e.g., to use paths relative to the mapping file.
 In addition to the preloaded module `preact`, they have access to the
 SVG Tiler API (not yet documented) via `svgtiler`, and a global shared object
 `share` that you can add properties to for communication between mapping
@@ -243,7 +244,8 @@ as in [the Mario example](examples/mario)).
 You can also use `import ... from './filename'` or `require('./filename')`
 to import local modules or files relative to the mapping file.
 
-* In particular, you can share .js/.coffee code among mapping files.
+* In particular, you can share .js/.coffee code or .json config files
+  among mapping files.
 * If you `import`/`require` a filename with `.svg` extension, you obtain an
   Preact Virtual DOM object `svg` representing the SVG file, which you can
   include in a JSX template via `{svg}`.
@@ -258,7 +260,7 @@ to import local modules or files relative to the mapping file.
   Alternatively, use `svg.svg` (the `svg` attribute of the returned object)
   to get the SVG string (with comments removed).
 * If you `import`/`require` a filename with `.png`, `.jpg`, `.jpeg`, or `.gif`
-  extension, you obtain an Preact Virtual DOM object `image`
+  extension, you obtain a Preact Virtual DOM object `image`
   representing an `<image>` tag for the file's inclusion,
   which you can include in a JSX template via `{image}`.
   Or if you want to inline/manipulate the SVG string, use `image.svg`.
