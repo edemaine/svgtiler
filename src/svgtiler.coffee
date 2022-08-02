@@ -83,7 +83,7 @@ unless window?
   CoffeeScript.register()
 
 defaultSettings =
-  ## Force all symbol tiles to have specified width or height.
+  ## Force all tiles to have specified width or height.
   forceWidth: null   ## default: no size forcing
   forceHeight: null  ## default: no size forcing
   ## Inline <image>s into output SVG (replacing URLs to other files).
@@ -323,61 +323,24 @@ unless window?
       """
   , exts: Object.keys contentType
 
+isPreact = (data) ->
+  typeof data == 'object' and data?.type? and data.props?
 renderPreact = (data) ->
-  if typeof data == 'object' and data.type? and data.props?
-    data = require('preact-render-to-string') data
-  data
+  require('preact-render-to-string') data
 
-class Symbol extends HasSettings
-  @parse: (key, data, settings) ->
-    unless data?
-      throw new SVGTilerError "Attempt to create symbol '#{key}' without data"
-    else if typeof data == 'function'
-      new DynamicSymbol key, data, settings
-    else if data.function?
-      new DynamicSymbol key, data.function, settings
-    else
-      ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
-      ## Serialization + parsing shouldn't be necessary, but this lets us
-      ## deal with one parsed format (xmldom).
-      data = renderPreact data
-      if typeof data == 'string'
-        if data.trim() == ''  ## Blank SVG treated as 0x0 symbol
-          data = svg: '<symbol viewBox="0 0 0 0"/>'
-        else if data.indexOf('<') < 0  ## No <'s -> interpret as filename
-          if settings?.dirname?
-            filename = path.join settings.dirname, data
-          else
-            filename = data
-          extension = extensionOf data
-          ## <image> tag documentation: "Conforming SVG viewers need to
-          ## support at least PNG, JPEG and SVG format files."
-          ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
-          data =
-            switch extension
-              when '.png', '.jpg', '.jpeg', '.gif'
-                svg: """
-                  <image #{hrefAttr settings}="#{encodeURI data}"/>
-                """
-              when '.svg'
-                settings = {...settings, dirname: path.dirname filename}
-                data =
-                  filename: filename
-                  svg: loadSVG filename, settings
-              else
-                throw new SVGTilerError "Unrecognized extension in filename '#{data}' for symbol '#{key}'"
-        else
-          data = svg: data
-      new StaticSymbol key, {...data, settings}
-  includes: (substring) ->
-    @key.indexOf(substring) >= 0
-    ## ECMA6: @key.includes substring
-  match: (regex) -> @key.match regex
+$static = Symbol 'svgtiler.static'
+wrapStatic = (x) -> [$static]: x  # exported as `static` but that's reserved
 
+#fileCache = new Map
 loadSVG = (filename, settings) ->
+  #if (found = fileCache.get filename)?
+  #  return found
+  #data =
   fs.readFileSync filename,
     encoding: getSetting settings, 'svgEncoding'
-  ## TODO: Handle <?xml encoding="..."?> or BOM to override svgEncoding.
+    ## TODO: Handle <?xml encoding="..."?> or BOM to override svgEncoding.
+  #fileCache.set filename, data
+  #data
 
 escapeId = (key) ->
   ###
@@ -409,17 +372,57 @@ removeSVGComments = (svg) ->
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
 
-class StaticSymbol extends Symbol
-  constructor: (@key, options) ->
+class Tile extends HasSettings
+  constructor: (@key, @value, @settings) ->
+    ## `@value` can be a string or Preact VDOM.
     super()
-    for own key, value of options
-      @[key] = value
-    ## Remove initial SVG/XML comments for the next replace rule.
+    unless @value?
+      throw new SVGTilerError "Attempt to create tile '#{@key}' without data"
+
+  makeSVG: ->
+    return if @svg?
+    ## Set `@svg` to SVG string for duplication detection.
+    if isPreact @value
+      ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
+      ## Serialization + parsing shouldn't be necessary, but this lets us
+      ## deal with one parsed format (xmldom).
+      @svg = renderPreact @value
+    else if typeof @value == 'string'
+      if @value.trim() == ''  ## Blank SVG treated as 0x0 symbol
+        @svg = '<symbol viewBox="0 0 0 0"/>'
+      else unless @value.includes '<'  ## No <'s -> interpret as filename
+        filename = @value
+        filename = path.join @settings.dirname, filename if @settings?.dirname?
+        extension = extensionOf filename
+        ## <image> tag documentation: "Conforming SVG viewers need to
+        ## support at least PNG, JPEG and SVG format files."
+        ## [https://svgwg.org/svg2-draft/embedded.html#ImageElement]
+        switch extension
+          when '.png', '.jpg', '.jpeg', '.gif'
+            @svg = """
+              <image #{hrefAttr @settings}="#{encodeURI @value}"/>
+            """
+          when '.svg'
+            @filename = filename
+            @settings = {...@settings, dirname: path.dirname filename}
+            @svg = loadSVG @filename, @settings
+          else
+            throw new SVGTilerError "Unrecognized extension in filename '#{@value}' for tile '#{@key}'"
+      else
+        @svg = @value
+    else
+      throw new SVGTilerError "Invalid value for tile '#{@key}': #{typeof @value}"
+    ## Remove initial SVG/XML comments (for broader duplication detection,
+    ## and the next replace rule).
     @svg = removeSVGComments @svg
+
+  makeXML: (versions) ->
+    return @xml if @xml?
+    @makeSVG()
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
     ## (This is especially important on the browser, so the results can be
     ## reparented into an HTML Document.)
-    .replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
+    svg = @svg.replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
       (match, end) ->
         unless 'xmlns' in match
           match = match[...match.length-end.length] +
@@ -432,12 +435,12 @@ class StaticSymbol extends Symbol
       errorHandler: (level, msg, indent = '  ') =>
         msg = msg.replace /^\[xmldom [^\[\]]*\]\t/, ''
         msg = msg.replace /@#\[line:(\d+),col:(\d+)\]$/, (match, line, col) =>
-          lines = @svg.split '\n'
+          lines = svg.split '\n'
           (if line > 1 then indent + lines[line-2] + '\n' else '') +
           indent + lines[line-1] + '\n' +
           indent + ' '.repeat(col-1) + '^^^' +
           (if line < lines.length then '\n' + indent + lines[line] else '')
-        console.error "SVG parse #{level} in symbol '#{@key}': #{msg}"
+        console.error "SVG parse #{level} in tile '#{@key}': #{msg}"
     .parseFromString @svg, 'image/svg+xml'
     ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     ## in the original parsed content or possibly added above,
@@ -448,12 +451,13 @@ class StaticSymbol extends Symbol
 
     ## Wrap XML in <symbol> if not already.
     symbol = @xml.createElementNS SVGNS, 'symbol'
-    symbol.setAttribute 'id', @id = escapeId @key
+    ## Force `id` to be first attribute.
+    symbol.setAttribute 'id', @makeId versions
     # Avoid a layer of indirection for <symbol>/<svg> at top level
     if @xml.documentElement.nodeName in ['symbol', 'svg'] and
        not @xml.documentElement.nextSibling?
       for attribute in @xml.documentElement.attributes
-        unless attribute.name in ['version', 'id'] or attribute.name[...5] == 'xmlns'
+        unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
           symbol.setAttribute attribute.name, attribute.value
       doc = @xml.documentElement
       @xml.removeChild @xml.documentElement
@@ -485,31 +489,34 @@ class StaticSymbol extends Symbol
         ## Read file for width/height detection and/or inlining
         {href, key} = getHref node
         filename = href
-        if (dirname = @getSetting 'dirname')? and filename
-          filename = path.join dirname, filename
+        if @settings?.dirname? and filename
+          filename = path.join @settings.dirname, filename
         if filename? and not /^data:|file:|[a-z]+:\/\//.test filename # skip URLs
           filedata = null
           try
             filedata = fs.readFileSync filename unless window?
           catch e
             console.warn "Failed to read image '#{filename}': #{e}"
-          ## Fill in width and height
-          size = null
-          unless window?
-            try
-              size = require('image-size') filedata ? filename
-            catch e
-              console.warn "Failed to detect size of image '#{filename}': #{e}"
-          if size?
-            ## If one of width and height is set, scale to match.
-            if not isNaN width = parseFloat node.getAttribute 'width'
-              node.setAttribute 'height', size.height * (width / size.width)
-            else if not isNaN height = parseFloat node.getAttribute 'height'
-              node.setAttribute 'width', size.width * (height / size.height)
-            else
-              ## If neither width nor height are set, set both.
-              node.setAttribute 'width', size.width
-              node.setAttribute 'height', size.height
+          ## Fill in width and/or height if missing
+          width = parseFloat node.getAttribute 'width'
+          height = parseFloat node.getAttribute 'height'
+          if (isNaN width) or (isNaN height)
+            size = null
+            if filedata? and not window?
+              try
+                size = require('image-size') filedata ? filename
+              catch e
+                console.warn "Failed to detect size of image '#{filename}': #{e}"
+            if size?
+              ## If one of width and height is set, scale to match.
+              if not isNaN width
+                node.setAttribute 'height', size.height * (width / size.width)
+              else if not isNaN height
+                node.setAttribute 'width', size.width * (height / size.height)
+              else
+                ## If neither width nor height are set, set both.
+                node.setAttribute 'width', size.width
+                node.setAttribute 'height', size.height
           ## Inline
           if filedata? and @getSetting 'inlineImages'
             type = contentType[extensionOf filename]
@@ -561,7 +568,7 @@ class StaticSymbol extends Symbol
       warnings.push 'height'
       @height = 0
     if warnings.length > 0
-      console.warn "Failed to detect #{warnings.join ' and '} of SVG for symbol '#{@key}'"
+      console.warn "Failed to detect #{warnings.join ' and '} of SVG for tile '#{@key}'"
     ## Detect special `width="auto"` and/or `height="auto"` fields for future
     ## processing, and remove them to ensure valid SVG.
     @autoWidth = isAuto @xml, 'width'
@@ -579,72 +586,64 @@ class StaticSymbol extends Symbol
           false # don't recurse into <text>'s children
         else
           true
-  setId: (id) ->
-    @id = id # for <use>
-    @xml.documentElement.setAttribute 'id', id
-  use: -> @  ## do nothing for static symbol
-  usesContext: false
+    @xml
 
-class DynamicSymbol extends Symbol
-  @all: []
-  constructor: (@key, @func, @settings) ->
-    super()
-    @versions = {}
-    @nversions = 0
-    @constructor.all.push @
-  @resetAll: ->
-    ## Resets all DynamicSymbol's versions to 0.
-    ## Use before starting a new SVG document.
-    for symbol in @all
-      symbol.versions = {}
-      symbol.nversions = 0
-  use: (context) ->
-    result = @func.call context
-    unless result?
-      throw new SVGTilerError "Function for symbol #{@key} returned #{result}"
-    ## Render Preact virtual dom elements (e.g. from JSX notation) to SVG now,
-    ## for better duplicate detection.
-    result = renderPreact result
-    ## We use JSON serialization to detect duplicate symbols.  This enables
-    ## return values like {filename: ...}, in addition to raw SVG strings.
-    string = JSON.stringify result
-    unless string of @versions
-      version = @nversions++
-      @versions[string] =
-        Symbol.parse "#{@key}_v#{version}", result, @settings
-      @versions[string].setId "#{escapeId @key}_v#{version}"
-    @versions[string]
-  usesContext: true
+  makeId: (versions) ->
+    return @id if @id?
+    escaped = escapeId @key
+    if @isStatic
+      @id = escaped
+    else
+      version = versions.get(@key) ? 0
+      versions.set @key, version + 1
+      if version
+        @id = "#{escaped}_v#{version}"
+      else
+        @id = escaped
 
-## Symbol to fall back to when encountering an unrecognized symbol.
+## Tile to fall back to when encountering an unrecognized key.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
 ## by Amit6, released into the public domain.
-unrecognizedSymbol = new StaticSymbol '_unrecognized', svg: '''
+unrecognizedTile = new Tile '_unrecognized', '''
   <symbol viewBox="0 0 200 200" preserveAspectRatio="none" width="auto" height="auto">
     <rect width="200" height="200" fill="yellow"/>
     <path stroke="none" fill="red" d="M 200,100 100,200 0,100 100,0 200,100 z M 135.64709,74.70585 q 0,-13.52935 -10.00006,-22.52943 -9.99999,-8.99999 -24.35289,-8.99999 -17.29415,0 -30.117661,5.29409 L 69.05879,69.52938 q 9.764731,-6.23528 21.52944,-6.23528 8.82356,0 14.58824,4.82351 5.76469,4.82351 5.76469,12.70589 0,8.5883 -9.94117,21.70588 -9.94117,13.11766 -9.94117,26.76473 l 17.88236,0 q 0,-6.3529 6.9412,-14.9412 11.76471,-14.58816 12.82351,-16.35289 6.9412,-11.05887 6.9412,-23.29417 z m -22.00003,92.11771 0,-24.70585 -27.29412,0 0,24.70585 27.29412,0 z"/>
   </symbol>
 '''
-unrecognizedSymbol.setId '_unrecognized' # cannot be output of escapeId()
+unrecognizedTile.id = '_unrecognized' # cannot be output of escapeId()
 
 class Input extends HasSettings
+  constructor: (data, opts) ->
+    ###
+    `data` is input-specific data for direct creation (e.g. without a file),
+    which is processed via `@load()`.
+    If `data` is unspecified, `@parse` will be called with `@filedata`.
+    `opts` is an object with options attached directly to the Input, including:
+    `filename`, `filedata`, `settings`.
+    ###
+    super()
+    @[key] = value for key, value of opts if opts?
+    if data?
+      @load data
+    else
+      @parse @filedata
+  @make: (opts) ->
+    ## Create input when there's no `data`, only `opts`.
+    ## In particular, this is used to parse data from a file in `@parseData`.
+    new @ undefined, opts
   @encoding: 'utf8'
   @parseFile: (filename, filedata, settings) ->
     ## Generic method to parse file once we're already in the right class.
-    input = new @
-    input.filename = filename
-    input.modified = -Infinity
+    modified = -Infinity
     try
-      input.modified = (fs.statSync filename).mtimeMs
-    input.settings = settings
+      modified = (fs.statSync filename).mtimeMs
     unless filedata? or @skipRead
       filedata = fs.readFileSync filename, encoding: @encoding
-    input.parse filedata
-    input
+    @make {filename, filedata, modified, settings}
   @recognize: (filename, filedata, settings) ->
     ## Recognize type of file and call corresponding class's `parseFile`.
     extension = extensionOf filename
-    if extension of extensionMap
+    if extensionMap.hasOwnProperty extension
       extensionMap[extension].parseFile filename, filedata, settings
     else
       throw new SVGTilerError "Unrecognized extension in filename #{filename}"
@@ -678,45 +677,59 @@ class Styles
     @styles.values()
 
 class Mapping extends Input
-  constructor: (data) ->
-    super()
-    @map = {}
-    @load data if data?
-  load: (data) ->
-    if typeof data == 'function'
-      @function = data
-    else if typeof data == 'object'
-      @merge data
+  constructor: (...args) ->
+    super ...args
+    @cache ?= new Map
+    @settings = {...@settings, dirname: path.dirname @filename} if @filename?
+  load: (@data) ->
+    unless typeof @data in ['function', 'object']
+      console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @data}): should be function or object"
+      @data = null
+    if isPreact @data
+      console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
+      @data = null
+  lookup: (key, context) ->
+    ## Coerce `key` to string.  Sometimes get a number, e.g., from XLSX.
+    key = String key
+    ## Check cache (used for static tiles).
+    if (found = @cache.get key)?
+      return found
+
+    ## Repeatedly expand `@data` until we get string, Preact VDOM, or
+    ## null/undefined.
+    value = @data
+    isStatic = undefined
+    while value? and typeof value != 'string' and not isPreact value
+      if value instanceof Map or value instanceof WeakMap
+        value = value.get key
+      else if typeof value == 'function'
+        value = value.call context, key, context
+        ## Use of a function implies dynamic, unless there's a static wrapper.
+        isStatic ?= false
+      else if $static of value  # static wrapper from wrapStatic
+        value = value[$static]
+        ## Static wrapper forces static, even if there are functions.
+        isStatic = true
+      else  # typeof value == 'object'
+        if value.hasOwnProperty key  # avoid inherited property e.g. toString
+          value = value[key]
+        else
+          value = undefined
+    isStatic ?= true  # static unless we saw a function and no static wrapper
+
+    ## Build tile if non-null, and save in cache if it's static.
+    if value?
+      tile = new Tile key, value, @settings
+      tile.isStatic = isStatic
+      @cache.set key, tile if isStatic
+      tile
     else
-      console.warn "Mapping file #{@filename} returned invalid mapping data of type #{typeof data}"
-  merge: (data) ->
-    settings = @settings
-    settings = {...settings, dirname: path.dirname @filename} if @filename?
-    for own key, value of data
-      unless value instanceof Symbol
-        value = Symbol.parse key, value, settings
-      @map[key] = value
-  lookup: (key) ->
-    key = key.toString()  ## Sometimes get a number, e.g., from XLSX
-    if key of @map
-      @map[key]
-    else if @function?
-      ## Cache return value of function so that only one Symbol generated
-      ## for each key.  It still may be a DynamicSymbol, which will allow
-      ## it to make multiple versions, but keep track of which are the same.
-      value = @function key
-      if value?
-        settings = @settings
-        settings = {...settings, dirname: path.dirname @filename} if @filename?
-        @map[key] = Symbol.parse key, value, settings
-      else
-        value
-    else
-      undefined
+      @cache.set key, value if isStatic
+      value
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
-  @help: "Each line is <symbol-name><space><raw SVG or filename.svg>"
+  @help: "Each line is <tile-name><space><raw SVG or filename.svg>"
   parse: (data) ->
     map = {}
     for line in splitIntoLines data
@@ -736,7 +749,7 @@ class ASCIIMapping extends Mapping
 
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
-  @help: "Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}"
+  @help: "Object mapping tile names to TILE e.g. {dot: 'dot.svg'}"
   @skipRead: true  # require loads file contents for us
   parse: (data) ->
     unless data?
@@ -770,21 +783,21 @@ class JSMapping extends Mapping
       func = new Function \
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
       func exports, _filename, _dirname, svgtiler,
-        (if 0 <= code.indexOf 'preact' then require 'preact')
+        (if code.includes 'preact' then require 'preact')
       @load exports.default
   walkDeps: (filename) ->
-    deps = {}
+    deps = new Set
     recurse = (modname) =>
-      deps[modname] = true
+      deps.add modname
       for dep in require.cache[modname]?.deps ? []
-        unless dep of deps
+        unless deps.has dep
           recurse dep
     recurse filename
-    @dependsOn (dep for dep of deps)
+    @dependsOn (dep for dep from deps)
 
 class CoffeeMapping extends JSMapping
   @title: "CoffeeScript mapping file (including JSX notation)"
-  @help: "Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'"
+  @help: "Object mapping tile names to TILE e.g. dot: 'dot.svg'"
   parse: (data) ->
     unless data?
       ## Debug CoffeeScript output
@@ -821,22 +834,23 @@ class Mappings
       throw new SVGTilerError "Could not convert into Mapping(s): #{data}"
   push: (map) ->
     @maps.push map
-  lookup: (key) ->
+  lookup: (key, context) ->
     return unless @maps.length
     for i in [@maps.length-1..0]
-      value = @maps[i].lookup key
+      value = @maps[i].lookup key, context
       return value if value?
     undefined
   values: ->
     @maps.values()
 
-blankCells =
-  '': true
-  ' ': true  ## for ASCII art in particular
+blankCells = new Set [
+  ''
+  ' '  ## for ASCII art in particular
+]
 
 allBlank = (list) ->
   for x in list
-    if x? and x not of blankCells
+    if x? and not blankCells.has x
       return false
   true
 
@@ -921,11 +935,10 @@ class Drawing extends Input
   renderSVGDOM: (mappings, styles) ->
     ###
     Main rendering engine, returning an xmldom object for the whole document.
-    Also saves the table of symbols in `@symbols`, the corresponding
+    Also saves the table of tiles in `@tiles`, the corresponding
     coordinates in `@coords`, and overall `@weight` and `@height`,
     for use by `renderTeX`.
     ###
-    DynamicSymbol.resetAll()
     doc = domImplementation.createDocument SVGNS, 'svg'
     svg = doc.documentElement
     svg.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
@@ -935,40 +948,51 @@ class Drawing extends Input
     for style in styles?.styles ? []
       svg.appendChild styleTag = doc.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
-    ## Look up all symbols in the drawing.
-    missing = {}
-    @symbols =
-      for row in @data
-        for key in row
-          symbol = mappings.lookup key
-          unless symbol?
-            missing[key] = true
-            symbol = unrecognizedSymbol
-          symbol
-    missing = ("'#{key}'" for own key of missing)
-    if missing.length
-      console.warn "Failed to recognize symbols:", missing.join ', '
-    ## Instantiate (.use) all (dynamic) symbols in the drawing.
-    symbolsByKey = {}
-    @symbols =
-      for row, i in @symbols
-        for symbol, j in row
-          if symbol.usesContext
-            symbol = symbol.use new Context @, i, j
+    ## Render all tiles in the drawing.
+    missing = new Set
+    cache = new Map
+    versions = new Map
+    symbolIds = new Set
+    context = new Context @
+    @tiles =
+      for row, i in @data
+        for key, j in row
+          context.move i, j
+          tile = mappings.lookup key, context
+          if tile?
+            ## Check cache by tile value if it's a string (e.g. filename,
+            ## to avoid loading file again), and by computed SVG string
+            ## (in case multiple paths lead to the same SVG content).
+            if typeof tile.value == 'string' and
+               (found = cache.get tile.value)?
+              tile = found
+            else
+              tile.makeSVG()
+              unless tile.value == tile.svg
+                if (found = cache.get tile.svg)?
+                  tile = found
+                else
+                  cache.set tile.svg, tile
+              cache.set tile.value, tile
           else
-            symbol = symbol.use()
-          unless symbol.key of symbolsByKey
-            symbolsByKey[symbol.key] = symbol
-          else if symbolsByKey[symbol.key] is not symbol
-            console.warn "Multiple symbols with key #{symbol.key}"
-          symbol
-    ## Include all used symbols in SVG
-    for key, symbol of symbolsByKey
-      continue unless symbol?
-      svg.appendChild symbol.xml.documentElement.cloneNode true
+            missing.add key
+            tile = unrecognizedTile
+            unless (found = cache.get tile.key)?
+              cache.set tile.key, tile
+          ## Include new <symbol> in SVG
+          unless found?
+            svg.appendChild tile.makeXML versions
+            if symbolIds.has tile.id
+              console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
+            else
+              symbolIds.add tile.id
+          tile
+    missing = ("'#{key}'" for key from missing)
+    if missing.length
+      console.warn "Failed to recognize tiles:", missing.join ', '
     ## Factor out duplicate inline <image>s into separate <symbol>s.
-    inlineImages = {}
-    inlineImageVersions = {}
+    inlineImages = new Map
+    inlineImageVersions = new Map
     domRecurse svg, (node, parent) =>
       return true unless node.nodeName == 'image'
       {href} = getHref node
@@ -993,19 +1017,20 @@ class Drawing extends Input
           "#{attr.name}=#{attr.value}"
       attributes.sort()
       attributes = attributes.join ' '
-      if attributes not of inlineImages
-        inlineImageVersions[filename] ?= 0
-        version = inlineImageVersions[filename]++
-        inlineImages[attributes] = "_image_#{escapeId filename}_v#{version}"
+      unless (id = inlineImages.get attributes)?
+        version = inlineImageVersions.get(filename) ? 0
+        inlineImageVersions.set filename, version + 1
+        id = "_image_#{escapeId filename}_v#{version}"
+        inlineImages.set attributes, id
         svg.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
-        symbol.setAttribute 'id', inlineImages[attributes]
+        symbol.setAttribute 'id', id
         # If we don't have width/height set from data-width/height fields,
         # we take the first used width/height as the defining height.
         node.setAttribute 'width', width or use.getAttribute 'width'
         node.setAttribute 'height', height or use.getAttribute 'height'
         symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
         symbol.appendChild node
-      use.setAttribute @hrefAttr(), '#' + inlineImages[attributes]
+      use.setAttribute @hrefAttr(), '#' + id
       false
     ## Lay out the symbols in the drawing via SVG <use>.
     viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
@@ -1013,46 +1038,46 @@ class Drawing extends Input
     y = 0
     colWidths = {}
     @coords = []
-    for row, i in @symbols
+    for row, i in @tiles
       @coords.push coordsRow = []
       rowHeight = 0
-      for symbol in row when not symbol.autoHeight
-        if symbol.height > rowHeight
-          rowHeight = symbol.height
+      for tile in row when not tile.autoHeight
+        if tile.height > rowHeight
+          rowHeight = tile.height
       x = 0
-      for symbol, j in row
+      for tile, j in row
         coordsRow.push {x, y}
-        continue unless symbol?
-        levels[symbol.zIndex] ?= []
-        levels[symbol.zIndex].push use = doc.createElementNS SVGNS, 'use'
-        use.setAttribute @hrefAttr(), '#' + symbol.id
+        continue unless tile?
+        levels[tile.zIndex] ?= []
+        levels[tile.zIndex].push use = doc.createElementNS SVGNS, 'use'
+        use.setAttribute @hrefAttr(), '#' + tile.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
         scaleX = scaleY = 1
-        if symbol.autoWidth
+        if tile.autoWidth
           colWidths[j] ?= Math.max 0, ...(
-            for row2 in @symbols when row2[j]? and not row2[j].autoWidth
+            for row2 in @tiles when row2[j]? and not row2[j].autoWidth
               row2[j].width
           )
-          scaleX = colWidths[j] / symbol.width unless symbol.width == 0
-          scaleY = scaleX unless symbol.autoHeight
-        if symbol.autoHeight
-          scaleY = rowHeight / symbol.height unless symbol.height == 0
-          scaleX = scaleY unless symbol.autoWidth
-        ## Scaling of symbol is relative to viewBox, so use that to define
+          scaleX = colWidths[j] / tile.width unless tile.width == 0
+          scaleY = scaleX unless tile.autoHeight
+        if tile.autoHeight
+          scaleY = rowHeight / tile.height unless tile.height == 0
+          scaleX = scaleY unless tile.autoWidth
+        ## Scaling of tile is relative to viewBox, so use that to define
         ## width and height attributes:
         use.setAttribute 'width',
-          (symbol.viewBox?[2] ? symbol.width) * scaleX
+          (tile.viewBox?[2] ? tile.width) * scaleX
         use.setAttribute 'height',
-          (symbol.viewBox?[3] ? symbol.height) * scaleY
-        if symbol.overflowBox?
-          dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
-          dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
+          (tile.viewBox?[3] ? tile.height) * scaleY
+        if tile.overflowBox?
+          dx = (tile.overflowBox[0] - tile.viewBox[0]) * scaleX
+          dy = (tile.overflowBox[1] - tile.viewBox[1]) * scaleY
           viewBox[0] = Math.min viewBox[0], x + dx
           viewBox[1] = Math.min viewBox[1], y + dy
-          viewBox[2] = Math.max viewBox[2], x + dx + symbol.overflowBox[2] * scaleX
-          viewBox[3] = Math.max viewBox[3], y + dy + symbol.overflowBox[3] * scaleY
-        x += symbol.width * scaleX
+          viewBox[2] = Math.max viewBox[2], x + dx + tile.overflowBox[2] * scaleX
+          viewBox[3] = Math.max viewBox[3], y + dy + tile.overflowBox[3] * scaleY
+        x += tile.width * scaleX
         viewBox[2] = Math.max viewBox[2], x
       y += rowHeight
       viewBox[3] = Math.max viewBox[3], y
@@ -1146,10 +1171,10 @@ class Drawing extends Input
         \\begin{picture}(#{@width},#{@height})%
           \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{relativeDir ? ''}#{basename}}}%
     """]
-    for row, i in @symbols
-      for symbol, j in row
+    for row, i in @tiles
+      for tile, j in row
         {x, y} = @coords[i][j]
-        for text in symbol.text
+        for text in tile.text
           tx = parseNum(text.getAttribute('x')) ? 0
           ty = parseNum(text.getAttribute('y')) ? 0
           content = (
@@ -1198,7 +1223,7 @@ class Drawing extends Input
       console.log ' &', filename, '(UNCHANGED)'
     filename
   shouldGenerate: (filename, ...depGroups) ->
-    return true if @settings.force
+    return true if @getSetting 'force'
     try
       modified = (fs.statSync filename).mtimeMs
     ## If file doesn't exist or can't be stat, need to generate it.
@@ -1216,7 +1241,7 @@ class Drawing extends Input
     false
 
 class ASCIIDrawing extends Drawing
-  @title: "ASCII drawing (one character per symbol)"
+  @title: "ASCII drawing (one character per tile)"
   parse: (data) ->
     @load(
       for line in splitIntoLines data
@@ -1236,7 +1261,7 @@ class DSVDrawing extends Drawing
       relax_column_count: true
 
 class SSVDrawing extends DSVDrawing
-  @title: "Space-delimiter drawing (one word per symbol)"
+  @title: "Space-delimiter drawing (one word per tile)"
   @delimiter: ' '
   parse: (data) ->
     ## Coallesce non-newline whitespace into single space
@@ -1255,12 +1280,10 @@ class Drawings extends Input
   load: (datas) ->
     @drawings =
       for data in datas
-        drawing = new Drawing
-        drawing.settings = @settings
-        drawing.filename = @filename
-        drawing.subname = data.subname
-        drawing.load data
-        drawing
+        new Drawing data,
+          settings: @settings
+          filename: @filename
+          subname: data.subname
   subfilename: (extension, drawing) ->
     filename2 = path.parse @filename
     filename2.base = filename2.base[...-filename2.ext.length]
@@ -1312,26 +1335,31 @@ class SVGFile extends DummyInput
   @skipRead: true  # svgink/Inkscape will do actual file reading
 
 class Context
-  constructor: (@drawing, @i, @j) ->
-    @symbols = @drawing.symbols
-    @filename = @drawing.filename
-    @subname = @drawing.subname
-    @symbol = @symbols[@i]?[@j]
-    @key = @symbol?.key
+  constructor: (@drawing, i, j) ->
+    ## Use @drawing to access these old properties:
+    #@data = @drawing.data
+    #@filename = @drawing.filename
+    #@subname = @drawing.subname
+    @move i, j if i? and j?
+  move: (@i, @j) ->
+    @key = @drawing.data[@i]?[@j]
   neighbor: (dj, di) ->
     new Context @drawing, @i + di, @j + dj
   includes: (...args) ->
-    @symbol? and @symbol.includes ...args
+    @key? and @key.includes ...args
   match: (...args) ->
-    @symbol? and @symbol.match ...args
+    @key? and @key.match ...args
   row: (di = 0) ->
     i = @i + di
-    for symbol, j in @symbols[i] ? []
+    for tile, j in @drawing.data[i] ? []
       new Context @drawing, i, j
   column: (dj = 0) ->
     j = @j + dj
-    for row, i in @symbols
+    for row, i in @drawing.data
       new Context @drawing, i, j
+Object.defineProperties Context.prototype,
+  filename: get: -> @drawing.filename
+  subname: get: -> @drawing.subname
 
 extensionMap =
   # Mappings
@@ -1373,7 +1401,7 @@ renderDOM = (mappings, elts, settings) ->
     settings = {...defaultSettings, useHref: true, ...settings}
     ## Override settings via data-* attributes.
     for key, value of elt.dataset
-      continue unless key of settings
+      continue unless settings.hasOwnProperty key
       if typeof settings[key] == 'boolean'
         switch value = setting key
           #when 'true', 'on', 'yes'
@@ -1431,9 +1459,9 @@ Optional arguments:
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
-                        Force all symbol tiles to have specified width
+                        Force all tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
-                        Force all symbol tiles to have specified height
+                        Force all tiles to have specified height
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
@@ -1448,14 +1476,15 @@ Filename arguments:  (mappings and styles before relevant drawings!)
     console.log "               #{klass.help}" if klass.help?
   console.log """
 
-SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
+TILE specifiers:  (omit the quotes in anything except .js and .coffee files)
 
   'filename.svg':   load SVG from specified file
   'filename.png':   include PNG image from specified file
   'filename.jpg':   include JPEG image from specified file
-  '<svg>...</svg>': raw SVG
+  '<svg>...</svg>' or '<symbol>...</symbol>': raw SVG string
+  <svg>...</svg> or <symbol>...</symbol>: SVG in JSX notation
   -> ...@key...:    function computing SVG, with `this` bound to Context with
-                    `key` (symbol name), `i` and `j` (y and x coordinates),
+                    `key` (tile name), `i` and `j` (y and x coordinates),
                     `filename` (drawing filename), `subname` (subsheet name),
                     and supporting `neighbor`/`includes`/`row`/`column` methods
 """
@@ -1578,7 +1607,7 @@ main = (args = process.argv[2..]) ->
     help()
 
 svgtiler = {
-  Symbol, StaticSymbol, DynamicSymbol, unrecognizedSymbol,
+  Tile, unrecognizedTile,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
@@ -1587,6 +1616,7 @@ svgtiler = {
   extensionMap, Input, DummyInput, Mappings, Context,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
+  static: wrapStatic,
   share: {}  # for shared data between mapping modules
   version: metadata.version
 }

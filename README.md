@@ -4,7 +4,7 @@
 where you draw ASCII art or spreadsheets and SVG Tiler automatically
 subsitutes each character or cell with a corresponding SVG symbol
 to make a big SVG figure
-(in an efficient representation that factors out repeated symbols),
+(in an efficient representation that factors out repeated tiles),
 and optionally converts it to PDF, PNG, and/or LaTeX for LaTeX text.
 Here are a few examples of generated figures;
 see [more examples below](#examples).
@@ -21,10 +21,10 @@ see [more examples below](#examples).
 - [Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods](#drawing-files-asc-ssv-csv-tsv-xlsx-xls-ods)
 - [Style Files: .css, .styl](#style-files-css-styl)
 - [Layout Algorithm](#layout-algorithm)
-- [z-index: Stacking Order of Symbols](#z-index-stacking-order-of-symbols)
+- [z-index: Stacking Order of Tiles](#z-index-stacking-order-of-tiles)
 - [Overflow and Bounding Box](#overflow-and-bounding-box)
-- [Autosizing Symbols](#autosizing-symbols)
-- [Unrecognized Symbols](#unrecognized-symbols)
+- [Autosizing Tiles](#autosizing-tiles)
+- [Unrecognized Tiles](#unrecognized-tiles)
 - [Automatic `<symbol>` Wrapping](#automatic-symbol-wrapping)
 - [`<image>` Processing](#image-processing)
 - [Converting SVG to PDF/PNG](#converting-svg-to-pdfpng)
@@ -43,17 +43,17 @@ see [more examples below](#examples).
 To use SVG Tiler, you combine at least two types of files
 (possibly multiple of each type):
 
-1. A **mapping file** specifies how to map symbol names (strings) to
+1. A **mapping file** specifies how to map tile names (strings) to
    SVG content (either embedded in the same file or in separate files).
    Mapping files can be specified in a simple ASCII format, or
    as a dynamic mapping defined by JavaScript or CoffeeScript code.
 
-2. A **drawing file** specifies a grid of symbol names (strings) which,
+2. A **drawing file** specifies a grid of tile names (strings) which,
    combined with one or more mapping files to define the SVG associated
-   with each symbol, compile to a single (tiled) SVG.
+   with each tile, compile to a single (tiled) SVG.
    Drawing files can be specified as
-   ASCII art (where each symbol is limited to a single character),
-   space-separated ASCII art (where symbols are separated by whitespace),
+   ASCII art (where each tile name is limited to a single character),
+   space-separated ASCII art (where tile names are separated by whitespace),
    standard CSV/TSV (comma/tab-separated) tabular formats, or
    standard multi-sheet spreadsheet formats XLSX/XLS/ODS
    supported by Google Sheets, OfficeOffice, and Excel.
@@ -144,7 +144,7 @@ into SVG drawings.
 
 ## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
 
-In the **.txt format** for mapping files, each line consists of a symbol name
+In the **.txt format** for mapping files, each line consists of a tile name
 (either having no spaces, or consisting entirely of a single space),
 followed by whitespace, followed by either a block of SVG code
 (such as `<symbol viewBox="...">...</symbol>`) or a filename containing
@@ -154,11 +154,11 @@ and both ` ` (space) and empty string to blank squares, all dimensioned
 
 ```svg
 O <symbol viewBox="0 0 50 50"><rect width="50" height="50"/></symbol>
-  <symbol viewBox="0 0 50 50"></symbol>
- <symbol viewBox="0 0 50 50"></symbol>
+  <symbol viewBox="0 0 50 50"/>
+ <symbol viewBox="0 0 50 50"/>
 ```
 
-Here is a mapping of the same symbols to external files:
+Here is a mapping of the same tiles to external files:
 
 ```
 O O.svg
@@ -170,68 +170,97 @@ In the **.js / .coffee / .jsx / .cjsx formats**, the file consists of
 JavaScript / CoffeeScript code that gets loaded as a NodeJS module.
 The code specifies a `mapping` in one of three ways:
 
-1. Writing a `mapping` expression at the end of the file (implicit export).
-2. `export default mapping` (ECMAScript modules style)
-3. `exports.default = mapping` (CommonJS modules style)
+1. `export default mapping` (ECMAScript modules style)
+2. `exports.default = mapping` (CommonJS modules style)
+3. Writing a `mapping` expression at the end of the file (implicit export).
 
-In any case, `mapping` should be an expression evaluating to either
+In any case, `mapping` should be one of the following types of **mapping**
+objects:
 
-1. an *object* whose keys are symbol names, or
-2. a *function* in one argument, a symbol name (string).
-   (This feature allows you to parse symbol names how you want; or check an
-    object for a matching key but use a default value otherwise; etc.).
+1. A plain **JavaScript object** whose properties map tile names to tiles
+   (e.g., `{O: tile1, ' ': tile2}`).
+2. A [**`Map` object**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
+   mapping tile names to tiles.
+3. A **function** taking two arguments &mdash; a tile name (string)
+   and a `Context` object &mdash; and returning a tile.
+   This feature allows you to parse tile names how you want, and to
+   vary the tile depending on the context (e.g., neighboring tile names
+   or parity of the tile location).
 
-The object or function should map a symbol name to either
+Each **tile** (property of JavaScript object, value of `Map` object,
+or return value of a function) should be specified as one of the following:
 
-1. a string of SVG code (detected by the presence of a `<` character),
-2. [Preact](https://preactjs.com/) (React-style) Virtual DOM elements, via
-   [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax
-   (or its [CoffeeScript analog](https://coffeescript.org/#jsx))
-   or via
+1. SVG written directly in
+   [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax, such as
+   `<symbol viewBox=`0 0 ${width} ${height}`>{parity ? child1 : child2}</symbol>`;
+   or its [CoffeeScript analog](https://coffeescript.org/#jsx), such as
+   `<symbol viewBox="0 0 #{width} #{height}">{if parity then child1 else child2}</symbol>`.
+   (See e.g. [the polyomino example](examples/polyomino).)
+2. [Preact](https://preactjs.com/) (React-style) Virtual DOM elements built via
    [`preact.h`](https://preactjs.com/guide/v10/api-reference/#h--createelement)
-   calls; see [the polyomino example](examples/polyomino).
-   Be careful not to modify Preact nodes, in case they get re-used; instead use
+   calls.  (This is what JSX notation actually gets converted into.)
+   Be careful not to modify Preact nodes, in case you re-use them; instead use
    [`preact.cloneElement`](https://preactjs.com/guide/v10/api-reference/#cloneelement)
    to make a modified copy (or before modification).
-3. a filename with `.svg` extension containing SVG code,
-4. a filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension containing an
-   image (which will get [processed](#image-processing) as an `<image>`), or
-5. a function returning one of the above.
+3. A string of raw SVG code (detected by the presence of a `<` character).
+4. A filename with `.svg` extension containing SVG code that gets inlined.
+5. A filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension containing an
+   image, which will get [processed](#image-processing) as an `<image>`.
+6. An empty string, short for the empty symbol `<symbol viewBox="0 0 0 0"/>`.
+7. `undefined` or `null`, indicating that this mapping doesn't define a tile
+   for this tile name (and the next mapping should be checked).
+8. Another mapping (JavaScript object, `Map` object, or function) that gets
+   recursively evaluated as described above (with the same tile name and
+   context).  For example, a top-level JavaScript object could map some tile
+   names to functions (when they need to be dynamic); or a top-level function
+   could return different mappings depending on context.
+9. One of the tiles above wrapped in a call to `svgtiler.static`, e.g.,
+   `svgtiler.static(<symbol/>)`.  This wrapper tells SVG Tiler that the tile
+   mapping is always the same for this tile name, and does not depend on
+   `Context` (e.g. adjacent tiles), enabling SVG Tiler to do more caching.
 
-In the last case, the function is called *for each occurrence of the symbol*,
-and has `this` bound to a manufactured `Context` object, giving you access to
-the following properties:
+Functions get called with a **`Context`** object as both a second argument and
+as `this` (if the function is defined via `function`;
+[`=>` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
+can't have `this` bound).
+The `Context` object has the following properties and methods:
 
-* `this.key` is the symbol name, or `null` if the `Context` is out of bounds
-  of the drawing.
-* `this.includes(substring)` computes whether `this.key` contains the given
-  `substring` (a shortcut for `this.key.includes(substring)` in ECMAScript 2015,
-  but handling the case when `this.key` is `null`).
-* `this.match(regex)` matches `this.key` against the given regular
-  expression (a shortcut for `this.key.match(regex)`,
-  but handling the case when `this.key` is `null`).
-* `this.i` is the row number of the cell of this symbol occurrence (starting
-  at 0).
-* `this.j` is the column number of the cell of this symbol occurrence
-  (starting at 0).
-* `this.neighbor(dj, di)` returns a new `Context` for row `i + di` and
+* `context.key` is the tile name, or `null` if the `Context` is out of bounds
+  of the drawing.  (This can't happen in the initial call, but can happen
+  when you call `context.neighbor`.)
+* `context.includes(substring)` computes whether `context.key` contains the
+  given `substring` (a shortcut for `this.key.includes(substring)` in
+  ECMAScript 2015, but handling the case when `this.key` is `null`).
+* `context.match(regex)` matches `context.key` against the given regular
+  expression (a shortcut for `context.key.match(regex)`,
+  but handling the case when `context.key` is `null`).
+* `context.i` is the row number of the cell of this tile (starting at 0).
+* `context.j` is the column number of the cell of this tile (starting at 0).
+* `context.neighbor(dj, di)` returns a new `Context` for row `i + di` and
   column `j + dj`.  (Note the reversal of coordinates, so that the order
   passed to `neighbor` corresponds to *x* then *y* coordinate.)
-  If there is no symbol at that position, you will still get a `Context`
-  whose `key` value is `null` and whose `includes()` and `match()`
-  always return `false`.
-* In particular, it's really useful to call e.g.
-  `this.neighbor(1, 0).includes('-')` to check for adjacent symbols that
-  change how this symbol should be rendered.
-* `this.row(di = 0)` returns an array of `Context` objects, one for each
-  symbol in row `i + di` (in particular, including `this` if `di` is the
-  default of `0`).  For example, you can use the `some` or `every` methods
-  on this array to do bulk tests on the row.
-* `this.column(dj = 0)` returns an array of `Context` objects, one for each
-  symbol in column `j + dj`.
-* `this.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
-* `this.subname` is the name of the sheet within the spreadsheet drawing input,
-  or `undefined` if the input format does allow multiple sheets.
+  If there is no tile at that position, you will still get a `Context` object
+  but its `key` value will be `null` and `includes()` and `match()`
+  will always return `false`.
+* In particular, it's useful to call e.g.
+  `context.neighbor(1, 0).includes('-')` to check for adjacent tiles that
+  change how this tile should be rendered.
+* `context.row(di = 0)` returns an array of `Context` objects, one for each
+  tile in row `i + di` (in particular, including `context` if `di` is the
+  default of `0`).  For example, you can use the
+  [`some`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+  or
+  [`every`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+  method on this array to do bulk tests on the row.
+* `context.column(dj = 0)` returns an array of `Context` objects, one for each
+  tile in column `j + dj`.
+* `context.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
+* `context.subname` is the name of the sheet within the spreadsheet drawing input,
+  or `undefined` if the drawing input format does allow multiple sheets.
+* You can also add extra data to the main `context` object given to the
+  function, and it will be shared among all calls to all mapping/tile
+  functions within the same drawing (but not between separate drawings).
+  This can be useful for drawing-specific state.
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
 .js and .coffee files can access `__dirname` and `__filename`,
@@ -247,7 +276,7 @@ to import local modules or files relative to the mapping file.
 
 * In particular, you can share .js/.coffee code or .json config files
   among mapping files.
-* If you `import`/`require` a filename with `.svg` extension, you obtain an
+* If you `import`/`require` a filename with `.svg` extension, you obtain a
   Preact Virtual DOM object `svg` representing the SVG file, which you can
   include in a JSX template via `{svg}`.
   You can also easily manipulate the SVG before inclusion.
@@ -269,8 +298,8 @@ to import local modules or files relative to the mapping file.
 ## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
 
 The **.asc format** for drawing files represents traditional ASCII art:
-each non-newline character represents a one-character symbol name.
-For example, here is a simple 5 &times; 5 ASCII drawing using symbols
+each non-newline character represents a one-character tile name.
+For example, here is a simple 5 &times; 5 ASCII drawing using tiles
 `O` and ` `&nbsp;(space):
 
 ```
@@ -289,22 +318,22 @@ See [an example with Unicode](examples/unicode).
 
 The **.ssv, .csv, and .tsv formats** use
 [delimiter-separated values (DSV)](https://en.wikipedia.org/wiki/Delimiter-separated_values)
-to specify an array of symbol names.  In particular,
+to specify an array of tile names.  In particular,
 [.csv (comma-separated)](https://en.wikipedia.org/wiki/Comma-separated_values)
 and
 [.tsv (tab-separated)](https://en.wikipedia.org/wiki/Tab-separated_values)
 formats are exactly those exported by spreadsheet software such as
 Google Drive, OpenOffice, or Excel, enabling you to draw in that software.
-The .ssv format is similar, but where the delimiter between symbol names
+The .ssv format is similar, but where the delimiter between tile names
 is arbitrary whitespace.
 (Contrast this behavior with .csv which treats every comma as a delimiter.)
 This format is nice to work with in a text editor, allowing you to line up
-the columns by padding symbol names with extra spaces.
+the columns by padding tile names with extra spaces.
 All three formats support quoting according to the usual DSV rules:
-any symbol name (in particular, if it has a delimiter or double quote in it)
+any tile name (in particular, if it has a delimiter or double quote in it)
 can be put in double quotes, and double quotes can be produced in the
-symbol name by putting `""` (two double quotes) within the quoted string.
-Thus, the one-character symbol name `"` would be represented by `""""`.
+tile name by putting `""` (two double quotes) within the quoted string.
+Thus, the one-character tile name `"` would be represented by `""""`.
 
 The **.xlsx, .xlsm, .xlsb, .xls** (Microsoft Excel),
 **.ods, .fods** (OpenDocument), **.dif** (Data Interchange Format),
@@ -343,11 +372,11 @@ See the [animation example](examples/anim) for sample usage of a .css or
 ## Layout Algorithm
 
 Given one or more mapping files and a drawing file, SVG Tiler follows a fairly
-simple layout algorithm to place the SVG expansions of the symbols into a
-single SVG output.  Each symbol has a bounding box, either specified by
-the `viewBox` of the root element, or
+simple layout algorithm to place the SVG expansions of the tiles into a
+single SVG output.  Each tile has a bounding box, either specified by
+the `viewBox` of the root `<symbol>` or `<svg>` element, or
 [automatically computed](#automatic-symbol-wrapping).
-The algorithm places symbols in a single row to align their top edges,
+The algorithm places tiles in a single row to align their top edges,
 with no horizontal space between them.
 The algorithm places rows to align their left edges so that the rows' bounding
 boxes touch, with the bottom of one row's bounding box equalling the top of
@@ -356,25 +385,25 @@ the next row's bounding box.
 This layout algorithm works well if each row has a uniform height and each
 column has a uniform width, even if different rows have different heights
 and different columns have different widths.  But it probably isn't what you
-want if symbols have wildly differing widths or heights, so you should set
+want if tiles have wildly differing widths or heights, so you should set
 your `viewBox`es accordingly.
 
-Each unique symbol gets defined just once (via SVG's
+Each unique tile gets defined just once (via SVG's
 [`<symbol>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol))
 and then instantiated (via SVG's
 [`<use>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use))
 many times, resulting in relatively small and efficient SVG outputs.
 
-## z-index: Stacking Order of Symbols
+## z-index: Stacking Order of Tiles
 
-Often it is helpful to render some tile symbols on top of others.
+Often it is helpful to render some tiles on top of others.
 Although [SVG](https://www.w3.org/TR/SVG2/) does not support a `z-index`
 property, there was
 [a proposal](https://www.w3.org/TR/2016/CR-SVG2-20160915/render.html#ZIndexProperty)
 which SVG Tiler supports *at the `<symbol>` level*, emulated by
 re-ordering tile rendering order to simulate the specified z order.
-For example, `<symbol viewBox="0 0 10 10" z-index="2">...</symbol>`
-will be rendered on top of (later than) all symbols without a
+For example, the tile `<symbol viewBox="0 0 10 10" z-index="2">...</symbol>`
+will be rendered on top of (later than) all tiles without a
 `z-index="..."` specification (which default to a z-index of 0).
 You can use a `z-index="..."` property or an HTML-style
 `style="z-index: ..."` property.
@@ -394,19 +423,20 @@ When `overflow` is `visible`, `viewBox` still represents the size of the
 element in the [grid layout](#layout-algorithm),
 but allows the element's actual bounding box to be something else.
 To correctly set the bounding box of the overall SVG drawing, SVG Tiler
-defines an additional symbol attribute called `overflowBox`, which is like
+defines an additional `<symbol>` attribute called `overflowBox`, which is like
 `viewBox` but for specifying the actual bounding box of the content
 (when they differ &mdash; `overflowBox` defaults to the value of `viewBox`).
 The `viewBox` of the overall SVG is set to the minimum rectangle
-containing all symbols' `overflowBox`s.
+containing all tiles' `overflowBox`s.
 
-For example, `<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" overflow="visible">...</symbol>`
-defines a symbol that gets laid out as if it occupies the [0, 10] &times;
-[0, 10] square, but the symbol can draw outside that square, and the overall
-drawing bounding box will be set as if the symbol occupies the
+For example,
+`<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" overflow="visible">...</symbol>`
+defines a tile that gets laid out as if it occupies the [0, 10] &times;
+[0, 10] square, but the tile can draw outside that square, and the overall
+drawing bounding box will be set as if the tile occupies the
 [&minus;5, 15] &times; [&minus;5, 15] square.
 
-Even zero-width and zero-height symbols will get rendered (unless
+Even zero-width and zero-height `<symbol>`s will get rendered (unless
 `overflow="hidden"`).  This can be useful for drawing grid
 outlines without affecting the overall grid layout, for example.
 (SVG defines that [symbols are invisible if they have zero width or
@@ -414,32 +444,32 @@ height](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox),
 so SVG Tiler automatically works around this by using slightly positive
 widths and heights in the output `viewBox`.)
 
-## Autosizing Symbols
+## Autosizing Tiles
 
-As a special non-SVG feature, symbols can specify `width="auto"` and/or
+As a special non-SVG feature, `<symbol>`s can specify `width="auto"` and/or
 `height="auto"` to make their instantiated width and/or height match their
 column and/or row, respectively.
 In this way, multiple uses of the same symbol can appear as different sizes.
 See the [auto sizing example](examples/auto).
 
 If you want to nonuniformly scale the tile, you may want to also adjust
-the symbol's [`preserveAspectRatio`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
+the `<symbol>`'s [`preserveAspectRatio`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
 
-## Unrecognized Symbols
+## Unrecognized Tiles
 
-Any undefined symbol displays as a red-on-yellow diamond question mark
+Any undefined tile displays as a red-on-yellow diamond question mark
 (like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
 with automatic width and height, so that it is easy to spot.
 See the [auto sizing example](examples/auto).
 
 ## Automatic `<symbol>` Wrapping
 
-In limited cases, you can avoid wrapping your symbol definitions in
+In limited cases, you can avoid wrapping your tile definitions in
 `<symbol>` tags, or avoid specifying the `viewBox` of the `<symbol>` tag.
 In this case, SVG Tiler attempts to set the `viewBox` to the bounding box of
 the SVG elements in the symbol.
 For example, the SVG `<rect x="-5" y="-5" width="10" height="10"/>`
-will automatically get wrapped by `<symbol viewBox="-5 -5 10 10">`.
+will automatically get wrapped by `<symbol viewBox="-5 -5 10 10">...</symbol>`.
 However, the current computation has many limitations (see the code for
 details), so it is recommended to specify your own `viewBox`, especially to
 control the layout bounding box which may different from the contents'
