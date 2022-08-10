@@ -1,7 +1,3 @@
-`#!/usr/bin/env -S node --enable-source-maps
-(function() {
-`
-
 unless window?
   path = require 'path'
   fs = require 'fs'
@@ -1616,5 +1612,3 @@ if module? and require?.main == module and not window?
   require('module').Module._initPaths()
 
   main()
-
-`}).call(this)`

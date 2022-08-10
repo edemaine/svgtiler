@@ -21,11 +21,11 @@
   },
   "main": "lib/svgtiler.js",
   "bin": {
-    "svgtiler": "lib/svgtiler.js"
+    "svgtiler": "cli.js"
   },
   "preferGlobal": true,
   "scripts": {
-    "prepare": "coffee --no-header --bare -o lib -c src/svgtiler.coffee",
+    "prepare": "coffee -o lib -c src/svgtiler.coffee",
     "test": "make test"
   },
   "dependencies": {
