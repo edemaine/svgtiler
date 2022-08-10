@@ -218,7 +218,8 @@ the following properties:
   column `j + dj`.  (Note the reversal of coordinates, so that the order
   passed to `neighbor` corresponds to *x* then *y* coordinate.)
   If there is no symbol at that position, you will still get a `Context`
-  whose `key` value is `null` and whose `includes()` always returns `false`.
+  whose `key` value is `null` and whose `includes()` and `match()`
+  always return `false`.
 * In particular, it's really useful to call e.g.
   `this.neighbor(1, 0).includes('-')` to check for adjacent symbols that
   change how this symbol should be rendered.
