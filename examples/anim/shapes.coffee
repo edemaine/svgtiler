@@ -25,7 +25,8 @@ export shapes =
 
 (key) ->
   [shape, classes...] = key.split /\s+/
-  attrs = class: classes.join ' '
-  # SVG parser complains about empty class attribute
-  delete attrs.class unless attrs.class
-  shapes[shape] attrs
+  attrs = class: classes.join(' ') or undefined
+    # `or undefined` needed or SVG parser complains about empty class attribute
+  ## `svgtiler.static` wrapper indicates that symbol depends only on key,
+  ## not any other context in the drawing.
+  svgtiler.static shapes[shape] attrs
