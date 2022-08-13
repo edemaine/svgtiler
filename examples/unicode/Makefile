@@ -1,2 +1,2 @@
 all:
-	svgtiler maze.txt maze.asc
+	svgtiler -f maze.txt maze.asc

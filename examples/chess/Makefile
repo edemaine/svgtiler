@@ -1,5 +1,5 @@
 all: coffee js
 coffee:
-	svgtiler map.coffee *.asc
+	svgtiler -f map.coffee *.asc
 js:
-	svgtiler map.js *.asc
+	svgtiler -f map.js *.asc

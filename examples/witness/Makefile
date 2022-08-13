@@ -1,4 +1,4 @@
 svg:
-	svgtiler witness.coffee *.ssv *.asc
+	svgtiler -f witness.coffee *.ssv *.asc
 pdf:
-	svgtiler -p witness.coffee *.ssv *.asc
+	svgtiler -f -p witness.coffee *.ssv *.asc

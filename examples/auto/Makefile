@@ -1,2 +1,2 @@
 all:
-	svgtiler auto.txt grid.asc
+	svgtiler -f auto.txt grid.asc

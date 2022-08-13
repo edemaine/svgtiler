@@ -1,6 +1,6 @@
 cjsx:
-	svgtiler outlines.cjsx *.asc
+	svgtiler -f outlines.cjsx *.asc
 jsx:
-	svgtiler outlines.jsx *.asc
+	svgtiler -f outlines.jsx *.asc
 coffee:
-	svgtiler outlines.coffee *.asc
+	svgtiler -f outlines.coffee *.asc
