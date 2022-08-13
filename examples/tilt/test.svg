@@ -7,9 +7,6 @@
   <symbol id="_blank" overflow="visible">
     <g/>
   </symbol>
-  <symbol id="_20" overflow="visible">
-    <g/>
-  </symbol>
   <symbol id="O" overflow="visible" viewBox="0 0 50 50">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
@@ -19,6 +16,6 @@
   </symbol>
   <use xlink:href="#X" x="0" y="0" width="50" height="50"/>
   <use xlink:href="#_blank" x="50" y="0" width="50" height="50"/>
-  <use xlink:href="#_20" x="100" y="0" width="50" height="50"/>
+  <use xlink:href="#_blank" x="100" y="0" width="50" height="50"/>
   <use xlink:href="#O" x="150" y="0" width="50" height="50"/>
 </svg>

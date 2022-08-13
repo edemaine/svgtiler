@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 4450 3950" width="4450" height="3950" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="_20" overflow="visible">
+    <g/>
+  </symbol>
   <symbol id="_30" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">0</text>
   </symbol>
@@ -9,9 +12,6 @@
   </symbol>
   <symbol id="_32" overflow="visible">
     <text x="25" y="35" fill="black" style="font-size: 30" text-anchor="middle">2</text>
-  </symbol>
-  <symbol id="_20" overflow="visible">
-    <g/>
   </symbol>
   <symbol id="X" overflow="visible" viewBox="0 0 50 50">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
