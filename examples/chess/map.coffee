@@ -7,7 +7,7 @@ read = (filename) ->
   console.assert dom.type == 'svg'
   dom.props.children
 
-(key) -> ->
+(key) ->
   # Map blanks to empty string
   key = key.trim()
   key = '' if key == '.'

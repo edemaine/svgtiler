@@ -1,3 +1,4 @@
+all: cjsx jsx coffee
 cjsx:
 	svgtiler -f outlines.cjsx *.asc
 jsx:

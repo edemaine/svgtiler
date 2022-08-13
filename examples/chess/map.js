@@ -8,7 +8,7 @@ function read(filename) {
   return dom.props.children;
 }
 
-(key) => function() {
+(key, context) => {
   // Map blanks to empty string
   key = key.trim();
   if (key === '.') key = '';
@@ -16,7 +16,7 @@ function read(filename) {
   return (
     <symbol viewBox="0 0 45 45">
       <rect width="45" height="45" fill="white" stroke="white"/>
-      {(this.i + this.j) % 2 === 0 ? light : dark}
+      {(context.i + context.j) % 2 === 0 ? light : dark}
       {key.trim() && key !== '.' &&
        read(`./Chess_${piece}${piece === key ? "d" : "l"}t45.svg`)
       }

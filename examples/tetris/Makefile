@@ -1,4 +1,5 @@
-all:
+all: txt coffee
+txt:
 	svgtiler -f -P NES_level7.txt example.asc
 coffee:
 	svgtiler -f -P NES_level7.coffee example.asc
