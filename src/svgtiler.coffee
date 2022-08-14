@@ -946,7 +946,7 @@ class Drawing extends Input
     ###
     Main rendering engine, returning an xmldom object for the whole document.
     Also saves the table of tiles in `@tiles`, the corresponding
-    coordinates in `@coords`, and overall `@weight` and `@height`,
+    coordinates in `@coords`, and overall `@width` and `@height`,
     for use by `renderTeX`.
     ###
     doc = domImplementation.createDocument SVGNS, 'svg'
