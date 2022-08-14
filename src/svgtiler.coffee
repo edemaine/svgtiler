@@ -252,6 +252,16 @@ attributeOrStyle = (node, attr, styleKey = attr) ->
     if style
       match = ///(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)///i.exec style
       match?[1]
+removeAttributeOrStyle = (node, attr, styleKey = attr) ->
+  node.removeAttribute attr
+  style = node.getAttribute 'style'
+  return unless style?
+  newStyle = style.replace ///(?:^|;)\s*#{styleKey}\s*:\s*([^;\s][^;]*)///i, ''
+  if style != newStyle
+    if newStyle.trim()
+      node.setAttribute 'style', newStyle
+    else
+      node.removeAttribute 'style'
 
 getHref = (node) ->
   for key in ['xlink:href', 'href']
@@ -270,7 +280,7 @@ extractZIndex = (node) ->
   ## a z-index="..." attribute.  Check for this first.
   ## 2. Look for style="z-index:..." as in HTML.
   z = parseInt attributeOrStyle node, 'z-index'
-  node.removeAttribute 'z-index'
+  removeAttributeOrStyle node, 'z-index'
   if isNaN z
     0
   else
