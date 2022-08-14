@@ -689,8 +689,8 @@ class Mapping extends Input
       console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
       @data = null
   lookup: (key, context) ->
-    ## Coerce `key` to string.  Sometimes get a number, e.g., from XLSX.
-    key = String key
+    ## `key` must be a String (should already be coerced by `Drawing::load`).
+    #key = String key
     ## Check cache (used for static tiles).
     if (found = @cache.get key)?
       return found
@@ -888,10 +888,10 @@ writeOrTouch = (filename, data) ->
 class Drawing extends Input
   hrefAttr: -> hrefAttr @settings
   load: (data) ->
-    ## Turn strings into arrays
+    ## Turn strings into arrays, and turn numbers (e.g. from XLSX) into strings.
     data = for row in data
              for cell in row
-               cell
+               String cell
     unless @getSetting 'keepMargins'
       ## Top margin
       while data.length > 0 and allBlank data[0]
