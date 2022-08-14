@@ -10,7 +10,7 @@
 ## Mapping
 
 * [CoffeeScript mapping file](map.coffee) and equivalent
-  [JavaScript mapping file](map.js), illustrating:
+  [JavaScript mapping file](map.jsx), illustrating:
   * Computing the square parity to automatically shade dark squares
   * Using `require` to load and modify external SVG files
     (strip off unnecessary `<svg>` wrapper)
