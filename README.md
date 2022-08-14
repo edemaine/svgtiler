@@ -236,12 +236,17 @@ The `Context` object has the following properties and methods:
   but handling the case when `context.key` is `null`).
 * `context.i` is the row number of the cell of this tile (starting at 0).
 * `context.j` is the column number of the cell of this tile (starting at 0).
-* `context.neighbor(dj, di)` returns a new `Context` for row `i + di` and
-  column `j + dj`.  (Note the reversal of coordinates, so that the order
-  passed to `neighbor` corresponds to *x* then *y* coordinate.)
+* `context.neighbor(dj, di)` returns a new `Context` for row `context.i + di`
+  and column `context.j + dj` (for relative neighbors).
+  (Note the reversal of coordinates, so that the order passed to `neighbor`
+  corresponds to *x* then *y* coordinate.)
   If there is no tile at that position, you will still get a `Context` object
   but its `key` value will be `null` and `includes()` and `match()`
   will always return `false`.
+* `context.at(j, i)` returns a new `Context` for row `j` and column `i`
+  (absolute coordinates).
+  (Note again the reversal of coordinates to correspond to *x* before *y*.)
+  Negative numbers count backward from the last row or column.
 * In particular, it's useful to call e.g.
   `context.neighbor(1, 0).includes('-')` to check for adjacent tiles that
   change how this tile should be rendered.

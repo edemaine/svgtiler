@@ -1353,6 +1353,12 @@ class Context
     @move i, j if i? and j?
   move: (@i, @j) ->
     @key = @drawing.data[@i]?[@j]
+  at: (j, i) ->
+    if i < 0
+      i += @drawing.data.length
+    if j < 0
+      j += @drawing.data[i]?.length ? 0
+    new Context @drawing, i, j
   neighbor: (dj, di) ->
     new Context @drawing, @i + di, @j + dj
   includes: (...args) ->
