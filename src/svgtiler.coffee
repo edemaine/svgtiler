@@ -117,6 +117,9 @@ defaultSettings =
   filename: 'drawing.asc'  # default filename when not otherwise specified
   keepParent: false
   keepClass: false
+  ## Major state
+  mappings: null  # should be Mappings instance
+  styles: null  # should be Styles instance
 
 getSetting = (settings, key) ->
   settings?[key] ? defaultSettings[key]
@@ -426,7 +429,9 @@ class Tile extends HasSettings
     ## and the next replace rule).
     @svg = removeSVGComments @svg
 
-  makeXML: (versions) ->
+  setId: (@id) ->
+    @xml.setAttribute 'id', @id if @xml?
+  makeXML: ->
     return @xml if @xml?
     @makeSVG()
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
@@ -462,7 +467,7 @@ class Tile extends HasSettings
     ## Wrap XML in <symbol> if not already.
     symbol = @xml.createElementNS SVGNS, 'symbol'
     ## Force `id` to be first attribute.
-    symbol.setAttribute 'id', @makeId versions
+    symbol.setAttribute 'id', @id if @id?
     # Avoid a layer of indirection for <symbol>/<svg> at top level
     if @xml.documentElement.nodeName in ['symbol', 'svg'] and
        not @xml.documentElement.nextSibling?
@@ -488,8 +493,9 @@ class Tile extends HasSettings
         but supports a CSS3 (or SVG) specification of
         "image-rendering:pixelated".  Combining these seems to work everywhere.
         ###
-        rendering = attributeOrStyle node, 'image-rendering'
-        if not rendering? or rendering in ['optimizeSpeed', 'pixelated']
+        imageRendering = attributeOrStyle node, 'image-rendering'
+        if not imageRendering? or
+           imageRendering in ['optimizeSpeed', 'pixelated']
           node.setAttribute 'image-rendering', 'optimizeSpeed'
           style = node.getAttribute('style') ? ''
           style = style.replace /(^|;)\s*image-rendering\s*:\s*\w+\s*($|;)/,
@@ -598,19 +604,6 @@ class Tile extends HasSettings
           true
     @xml
 
-  makeId: (versions) ->
-    return @id if @id?
-    escaped = escapeId @key
-    if @isStatic
-      @id = escaped
-    else
-      version = versions.get(@key) ? 0
-      versions.set @key, version + 1
-      if version
-        @id = "#{escaped}_v#{version}"
-      else
-        @id = escaped
-
 ## Tile to fall back to when encountering an unrecognized key.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
 ## by Amit6, released into the public domain.
@@ -663,6 +656,19 @@ class Input extends HasSettings
         modified = (fs.statSync dep).mtimeMs
       continue unless modified?
       @modified = Math.max @modified, modified
+  filenameSeparator: '_'
+  generateFilename: (ext, filename = @filename, subname = @subname) ->
+    filename = path.parse filename
+    delete filename.base
+    if subname
+      filename.name += (@filenameSeparator ? '') + subname
+    if filename.ext == ext
+      filename.ext += ext
+    else
+      filename.ext = ext
+    if (outputDir = @getOutputDir ext)?
+      filename.dir = outputDir
+    path.format filename
 
 class Style extends Input
   load: (@css) ->
@@ -679,12 +685,41 @@ class StylusStyle extends Style
       filename: @filename
     @load styl.render()
 
-class Styles
-  constructor: (@styles = []) ->
-  push: (map) ->
-    @styles.push map
-  values: ->
-    @styles.values()
+class ArrayWrapper extends Array
+  ###
+  Array-like object (indeed, Array subclass) where each item in the array
+  is supposed to be of a fixed class, given by the `@itemClass` class attribute.
+  For example, `Styles` is like an array of `Style`s; and
+  `Mappings` is like an array of `Mapping`s.
+  ###
+  @from: (data) ->
+    ###
+    Enforce `data` to be `ArrayWrapper` (sub)class.
+    Supported formats:
+      * `ArrayWrapper` (do nothing)
+      * `@itemClass` (wrap in singleton)
+      * raw data to pass to `new @itemClass`
+      * `Array` of `@itemClass`
+      * `Array` of raw data to pass to `new @itemClass`
+      * `Array` of a mixture
+      * `undefined`/`null` (empty)
+    ###
+    if data instanceof @
+      data
+    else if data?
+      data = [data] unless Array.isArray data
+      new @ ...(
+        for item in data when item?
+          if item instanceof @itemClass
+            item
+          else
+            new @itemClass item
+      )
+    else
+      new @
+
+class Styles extends ArrayWrapper
+  @itemClass: Style
 
 class Mapping extends Input
   constructor: (...args) ->
@@ -831,27 +866,14 @@ class CoffeeMapping extends JSMapping
         filename: @filename
         sourceFiles: [@filename]
 
-class Mappings
-  constructor: (@maps = []) ->
-  @from: (data) ->
-    if data instanceof Mappings
-      data
-    else if data instanceof Mapping
-      new Mappings [data]
-    else if Array.isArray data
-      new Mappings data
-    else
-      throw new SVGTilerError "Could not convert into Mapping(s): #{data}"
-  push: (map) ->
-    @maps.push map
+class Mappings extends ArrayWrapper
+  @itemClass: Mapping
   lookup: (key, context) ->
-    return unless @maps.length
-    for i in [@maps.length-1..0]
-      value = @maps[i].lookup key, context
+    return unless @length
+    for i in [@length-1..0]
+      value = @[i].lookup key, context
       return value if value?
     undefined
-  values: ->
-    @maps.values()
 
 blankCells = new Set [
   ''
@@ -896,7 +918,6 @@ writeOrTouch = (filename, data) ->
 ###
 
 class Drawing extends Input
-  hrefAttr: -> hrefAttr @settings
   load: (data) ->
     ## Turn strings into arrays, and turn numbers (e.g. from XLSX) into strings.
     data = for row in data
@@ -922,53 +943,141 @@ class Drawing extends Input
               row.pop()
           j--
     @data = data
-  writeSVG: (mappings, styles, filename) ->
-    ## Generates SVG and writes to filename.
-    ## Default filename is the input filename with extension replaced by .svg.
-    ## Returns generated .svg filename (even if it didn't changed).
-    unless filename?
-      filename = path.parse @filename
-      if filename.ext == '.svg'
-        filename.base += '.svg'
-      else
-        filename.base = filename.base[...-filename.ext.length] + '.svg'
-      if (outputDir = @getOutputDir '.svg')?
-        filename.dir = outputDir
-      filename = path.format filename
-    unless @shouldGenerate filename, mappings, styles
-      console.log '->', filename, '(SKIPPED)'
-    else if maybeWrite filename, @renderSVG mappings, styles
-      console.log '->', filename
-    else
-      console.log '->', filename, '(UNCHANGED)'
+  renderDOM: (settings = @settings) ->
+    new Render @, settings
+    .makeDOM()
+  render: (settings = @settings) ->
+    ## Writes SVG and optionally TeX file.
+    ## Returns output SVG filename.
+    r = new Render @, settings
+    filename = r.writeSVG()
+    r.writeTeX() if getSetting settings, 'texText'
     filename
-  renderSVGDOM: (mappings, styles) ->
+
+class ASCIIDrawing extends Drawing
+  @title: "ASCII drawing (one character per tile)"
+  parse: (data) ->
+    @load(
+      for line in splitIntoLines data
+        graphemeSplitter.splitGraphemes line
+    )
+
+class DSVDrawing extends Drawing
+  parse: (data) ->
+    ## Remove trailing newline / final blank line.
+    if data[-2..] == '\r\n'
+      data = data[...-2]
+    else if data[-1..] in ['\r', '\n']
+      data = data[...-1]
+    ## CSV parser.
+    @load require('csv-parse/sync').parse data,
+      delimiter: @constructor.delimiter
+      relax_column_count: true
+
+class SSVDrawing extends DSVDrawing
+  @title: "Space-delimiter drawing (one word per tile)"
+  @delimiter: ' '
+  parse: (data) ->
+    ## Coallesce non-newline whitespace into single space
+    super data.replace /[ \t\f\v]+/g, ' '
+
+class CSVDrawing extends DSVDrawing
+  @title: "Comma-separated drawing (spreadsheet export)"
+  @delimiter: ','
+
+class TSVDrawing extends DSVDrawing
+  @title: "Tab-separated drawing (spreadsheet export)"
+  @delimiter: '\t'
+
+class Drawings extends Input
+  load: (datas) ->
+    @drawings =
+      for data in datas
+        new Drawing data,
+          settings: @settings
+          filename: @filename
+          subname: data.subname
+  render: (settings = @settings) ->
+    ## Writes SVG and optionally TeX files.
+    ## Returns array of output SVG filenames.
+    for drawing in @drawings
+      drawing.render settings
+
+class XLSXDrawings extends Drawings
+  @encoding: 'binary'
+  @title: "Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)"
+  parse: (data) ->
+    xlsx = require 'xlsx'
+    workbook = xlsx.read data, type: 'binary'
+    ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
+    @load (
+      for sheetInfo in workbook.Workbook.Sheets
+        subname = sheetInfo.name
+        sheet = workbook.Sheets[subname]
+        ## 0 = Visible, 1 = Hidden, 2 = Very Hidden
+        ## https://sheetjs.gitbooks.io/docs/#sheet-visibility
+        if sheetInfo.Hidden and not @getSetting 'keepHidden'
+          continue
+        if subname.length == 31
+          console.warn "Warning: Sheet '#{subname}' has length exactly 31, which may be caused by Google Sheets export truncation"
+        rows = xlsx.utils.sheet_to_json sheet,
+          header: 1
+          defval: ''
+        rows.subname = subname
+        rows
+    )
+
+class DummyInput extends Input
+  parse: ->
+
+class SVGFile extends DummyInput
+  @title: "SVG file (convert to PDF/PNG without any tiling)"
+  @skipRead: true  # svgink/Inkscape will do actual file reading
+
+class Render extends HasSettings
+  constructor: (@drawing, @settings) ->
+    super()
+    @settings ?= @drawing.settings
+    @idVersions = new Map
+    @mappings = Mappings.from @getSetting 'mappings'
+    @styles = Styles.from @getSetting 'styles'
+  hrefAttr: -> hrefAttr @settings
+  id: (key) ->
+    ## Generate unique ID starting with an escaped version of `key`.
+    ## If necessary, appends _v0, _v1, _v2, etc. to make unique.
+    escaped = escapeId key
+    version = @idVersions.get(key) ? 0
+    @idVersions.set key, version + 1
+    if version
+      "#{escaped}_v#{version}"
+    else
+      escaped
+  makeDOM: ->
     ###
     Main rendering engine, returning an xmldom object for the whole document.
     Also saves the table of tiles in `@tiles`, the corresponding
     coordinates in `@coords`, and overall `@width` and `@height`,
-    for use by `renderTeX`.
+    for use by `makeTeX`.
     ###
-    doc = domImplementation.createDocument SVGNS, 'svg'
-    svg = doc.documentElement
+    @dom = domImplementation.createDocument SVGNS, 'svg'
+    svg = @dom.documentElement
     svg.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
     svg.setAttribute 'version', '1.1'
-    #svg.appendChild defs = doc.createElementNS SVGNS, 'defs'
+    #svg.appendChild defs = @dom.createElementNS SVGNS, 'defs'
     ## <style> tags for CSS
-    for style in styles?.styles ? []
-      svg.appendChild styleTag = doc.createElementNS SVGNS, 'style'
+    for style in @styles
+      svg.appendChild styleTag = @dom.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
     ## Render all tiles in the drawing.
     missing = new Set
     cache = new Map
-    versions = new Map
     symbolIds = new Set
     context = new Context @
     @tiles =
-      for row, i in @data
+      for row, i in @drawing.data
         for key, j in row
           context.move i, j
-          tile = mappings.lookup key, context
+          tile = @mappings.lookup key, context
           if tile?
             ## Check cache by tile value if it's a string (e.g. filename,
             ## to avoid loading file again), and by computed SVG string
@@ -991,7 +1100,8 @@ class Drawing extends Input
               cache.set tile.key, tile
           ## Include new <symbol> in SVG
           unless found?
-            svg.appendChild tile.makeXML versions
+            tile.setId @id key unless tile.id?  # unrecognizedTile has id
+            svg.appendChild tile.makeXML()
             if symbolIds.has tile.id
               console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
@@ -1017,7 +1127,7 @@ class Drawing extends Input
       height = node.getAttribute 'data-height'
       node.removeAttribute 'data-height'
       # Transfer x/y/width/height to <use> element, for more re-usability.
-      parent.replaceChild (use = doc.createElementNS SVGNS, 'use'), node
+      parent.replaceChild (use = @dom.createElementNS SVGNS, 'use'), node
       for attr in ['x', 'y', 'width', 'height']
         use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
         node.removeAttribute attr
@@ -1032,7 +1142,7 @@ class Drawing extends Input
         inlineImageVersions.set filename, version + 1
         id = "_image_#{escapeId filename}_v#{version}"
         inlineImages.set attributes, id
-        svg.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
+        svg.appendChild symbol = @dom.createElementNS SVGNS, 'symbol'
         symbol.setAttribute 'id', id
         # If we don't have width/height set from data-width/height fields,
         # we take the first used width/height as the defining height.
@@ -1059,7 +1169,7 @@ class Drawing extends Input
         coordsRow.push {x, y}
         continue unless tile?
         levels[tile.zIndex] ?= []
-        levels[tile.zIndex].push use = doc.createElementNS SVGNS, 'use'
+        levels[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
         use.setAttribute @hrefAttr(), '#' + tile.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
@@ -1103,9 +1213,9 @@ class Drawing extends Input
     svg.setAttribute 'width', @width = viewBox[2]
     svg.setAttribute 'height', @height = viewBox[3]
     #svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
-    doc
-  renderSVG: (mappings, styles) ->
-    out = new XMLSerializer().serializeToString @renderSVGDOM mappings, styles
+    @dom
+  makeSVG: ->
+    out = new XMLSerializer().serializeToString @makeDOM()
     ## Parsing xlink:href in user's SVG fragments, and then serializing,
     ## can lead to these null namespace definitions.  Remove.
     out = out.replace /\sxmlns:xlink=""/g, ''
@@ -1117,8 +1227,8 @@ class Drawing extends Input
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
 ''' + out
-  renderTeX: (filename, relativeDir) ->
-    ## Must be called *after* `renderSVG` (or `renderSVGDOM`)
+  makeTeX: (filename, relativeDir) ->
+    @makeDOM() unless @tiles?
     filename = path.parse filename
     basename = filename.base[...-filename.ext.length]
     if relativeDir
@@ -1205,29 +1315,32 @@ class Drawing extends Input
       \\endgroup
     """, '' # trailing newline
     lines.join '\n'
-  writeTeX: (mappings, filename, relativeDir) ->
+  writeSVG: (filename) ->
+    ## Generates SVG and writes to filename.
+    ## Default filename is the input filename with extension replaced by .svg.
+    ## Returns generated .svg filename (even if it didn't changed).
+    filename ?= @drawing.generateFilename '.svg'
+    unless @shouldGenerate filename, @mappings, @styles
+      console.log '->', filename, '(SKIPPED)'
+    else if maybeWrite filename, @makeSVG()
+      console.log '->', filename
+    else
+      console.log '->', filename, '(UNCHANGED)'
+    filename
+  writeTeX: (filename, relativeDir) ->
     ###
-    Must be called *after* `writeSVG`.
     Default filename is the input filename with extension replaced by .svg_tex
     (analogous to .pdf_tex from Inkscape's --export-latex feature, but noting
     that the text is extracted from the SVG not the PDF, and that this file
     works with both .pdf and .png auxiliary files).
     ###
-    unless filename?
-      filename = path.parse @filename
-      if filename.ext == '.svg_tex'
-        filename.base += '.svg_tex'
-      else
-        filename.base = filename.base[...-filename.ext.length] + '.svg_tex'
-      if (outputDir = @getOutputDir '.svg_tex')?
-        filename.dir = outputDir
-      if (graphicDir = @getOutputDir('.pdf') ? @getOutputDir('.png'))? or
-         outputDir?
-        relativeDir = path.relative (outputDir ? '.'), (graphicDir ? '.')
-      filename = path.format filename
-    unless @shouldGenerate filename, mappings
+    filename ?= @drawing.generateFilename '.svg_tex'
+    relativeDir ?= path.relative path.parse(filename).dir,
+      @getOutputDir('.pdf') ? @getOutputDir('.png') ?
+      @getOutputDir('.svg')
+    unless @shouldGenerate filename, @mappings
       console.log '->', filename, '(SKIPPED)'
-    else if maybeWrite filename, @renderTeX filename, relativeDir
+    else if maybeWrite filename, @makeTeX filename, relativeDir
       console.log ' &', filename
     else
       console.log ' &', filename, '(UNCHANGED)'
@@ -1240,112 +1353,19 @@ class Drawing extends Input
     return true unless modified?
     ## If SVG Tiler is newer than file, need to generate it.
     return true if metadata.modified? and metadata.modified > modified
-    ## If this input is newer than file, need to generate it.
-    return true if @modified? and @modified > modified
+    ## If drawing is newer than file, need to generate it.
+    return true if @drawing.modified? and @drawing.modified > modified
     ## If dependency is newer than file, need to generate it.
     for depGroup in depGroups
-      ## `depGroup` may be a a `Mappings` or `Styles` object
-      ## (which both implement `values`).
-      for dep from depGroup.values()
+      ## `depGroup` may be a `Mappings` or `Styles` object
+      ## (which both implement array interface).
+      for dep in depGroup
         return true if dep.modified? and dep.modified > modified
     false
 
-class ASCIIDrawing extends Drawing
-  @title: "ASCII drawing (one character per tile)"
-  parse: (data) ->
-    @load(
-      for line in splitIntoLines data
-        graphemeSplitter.splitGraphemes line
-    )
-
-class DSVDrawing extends Drawing
-  parse: (data) ->
-    ## Remove trailing newline / final blank line.
-    if data[-2..] == '\r\n'
-      data = data[...-2]
-    else if data[-1..] in ['\r', '\n']
-      data = data[...-1]
-    ## CSV parser.
-    @load require('csv-parse/sync').parse data,
-      delimiter: @constructor.delimiter
-      relax_column_count: true
-
-class SSVDrawing extends DSVDrawing
-  @title: "Space-delimiter drawing (one word per tile)"
-  @delimiter: ' '
-  parse: (data) ->
-    ## Coallesce non-newline whitespace into single space
-    super data.replace /[ \t\f\v]+/g, ' '
-
-class CSVDrawing extends DSVDrawing
-  @title: "Comma-separated drawing (spreadsheet export)"
-  @delimiter: ','
-
-class TSVDrawing extends DSVDrawing
-  @title: "Tab-separated drawing (spreadsheet export)"
-  @delimiter: '\t'
-
-class Drawings extends Input
-  @filenameSeparator: '_'
-  load: (datas) ->
-    @drawings =
-      for data in datas
-        new Drawing data,
-          settings: @settings
-          filename: @filename
-          subname: data.subname
-  subfilename: (extension, drawing) ->
-    filename2 = path.parse @filename
-    filename2.base = filename2.base[...-filename2.ext.length]
-    if @drawings.length > 1
-      filename2.base += @constructor.filenameSeparator + drawing.subname
-    filename2.base += extension
-    if (outputDir = @getOutputDir extension)?
-      filename2.dir = outputDir
-    path.format filename2
-  writeSVG: (mappings, styles, filename) ->
-    for drawing in @drawings
-      drawing.writeSVG mappings, styles, @subfilename '.svg', drawing
-  writeTeX: (mappings, filename) ->
-    for drawing in @drawings
-      subfilename = @subfilename '.svg_tex', drawing
-      relativeDir = path.relative path.dirname(subfilename),
-        @getOutputDir('.pdf') ? @getOutputDir('.png') ? '.'
-      drawing.writeTeX mappings, subfilename, relativeDir
-
-class XLSXDrawings extends Drawings
-  @encoding: 'binary'
-  @title: "Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)"
-  parse: (data) ->
-    xlsx = require 'xlsx'
-    workbook = xlsx.read data, type: 'binary'
-    ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
-    @load (
-      for sheetInfo in workbook.Workbook.Sheets
-        subname = sheetInfo.name
-        sheet = workbook.Sheets[subname]
-        ## 0 = Visible, 1 = Hidden, 2 = Very Hidden
-        ## https://sheetjs.gitbooks.io/docs/#sheet-visibility
-        if sheetInfo.Hidden and not @getSetting 'keepHidden'
-          continue
-        if subname.length == 31
-          console.warn "Warning: Sheet '#{subname}' has length exactly 31, which may be caused by Google Sheets export truncation"
-        rows = xlsx.utils.sheet_to_json sheet,
-          header: 1
-          defval: ''
-        rows.subname = subname
-        rows
-    )
-
-class DummyInput extends Input
-  parse: ->
-
-class SVGFile extends DummyInput
-  @title: "SVG file (convert to PDF/PNG without any tiling)"
-  @skipRead: true  # svgink/Inkscape will do actual file reading
-
 class Context
-  constructor: (@drawing, i, j) ->
+  constructor: (@render, i, j) ->
+    @drawing = @render.drawing
     ## Use @drawing to access these old properties:
     #@data = @drawing.data
     #@filename = @drawing.filename
@@ -1358,9 +1378,9 @@ class Context
       i += @drawing.data.length
     if j < 0
       j += @drawing.data[i]?.length ? 0
-    new Context @drawing, i, j
+    new Context @render, i, j
   neighbor: (dj, di) ->
-    new Context @drawing, @i + di, @j + dj
+    new Context @render, @i + di, @j + dj
   includes: (...args) ->
     @key? and @key.includes ...args
   match: (...args) ->
@@ -1368,11 +1388,11 @@ class Context
   row: (di = 0) ->
     i = @i + di
     for tile, j in @drawing.data[i] ? []
-      new Context @drawing, i, j
+      new Context @render, i, j
   column: (dj = 0) ->
     j = @j + dj
     for row, i in @drawing.data
-      new Context @drawing, i, j
+      new Context @render, i, j
 Object.defineProperties Context.prototype,
   filename: get: -> @drawing.filename
   subname: get: -> @drawing.subname
@@ -1405,8 +1425,7 @@ extensionMap =
   # Other
   '.svg': SVGFile
 
-renderDOM = (mappings, elts, settings) ->
-  mappings = Mappings.from mappings
+renderDOM = (elts, settings) ->
   if typeof elts == 'string'
     elts = document.querySelectorAll elts
   else if elts instanceof HTMLElement
@@ -1414,33 +1433,33 @@ renderDOM = (mappings, elts, settings) ->
 
   for elt from elts
     ## Default to href attribute which works better in DOM.
-    settings = {...defaultSettings, useHref: true, ...settings}
+    eltSettings = {...defaultSettings, useHref: true, ...settings}
     ## Override settings via data-* attributes.
     for key, value of elt.dataset
-      continue unless settings.hasOwnProperty key
-      if typeof settings[key] == 'boolean'
+      continue unless eltSettings.hasOwnProperty key
+      if typeof eltSettings[key] == 'boolean'
         switch value = setting key
           #when 'true', 'on', 'yes'
-          #  settings[key] = true
+          #  eltSettings[key] = true
           when 'false', 'off', 'no'#, ''
-            settings[key] = false
+            eltSettings[key] = false
           else
-            settings[key] = Boolean value
+            eltSettings[key] = Boolean value
       else
-        settings[key] = value
+        eltSettings[key] = value
 
     try
       elt.style.whiteSpace = 'pre'
-      filename = settings.filename
-      drawing = Input.recognize filename, elt.innerText, settings
+      filename = eltSettings.filename
+      drawing = Input.recognize filename, elt.innerText, eltSettings
       if drawing instanceof Drawing
-        dom = drawing.renderSVGDOM(mappings).documentElement
-        if settings.keepParent
+        dom = drawing.renderDOM().documentElement
+        if eltSettings.keepParent
           elt.innerHTML = ''
           elt.appendChild dom
         else
           elt.replaceWith dom
-          if settings.keepClass
+          if eltSettings.keepClass
             dom.setAttribute 'class', elt.className
       else
         console.warn "Parsed element with filename '#{filename}' into #{drawing.constructor.name} instead of Drawing:", elt
@@ -1532,11 +1551,13 @@ convert = (filenames, formats, settings) ->
     processor.convertTo filenames, formats
 
 main = (args = process.argv[2..]) ->
-  mappings = new Mappings
-  styles = new Styles
   files = skip = 0
   formats = []
-  settings = {...defaultSettings}
+  settings = {
+    ...defaultSettings
+    mappings: new Mappings
+    styles: new Styles
+  }
   for arg, i in args
     if skip
       skip--
@@ -1606,12 +1627,11 @@ main = (args = process.argv[2..]) ->
         console.log '*', arg
         input = Input.recognize arg, undefined, settings
         if input instanceof Mapping
-          mappings.push input
+          settings.mappings.push input
         else if input instanceof Style
-          styles.push input
+          settings.styles.push input
         else if input instanceof Drawing or input instanceof Drawings
-          filenames = input.writeSVG mappings, styles
-          input.writeTeX mappings if settings.texText
+          filenames = input.render settings
           ## Convert to any additional formats.  Even if SVG files didn't
           ## change, we may not have done these conversions before or in the
           ## last run of SVG Tiler, so let svgink compare mod times and decide.
@@ -1629,7 +1649,8 @@ svgtiler = {
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle,
   SVGFile,
-  extensionMap, Input, DummyInput, Mappings, Context,
+  extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
+  Render, Context,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
   static: wrapStatic,

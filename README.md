@@ -591,15 +591,15 @@ On a web browser, you can include a `<script>` tag that points to
 though not all features are available or fully functional in this mode.
 While the full API is still in flux, the following subset should be stable:
 
-* `new Mapping(data)`: Create a mapping from `data` which is either an object
-  mapping keys to SVG strings or functions, or a function `data(key)` doing
-  such a mapping, similar to
+* `new Mapping(data)`: Create a mapping from `data` which is an object,
+  `Map`, or function mapping keys to SVG content, just like
   [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
-* `renderDOM(mappings, elts, options)`: Use the provided `mappings`
-  (which can be a `Mapping` object or an array of `Mapping` objects)
-  to convert drawings embedded in the DOM via elements matching `elts`
-  (which can be a query selector string like `'.svgtiler'`, or a DOM element,
-  or an iterable of DOM elements).
+* `renderDOM(elts, options)`: Convert drawings embedded in the DOM
+  via elements matching `elts` (which can be a query selector string like
+  `'.svgtiler'`, or a DOM element, or an iterable of DOM elements).
+  * Put your mappings in `options.mappings`, which can be a `Mapping` object,
+    a valid argument to `new Mapping`, an Array of the above, or
+    a `Mappings` object (a special type of Array).
   * Each drawing can have a `data-filename` attribute to define its name and
     extension, which determines its format; or you can set `options` to an
     object with specifying a default `filename`.
