@@ -721,6 +721,21 @@ class ArrayWrapper extends Array
 class Styles extends ArrayWrapper
   @itemClass: Style
 
+currentMapping = null
+getMapping = ->
+  ## Returns current `Mapping` object,
+  ## when used at top level of a JS/CS mapping file.
+  currentMapping
+runWithMapping = (mapping, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## at the top level of the specified mapping.
+  oldMapping = currentMapping
+  currentMapping = mapping
+  try
+    fn()
+  finally
+    currentMapping = oldMapping
+
 class Mapping extends Input
   constructor: (...args) ->
     super ...args
@@ -807,7 +822,8 @@ class JSMapping extends Mapping
       #}
       #console.log code
       pirates?.settings = @settings
-      @load require(filename).default ? {}
+      @module = runWithMapping @, -> require filename
+      @load @module.default ? {}
       @walkDeps filename
     else
       ## But if file has been explicitly loaded (e.g. in browser),
@@ -817,7 +833,7 @@ class JSMapping extends Mapping
         filename: @filename
       }
       #console.log code
-      exports = {}
+      @module = {}
       ## Mimick NodeJS module's __filename and __dirname variables
       ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
       _filename = path.resolve @filename
@@ -827,9 +843,10 @@ class JSMapping extends Mapping
       #@load eval code
       func = new Function \
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
-      func exports, _filename, _dirname, svgtiler,
-        (if code.includes 'preact' then require 'preact')
-      @load exports.default
+      runWithMapping @, ->
+        func @module, _filename, _dirname, svgtiler,
+          (if code.includes 'preact' then require 'preact')
+      @load @module.default
   walkDeps: (filename) ->
     deps = new Set
     recurse = (modname) =>
@@ -1645,6 +1662,7 @@ main = (args = process.argv[2..]) ->
 svgtiler = {
   Tile, unrecognizedTile,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
+  getMapping, runWithMapping,
   Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle,
