@@ -339,7 +339,8 @@ unless window?
 isPreact = (data) ->
   typeof data == 'object' and data?.type? and data.props?
 renderPreact = (data) ->
-  require('preact-render-to-string') data
+  (window?.preactRenderToString?.default ? require('preact-render-to-string')) \
+    data
 
 $static = Symbol 'svgtiler.static'
 wrapStatic = (x) -> [$static]: x  # exported as `static` but that's reserved
@@ -439,7 +440,7 @@ class Tile extends HasSettings
     ## reparented into an HTML Document.)
     svg = @svg.replace /^\s*<(?:[^<>'"\/]|'[^']*'|"[^"]*")*\s*(\/?\s*>)/,
       (match, end) ->
-        unless 'xmlns' in match
+        unless match.includes 'xmlns'
           match = match[...match.length-end.length] +
             " xmlns='#{SVGNS}'" + match[match.length-end.length..]
         match
@@ -456,7 +457,7 @@ class Tile extends HasSettings
           indent + ' '.repeat(col-1) + '^^^' +
           (if line < lines.length then '\n' + indent + lines[line] else '')
         console.error "SVG parse #{level} in tile '#{@key}': #{msg}"
-    .parseFromString @svg, 'image/svg+xml'
+    .parseFromString svg, 'image/svg+xml'
     ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     ## in the original parsed content or possibly added above,
     ## to avoid conflict with these attributes in the top-level <svg>.
@@ -1118,7 +1119,7 @@ class Render extends HasSettings
           ## Include new <symbol> in SVG
           unless found?
             tile.setId @id key unless tile.id?  # unrecognizedTile has id
-            svg.appendChild tile.makeXML()
+            svg.appendChild tile.makeXML().documentElement
             if symbolIds.has tile.id
               console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
@@ -1486,7 +1487,7 @@ renderDOM = (elts, settings) ->
       drawing: drawing
       filename: filename
     catch err
-      console.error 'svgtiler.renderDOM failed to parse element:', elt
+      console.error 'svgtiler.renderDOM failed to render element:', elt
       console.error err
 
 help = ->
