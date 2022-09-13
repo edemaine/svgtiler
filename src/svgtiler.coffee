@@ -1116,7 +1116,10 @@ class Render extends HasSettings
           ## Include new <symbol> in SVG
           unless found?
             tile.setId @id key unless tile.id?  # unrecognizedTile has id
-            svg.appendChild tile.makeDOM().documentElement
+            dom = tile.makeDOM().documentElement
+            ## Clone if tile is static, to enable later re-use
+            dom = dom.cloneNode true if tile.isStatic
+            svg.appendChild dom
             if symbolIds.has tile.id
               console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
