@@ -391,7 +391,7 @@ class Tile extends HasSettings
     ## `@value` can be a string or Preact VDOM.
     super()
     unless @value?
-      throw new SVGTilerError "Attempt to create tile '#{@key}' without data"
+      throw new SVGTilerError "Attempt to create tile '#{@key}' without content"
 
   makeSVG: ->
     return if @svg?
@@ -475,8 +475,7 @@ class Tile extends HasSettings
       for attribute in @dom.documentElement.attributes
         unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
           symbol.setAttribute attribute.name, attribute.value
-      doc = @dom.documentElement
-      @dom.removeChild @dom.documentElement
+      @dom.removeChild doc = @dom.documentElement
     else
       doc = @dom
     for child in (node for node in doc.childNodes)
@@ -617,35 +616,49 @@ unrecognizedTile = new Tile '_unrecognized', '''
 unrecognizedTile.id = '_unrecognized' # cannot be output of escapeId()
 
 class Input extends HasSettings
+  ###
+  Abstract base class for all inputs to SVG Tiler, in particular
+  `Mapping`, `Style`, and `Drawing` and their format-specific subclasses.
+
+  Each subclass should define:
+  * `parse(data)` method that parses the input contents in the format
+    defined by the subclass (specified manually by the user, or
+    automatically read from the input file).
+  * `skipRead: true` attribute if you don't want `@parseFile` class method
+    to read the file data and pass it into `parse`, in case you want to read
+    from `@filename` directly yourself in a specific way.
+  ###
   constructor: (data, opts) ->
     ###
     `data` is input-specific data for direct creation (e.g. without a file),
-    which is processed via `@load()`.
-    If `data` is unspecified, `@parse` will be called with `@filedata`.
-    `opts` is an object with options attached directly to the Input, including:
-    `filename`, `filedata`, `settings`.
+    which is processed via a `parse` method (which subclass must define).
+    `opts` is an object with options attached directly to the Input
+    (*before* `parse` gets called), including `filename` and `settings`.
     ###
     super()
     @[key] = value for key, value of opts if opts?
-    if data?
-      @load data
-    else
-      @parse @filedata
-  @make: (opts) ->
-    ## Create input when there's no `data`, only `opts`.
-    ## In particular, this is used to parse data from a file in `@parseData`.
-    new @ undefined, opts
+    @parse data
   @encoding: 'utf8'
   @parseFile: (filename, filedata, settings) ->
-    ## Generic method to parse file once we're already in the right class.
+    ###
+    Generic method to parse file once we're already in the correct subclass.
+    Automatically reads the file contents from `filename` unless
+    * `@skipRead` is true, or
+    * file contents are specified via `settings.filedata`.
+      Use this to avoid attempting to use the file system on the browser.
+    ###
     modified = -Infinity
     try
       modified = (fs.statSync filename).mtimeMs
     unless filedata? or @skipRead
       filedata = fs.readFileSync filename, encoding: @encoding
-    @make {filename, filedata, modified, settings}
+    new @ filedata, {filename, modified, settings}
   @recognize: (filename, filedata, settings) ->
-    ## Recognize type of file and call corresponding class's `parseFile`.
+    ###
+    Recognize type of file and call corresponding class's `parseFile`.
+    Meant to be used as `Input.recognize(...)` via top-level Input class,
+    without specific subclass.
+    ###
     extension = extensionOf filename
     if extensionMap.hasOwnProperty extension
       extensionMap[extension].parseFile filename, filedata, settings
@@ -672,19 +685,23 @@ class Input extends HasSettings
     path.format filename
 
 class Style extends Input
-  load: (@css) ->
+  ###
+  Base Style class assumes any passed data is in CSS format,
+  stored in `@css` attribute.
+  ###
+  parse: (@css) ->
 
 class CSSStyle extends Style
+  ## Style in CSS format.  Equivalent to Style base class.
   @title: "CSS style file"
-  parse: (filedata) ->
-    @load filedata
 
 class StylusStyle extends Style
+  ## Style in Stylus format.
   @title: "Stylus style file (https://stylus-lang.com/)"
-  parse: (filedata) ->
-    styl = require('stylus') filedata,
+  parse: (stylus) ->
+    styl = require('stylus') stylus,
       filename: @filename
-    @load styl.render()
+    super styl.render()
 
 class ArrayWrapper extends Array
   ###
@@ -738,27 +755,33 @@ runWithMapping = (mapping, fn) ->
     currentMapping = oldMapping
 
 class Mapping extends Input
+  ###
+  Base Mapping class.
+  The passed-in data can be any supported output from a JavaScript mapping
+  file: an object, a Map, or a function resolving to one of the above
+  or a String (containing SVG or a filename), Preact VDOM, or null/undefined.
+  In this class and subclasses, `@map` stores this data.
+  ###
   constructor: (...args) ->
     super ...args
-    @cache ?= new Map
+    @cache ?= new Map  # for static tiles
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
-  load: (@data) ->
-    unless typeof @data in ['function', 'object']
-      console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @data}): should be function or object"
-      @data = null
-    if isPreact @data
+  parse: (@map) ->
+    unless typeof @map in ['function', 'object']
+      console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @map}): should be function or object"
+      @map = null
+    if isPreact @map
       console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
-      @data = null
+      @map = null
   lookup: (key, context) ->
-    ## `key` must be a String (should already be coerced by `Drawing::load`).
-    #key = String key
+    ## `key` normally should be a String (via `AutoDrawing::parse` coercion).
     ## Check cache (used for static tiles).
     if (found = @cache.get key)?
       return found
 
-    ## Repeatedly expand `@data` until we get string, Preact VDOM, or
+    ## Repeatedly expand `@map` until we get string, Preact VDOM, or
     ## null/undefined.
-    value = @data
+    value = @map
     isStatic = undefined
     while value? and typeof value != 'string' and not isPreact value
       if value instanceof Map or value instanceof WeakMap
@@ -806,12 +829,12 @@ class ASCIIMapping extends Mapping
       else
         key = line[...separator.index]
       map[key] = line[separator.index + separator[0].length..]
-    @load map
+    super map
 
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
   @help: "Object mapping tile names to TILE e.g. {dot: 'dot.svg'}"
-  @skipRead: true  # require loads file contents for us
+  @skipRead: true  # `require` loads file contents for us
   parse: (data) ->
     unless data?
       ## Normally use `require` to load code as a real NodeJS module
@@ -824,7 +847,7 @@ class JSMapping extends Mapping
       #console.log code
       pirates?.settings = @settings
       @module = runWithMapping @, -> require filename
-      @load @module.default ? {}
+      super @module.default ? {}
       @walkDeps filename
     else
       ## But if file has been explicitly loaded (e.g. in browser),
@@ -841,13 +864,13 @@ class JSMapping extends Mapping
       _dirname = path.dirname _filename
       ## Use `new Function` instead of `eval` for improved performance and to
       ## restrict to passed arguments + global scope.
-      #@load eval code
+      #super eval code
       func = new Function \
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
       runWithMapping @, ->
         func @module, _filename, _dirname, svgtiler,
           (if code.includes 'preact' then require 'preact')
-      @load @module.default
+      super @module.default
   walkDeps: (filename) ->
     deps = new Set
     recurse = (modname) =>
@@ -874,11 +897,11 @@ class CoffeeMapping extends JSMapping
       #  {...babelConfig, filename: @filename})
       #console.log code
       ## Normally rely on `require` and `CoffeeScript.register` to load code.
-      super.parse data
+      super data
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually.
-      super.parse require('coffeescript').compile data,
+      super require('coffeescript').compile data,
         bare: true
         inlineMap: true
         filename: @filename
@@ -936,11 +959,38 @@ writeOrTouch = (filename, data) ->
 ###
 
 class Drawing extends Input
-  load: (data) ->
+  ###
+  Base Drawing class uses a data format of an Array of Array of keys,
+  where `data[i][j]` represents the key in row `i` and column `j`,
+  without any preprocessing.  This is meant for direct API use,
+  whereas AutoDrawing provides preprocessing for data from mapping files.
+  In this class and subclasses, `@keys` stores the Array of Array of keys.
+  ###
+  parse: (@keys) ->
+  renderDOM: (settings = @settings) ->
+    new Render @, settings
+    .makeDOM()
+  render: (settings = @settings) ->
+    ## Writes SVG and optionally TeX file.
+    ## Returns output SVG filename.
+    r = new Render @, settings
+    filename = r.writeSVG()
+    r.writeTeX() if getSetting settings, 'texText'
+    filename
+
+class AutoDrawing extends Drawing
+  ###
+  Extended Drawing base class that preprocesses the drawing as follows:
+  * Casts all keys to strings, in particular to handle Number data.
+  * Optionally removes margins according to `keepMargins` setting.
+  ###
+  parse: (data) ->
     ## Turn strings into arrays, and turn numbers (e.g. from XLSX) into strings.
-    data = for row in data
-             for cell in row
-               String cell
+    unless @skipStringCast
+      data =
+        for row in data
+          for cell in row
+            String cell
     unless @getSetting 'keepMargins'
       ## Top margin
       while data.length > 0 and allBlank data[0]
@@ -954,33 +1004,27 @@ class Drawing extends Input
           for row in data
             row.shift()
         ## Right margin
-        j = Math.max (row.length for row in data)...
+        j = Math.max ...(row.length for row in data)
         while j >= 0 and allBlank (row[j] for row in data)
           for row in data
             if j < row.length
               row.pop()
           j--
-    @data = data
-  renderDOM: (settings = @settings) ->
-    new Render @, settings
-    .makeDOM()
-  render: (settings = @settings) ->
-    ## Writes SVG and optionally TeX file.
-    ## Returns output SVG filename.
-    r = new Render @, settings
-    filename = r.writeSVG()
-    r.writeTeX() if getSetting settings, 'texText'
-    filename
+    super data
 
-class ASCIIDrawing extends Drawing
+class ASCIIDrawing extends AutoDrawing
   @title: "ASCII drawing (one character per tile)"
   parse: (data) ->
-    @load(
+    super(
       for line in splitIntoLines data
         graphemeSplitter.splitGraphemes line
     )
 
-class DSVDrawing extends Drawing
+class DSVDrawing extends AutoDrawing
+  ###
+  Abstract base class for all Delimiter-Separator Value (DSV) drawings.
+  Each subclass must define `@delimiter` class property.
+  ###
   parse: (data) ->
     ## Remove trailing newline / final blank line.
     if data[-2..] == '\r\n'
@@ -988,7 +1032,7 @@ class DSVDrawing extends Drawing
     else if data[-1..] in ['\r', '\n']
       data = data[...-1]
     ## CSV parser.
-    @load require('csv-parse/sync').parse data,
+    super require('csv-parse/sync').parse data,
       delimiter: @constructor.delimiter
       relax_column_count: true
 
@@ -1008,10 +1052,10 @@ class TSVDrawing extends DSVDrawing
   @delimiter: '\t'
 
 class Drawings extends Input
-  load: (datas) ->
+  parse: (datas) ->
     @drawings =
       for data in datas
-        new Drawing data,
+        new Drawing parse,
           settings: @settings
           filename: @filename
           subname: data.subname
@@ -1028,7 +1072,7 @@ class XLSXDrawings extends Drawings
     xlsx = require 'xlsx'
     workbook = xlsx.read data, type: 'binary'
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
-    @load (
+    super(
       for sheetInfo in workbook.Workbook.Sheets
         subname = sheetInfo.name
         sheet = workbook.Sheets[subname]
@@ -1092,7 +1136,7 @@ class Render extends HasSettings
     symbolIds = new Set
     context = new Context @
     @tiles =
-      for row, i in @drawing.data
+      for row, i in @drawing.keys
         for key, j in row
           context.move i, j
           tile = @mappings.lookup key, context
@@ -1385,17 +1429,17 @@ class Context
   constructor: (@render, i, j) ->
     @drawing = @render.drawing
     ## Use @drawing to access these old properties:
-    #@data = @drawing.data
+    #@keys = @drawing.keys
     #@filename = @drawing.filename
     #@subname = @drawing.subname
     @move i, j if i? and j?
   move: (@i, @j) ->
-    @key = @drawing.data[@i]?[@j]
+    @key = @drawing.keys[@i]?[@j]
   at: (j, i) ->
     if i < 0
-      i += @drawing.data.length
+      i += @drawing.keys.length
     if j < 0
-      j += @drawing.data[i]?.length ? 0
+      j += @drawing.keys[i]?.length ? 0
     new Context @render, i, j
   neighbor: (dj, di) ->
     new Context @render, @i + di, @j + dj
@@ -1405,11 +1449,11 @@ class Context
     @key? and @key.match ...args
   row: (di = 0) ->
     i = @i + di
-    for tile, j in @drawing.data[i] ? []
+    for tile, j in @drawing.keys[i] ? []
       new Context @render, i, j
   column: (dj = 0) ->
     j = @j + dj
-    for row, i in @drawing.data
+    for row, i in @drawing.keys
       new Context @render, i, j
 Object.defineProperties Context.prototype,
   filename: get: -> @drawing.filename
@@ -1664,7 +1708,8 @@ svgtiler = {
   Tile, unrecognizedTile,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   getMapping, runWithMapping,
-  Drawing, ASCIIDrawing, DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
+  Drawing, AutoDrawing, ASCIIDrawing,
+  DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle,
   SVGFile,
