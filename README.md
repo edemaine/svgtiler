@@ -267,6 +267,27 @@ The `Context` object has the following properties and methods:
   functions within the same drawing (but not between separate drawings).
   This can be useful for drawing-specific state.
 
+The top-level code of your .js or .coffee mapping file can also call:
+
+* `beforeRender(callback)` to schedule calling `callback(render)`
+  before rendering each drawing, e.g.,
+  to initialize drawing-specific data or globally examine the drawing.
+  The `callback`'s argument (and `this`) is set to a `Render` instance,
+  which in particular has `drawing`, `mappings`, and `styles` attributes.
+  You can even modify the drawing's `keys` at this stage,
+  by modifying `render.drawing.keys`.
+* `afterRender(callback)` to schedule calling `callback(render)`
+  after rendering each drawing.  In particular,
+  to render an overlay or underlay, return the content to render
+  as a string or Preact VDOM (ideally in an `<svg>` wrapper).
+  Specify a [`z-index`](#z-index-stacking-order-of-tiles)
+  to control the stacking order relative to other symbols
+  or overlays/underlays.
+  Specify [`overflowBox`](#overflow-and-bounding-box) to increase the
+  overall size of the rendered drawing.
+  During the callback, `render` has properties about the rendering's
+  bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
+
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
 .js and .coffee files can access `__dirname` and `__filename`,
 e.g., to use paths relative to the mapping file.

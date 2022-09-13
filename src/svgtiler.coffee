@@ -282,7 +282,7 @@ extractZIndex = (node) ->
   ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
   ## a z-index="..." attribute.  Check for this first.
   ## 2. Look for style="z-index:..." as in HTML.
-  z = parseInt attributeOrStyle node, 'z-index'
+  z = parseFloat attributeOrStyle node, 'z-index'
   removeAttributeOrStyle node, 'z-index'
   if isNaN z
     0
@@ -432,7 +432,7 @@ class Tile extends HasSettings
 
   setId: (@id) ->
     @dom.documentElement.setAttribute 'id', @id if @dom?
-  makeDOM: ->
+  makeDOM: (wrapper = 'symbol') ->
     return @dom if @dom?
     @makeSVG()
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
@@ -466,7 +466,7 @@ class Tile extends HasSettings
       @dom.documentElement.removeAttribute 'xmlns:xlink'
 
     ## Wrap XML in <symbol> if not already.
-    symbol = @dom.createElementNS SVGNS, 'symbol'
+    symbol = @dom.createElementNS SVGNS, wrapper
     ## Force `id` to be first attribute.
     symbol.setAttribute 'id', @id if @id?
     # Avoid a layer of indirection for <symbol>/<svg> at top level
@@ -478,6 +478,12 @@ class Tile extends HasSettings
       @dom.removeChild doc = @dom.documentElement
     else
       doc = @dom
+      ## Allow top-level object to specify <symbol> data.
+      for attribute in ['z-index', 'viewBox', 'overflowBox']
+        if doc.documentElement.hasAttribute attribute
+          symbol.setAttribute attribute,
+            doc.documentElement.getAttribute attribute
+          doc.documentElement.removeAttribute attribute
     for child in (node for node in doc.childNodes)
       symbol.appendChild child
     @dom.appendChild symbol
@@ -754,6 +760,15 @@ runWithMapping = (mapping, fn) ->
   finally
     currentMapping = oldMapping
 
+beforeRender = (fn) ->
+  unless currentMapping?
+    throw new SVGTilerError "svgtiler.beforeRender called outside mapping file"
+  currentMapping.beforeRender fn
+afterRender = (fn) ->
+  unless currentMapping?
+    throw new SVGTilerError "svgtiler.afterRender called outside mapping file"
+  currentMapping.afterRender fn
+
 class Mapping extends Input
   ###
   Base Mapping class.
@@ -762,9 +777,13 @@ class Mapping extends Input
   or a String (containing SVG or a filename), Preact VDOM, or null/undefined.
   In this class and subclasses, `@map` stores this data.
   ###
-  constructor: (...args) ->
-    super ...args
-    @cache ?= new Map  # for static tiles
+  constructor: (data, opts) ->
+    super data, {
+      cache: new Map  # for static tiles
+      beforeRenderQueue: []
+      afterRenderQueue: []
+      ...opts
+    }
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
   parse: (@map) ->
     unless typeof @map in ['function', 'object']
@@ -810,6 +829,18 @@ class Mapping extends Input
     else
       @cache.set key, value if isStatic
       value
+  beforeRender: (fn) ->
+    @beforeRenderQueue.push fn
+  afterRender: (fn) ->
+    @afterRenderQueue.push fn
+  doBeforeRender: (render, onResult) ->
+    for callback in @beforeRenderQueue
+      result = callback.call render, render
+      onResult? result
+  doAfterRender: (render, onResult) ->
+    for callback in @afterRenderQueue
+      result = callback.call render, render
+      onResult? result
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -915,6 +946,12 @@ class Mappings extends ArrayWrapper
       value = @[i].lookup key, context
       return value if value?
     undefined
+  doBeforeRender: (render, callback) ->
+    for mapping in @
+      mapping.doBeforeRender render, callback
+  doAfterRender: (render, callback) ->
+    for mapping in @
+      mapping.doAfterRender render, callback
 
 blankCells = new Set [
   ''
@@ -1131,6 +1168,7 @@ class Render extends HasSettings
       svg.appendChild styleTag = @dom.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
     ## Render all tiles in the drawing.
+    @mappings.doBeforeRender @
     missing = new Set
     cache = new Map
     symbolIds = new Set
@@ -1215,8 +1253,8 @@ class Render extends HasSettings
       use.setAttribute @hrefAttr(), '#' + id
       false
     ## Lay out the symbols in the drawing via SVG <use>.
-    viewBox = [0, 0, 0, 0]  ## initially x-min, y-min, x-max, y-max
-    levels = {}
+    @xMin = @yMin = @xMax = @yMax = 0
+    @layers = {}
     y = 0
     colWidths = {}
     @coords = []
@@ -1230,8 +1268,8 @@ class Render extends HasSettings
       for tile, j in row
         coordsRow.push {x, y}
         continue unless tile?
-        levels[tile.zIndex] ?= []
-        levels[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
+        @layers[tile.zIndex] ?= []
+        @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
         use.setAttribute @hrefAttr(), '#' + tile.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
@@ -1255,25 +1293,38 @@ class Render extends HasSettings
         if tile.overflowBox?
           dx = (tile.overflowBox[0] - tile.viewBox[0]) * scaleX
           dy = (tile.overflowBox[1] - tile.viewBox[1]) * scaleY
-          viewBox[0] = Math.min viewBox[0], x + dx
-          viewBox[1] = Math.min viewBox[1], y + dy
-          viewBox[2] = Math.max viewBox[2], x + dx + tile.overflowBox[2] * scaleX
-          viewBox[3] = Math.max viewBox[3], y + dy + tile.overflowBox[3] * scaleY
+          @xMin = Math.min @xMin, x + dx
+          @yMin = Math.min @yMin, y + dy
+          @xMax = Math.max @xMax, x + dx + tile.overflowBox[2] * scaleX
+          @yMax = Math.max @yMax, y + dy + tile.overflowBox[3] * scaleY
         x += tile.width * scaleX
-        viewBox[2] = Math.max viewBox[2], x
+        @xMax = Math.max @xMax, x
       y += rowHeight
-      viewBox[3] = Math.max viewBox[3], y
-    ## Change from x-min, y-min, x-max, y-max to x-min, y-min, width, height
-    viewBox[2] = viewBox[2] - viewBox[0]
-    viewBox[3] = viewBox[3] - viewBox[1]
-    ## Sort by level
-    levelOrder = (level for level of levels).sort (x, y) -> x-y
-    for level in levelOrder
-      for node in levels[level]
+      @yMax = Math.max @yMax, y
+    ## afterRender callbacks: render as <symbol> and then strip off that wrapper
+    do updateSize = =>
+      @width = @xMax - @xMin
+      @height = @yMax - @yMin
+    @mappings.doAfterRender @, (out) =>
+      return unless out
+      tile = new Tile '_afterRender', out
+      dom = tile.makeDOM 'svg'  # wrap in <svg> instead of <symbol>
+      @layers[tile.zIndex] ?= []
+      box = tile.overflowBox ? tile.viewBox
+      @xMin = Math.min @xMin, box[0]
+      @yMin = Math.min @yMin, box[1]
+      @xMax = Math.max @xMax, box[0] + box[2]
+      @yMax = Math.max @yMax, box[1] + box[3]
+      updateSize()
+      @layers[tile.zIndex].push dom.documentElement
+    ## Sort by layer
+    layerOrder = (layer for layer of @layers).sort (x, y) -> x-y
+    for layer in layerOrder
+      for node in @layers[layer]
         svg.appendChild node
-    svg.setAttribute 'viewBox', viewBox.join ' '
-    svg.setAttribute 'width', @width = viewBox[2]
-    svg.setAttribute 'height', @height = viewBox[3]
+    svg.setAttribute 'viewBox', "#{@xMin} #{@yMin} #{@width} #{@height}"
+    svg.setAttribute 'width', @width
+    svg.setAttribute 'height', @height
     #svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
     @dom
   makeSVG: ->
@@ -1679,7 +1730,7 @@ main = (args = process.argv[2..]) ->
         settings.inlineImages = false
       when '-j', '--jobs'
         skip = 1
-        arg = parseInt args[i+1]
+        arg = parseInt args[i+1], 10
         if arg
           settings.jobs = arg
         else
@@ -1715,6 +1766,7 @@ svgtiler = {
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
   Render, Context,
+  beforeRender, afterRender,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
   static: wrapStatic,

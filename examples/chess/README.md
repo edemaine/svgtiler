@@ -15,6 +15,7 @@
   * Using `require` to load and modify external SVG files
     (strip off unnecessary `<svg>` wrapper)
   * JSX notation for creating and composing symbols
+  * `svgtiler.afterRender` for rendering a background
 
 ## Piece Shapes
 
