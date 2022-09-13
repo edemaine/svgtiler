@@ -431,7 +431,7 @@ class Tile extends HasSettings
     @svg = removeSVGComments @svg
 
   setId: (@id) ->
-    @xml.setAttribute 'id', @id if @xml?
+    @xml.documentElement.setAttribute 'id', @id if @xml?
   makeXML: ->
     return @xml if @xml?
     @makeSVG()
