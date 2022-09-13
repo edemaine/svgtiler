@@ -174,22 +174,22 @@ parseNum = (x) ->
   else
     parsed
 
-svgBBox = (xml) ->
+svgBBox = (dom, auto = true) ->
   ## xxx Many unsupported features!
   ##   - transformations
   ##   - used symbols/defs
   ##   - paths
   ##   - text
   ##   - line widths which extend bounding box
-  if xml.documentElement.hasAttribute 'viewBox'
-    parseBox xml.documentElement.getAttribute 'viewBox'
-  else
+  if dom.documentElement.hasAttribute 'viewBox'
+    parseBox dom.documentElement.getAttribute 'viewBox'
+  else if auto
     recurse = (node) ->
       if node.nodeType != node.ELEMENT_NODE or
          node.nodeName in ['defs', 'use']
         return null
       # Ignore <symbol>s except the root <symbol> that we're bounding
-      if node.nodeName == 'symbol' and node != xml.documentElement
+      if node.nodeName == 'symbol' and node != dom.documentElement
         return null
       switch node.tagName
         when 'rect', 'image'
@@ -237,7 +237,7 @@ svgBBox = (xml) ->
           xmax = Math.max ...(viewBox[0]+viewBox[2] for viewBox in viewBoxes)
           ymax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
           [xmin, ymin, xmax - xmin, ymax - ymin]
-    viewBox = recurse xml.documentElement
+    viewBox = recurse dom.documentElement
     if not viewBox? or Infinity in viewBox or -Infinity in viewBox
       null
     else
@@ -394,7 +394,7 @@ class Tile extends HasSettings
       throw new SVGTilerError "Attempt to create tile '#{@key}' without content"
 
   makeSVG: ->
-    return if @svg?
+    return @svg if @svg?
     ## Set `@svg` to SVG string for duplication detection.
     if isPreact @value
       ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
@@ -553,8 +553,8 @@ class Tile extends HasSettings
       else
         true
 
-    ## Compute viewBox attribute if absent.
-    @viewBox = svgBBox @dom
+    ## Compute viewBox attribute if absent and wrapping in <symbol>.
+    @viewBox = svgBBox @dom, wrapper == 'symbol'
 
     ## Overflow behavior
     overflow = attributeOrStyle @dom.documentElement, 'overflow'
@@ -1014,6 +1014,14 @@ class Drawing extends Input
     filename = r.writeSVG()
     r.writeTeX() if getSetting settings, 'texText'
     filename
+  get: (j, i) ->
+    @keys[i]?[j]
+  at: (j, i) ->
+    if i < 0
+      i += @keys.length
+    if j < 0
+      j += @keys[i]?.length ? 0
+    @keys[i]?[j]
 
 class AutoDrawing extends Drawing
   ###
@@ -1308,13 +1316,15 @@ class Render extends HasSettings
     @mappings.doAfterRender @, (out) =>
       return unless out
       tile = new Tile '_afterRender', out
-      dom = tile.makeDOM 'svg'  # wrap in <svg> instead of <symbol>
+      ## Wrap in <svg> instead of <symbol>, with default viewBox of drawing.
+      dom = tile.makeDOM 'svg'
       @layers[tile.zIndex] ?= []
       box = tile.overflowBox ? tile.viewBox
-      @xMin = Math.min @xMin, box[0]
-      @yMin = Math.min @yMin, box[1]
-      @xMax = Math.max @xMax, box[0] + box[2]
-      @yMax = Math.max @yMax, box[1] + box[3]
+      if box?
+        @xMin = Math.min @xMin, box[0]
+        @yMin = Math.min @yMin, box[1]
+        @xMax = Math.max @xMax, box[0] + box[2]
+        @yMax = Math.max @yMax, box[1] + box[3]
       updateSize()
       @layers[tile.zIndex].push dom.documentElement
     ## Sort by layer
