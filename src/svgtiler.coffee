@@ -1096,26 +1096,23 @@ class Render extends HasSettings
         for key, j in row
           context.move i, j
           tile = @mappings.lookup key, context
-          if tile?
-            ## Check cache by tile value if it's a string (e.g. filename,
-            ## to avoid loading file again), and by computed SVG string
-            ## (in case multiple paths lead to the same SVG content).
-            if typeof tile.value == 'string' and
-               (found = cache.get tile.value)?
-              tile = found
-            else
-              tile.makeSVG()
-              unless tile.value == tile.svg
-                if (found = cache.get tile.svg)?
-                  tile = found
-                else
-                  cache.set tile.svg, tile
-              cache.set tile.value, tile
-          else
+          unless tile?
             missing.add key
             tile = unrecognizedTile
-            unless (found = cache.get tile.key)?
-              cache.set tile.key, tile
+          ## Check cache by tile value if it's a string (e.g. filename,
+          ## to avoid loading file again), and by computed SVG string
+          ## (in case multiple paths lead to the same SVG content).
+          if typeof tile.value == 'string' and
+              (found = cache.get tile.value)?
+            tile = found
+          else
+            tile.makeSVG()
+            unless tile.value == tile.svg
+              if (found = cache.get tile.svg)?
+                tile = found
+              else
+                cache.set tile.svg, tile
+            cache.set tile.value, tile
           ## Include new <symbol> in SVG
           unless found?
             tile.setId @id key unless tile.id?  # unrecognizedTile has id
