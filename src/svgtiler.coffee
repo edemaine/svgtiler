@@ -243,9 +243,9 @@ svgBBox = (xml) ->
     else
       viewBox
 
-isAuto = (xml, prop) ->
-  xml.documentElement.hasAttribute(prop) and
-  /^\s*auto\s*$/i.test xml.documentElement.getAttribute prop
+isAuto = (dom, prop) ->
+  dom.documentElement.hasAttribute(prop) and
+  /^\s*auto\s*$/i.test dom.documentElement.getAttribute prop
 
 attributeOrStyle = (node, attr, styleKey = attr) ->
   if value = node.getAttribute attr
@@ -431,9 +431,9 @@ class Tile extends HasSettings
     @svg = removeSVGComments @svg
 
   setId: (@id) ->
-    @xml.documentElement.setAttribute 'id', @id if @xml?
-  makeXML: ->
-    return @xml if @xml?
+    @dom.documentElement.setAttribute 'id', @id if @dom?
+  makeDOM: ->
+    return @dom if @dom?
     @makeSVG()
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
     ## (This is especially important on the browser, so the results can be
@@ -444,7 +444,7 @@ class Tile extends HasSettings
           match = match[...match.length-end.length] +
             " xmlns='#{SVGNS}'" + match[match.length-end.length..]
         match
-    @xml = new DOMParser
+    @dom = new DOMParser
       locator:  ## needed when specifying errorHandler
         line: 1
         col: 1
@@ -461,30 +461,30 @@ class Tile extends HasSettings
     ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     ## in the original parsed content or possibly added above,
     ## to avoid conflict with these attributes in the top-level <svg>.
-    @xml.documentElement.removeAttribute 'xmlns'
+    @dom.documentElement.removeAttribute 'xmlns'
     unless @getSetting 'useHref'
-      @xml.documentElement.removeAttribute 'xmlns:xlink'
+      @dom.documentElement.removeAttribute 'xmlns:xlink'
 
     ## Wrap XML in <symbol> if not already.
-    symbol = @xml.createElementNS SVGNS, 'symbol'
+    symbol = @dom.createElementNS SVGNS, 'symbol'
     ## Force `id` to be first attribute.
     symbol.setAttribute 'id', @id if @id?
     # Avoid a layer of indirection for <symbol>/<svg> at top level
-    if @xml.documentElement.nodeName in ['symbol', 'svg'] and
-       not @xml.documentElement.nextSibling?
-      for attribute in @xml.documentElement.attributes
+    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
+       not @dom.documentElement.nextSibling?
+      for attribute in @dom.documentElement.attributes
         unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
           symbol.setAttribute attribute.name, attribute.value
-      doc = @xml.documentElement
-      @xml.removeChild @xml.documentElement
+      doc = @dom.documentElement
+      @dom.removeChild @dom.documentElement
     else
-      doc = @xml
+      doc = @dom
     for child in (node for node in doc.childNodes)
       symbol.appendChild child
-    @xml.appendChild symbol
+    @dom.appendChild symbol
 
     ## <image> processing
-    domRecurse @xml.documentElement, (node) =>
+    domRecurse @dom.documentElement, (node) =>
       if node.nodeName == 'image'
         ###
         Fix image-rendering: if unspecified, or if specified as "optimizeSpeed"
@@ -549,12 +549,12 @@ class Tile extends HasSettings
         true
 
     ## Compute viewBox attribute if absent.
-    @viewBox = svgBBox @xml
+    @viewBox = svgBBox @dom
 
     ## Overflow behavior
-    overflow = attributeOrStyle @xml.documentElement, 'overflow'
+    overflow = attributeOrStyle @dom.documentElement, 'overflow'
     if not overflow? and (overflowDefault = @getSetting 'overflowDefault')?
-      @xml.documentElement.setAttribute 'overflow',
+      @dom.documentElement.setAttribute 'overflow',
         overflow = overflowDefault
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
     @width = @height = null
@@ -573,8 +573,8 @@ class Tile extends HasSettings
           @viewBox[3] = zeroSizeReplacement
       ## Reset viewBox attribute in case either absent (and computed via
       ## svgBBox) or changed to avoid zeroes.
-      @xml.documentElement.setAttribute 'viewBox', @viewBox.join ' '
-    @overflowBox = extractOverflowBox @xml
+      @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+    @overflowBox = extractOverflowBox @dom
     @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
     @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
     warnings = []
@@ -588,22 +588,22 @@ class Tile extends HasSettings
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for tile '#{@key}'"
     ## Detect special `width="auto"` and/or `height="auto"` fields for future
     ## processing, and remove them to ensure valid SVG.
-    @autoWidth = isAuto @xml, 'width'
-    @autoHeight = isAuto @xml, 'height'
-    @xml.documentElement.removeAttribute 'width' if @autoWidth
-    @xml.documentElement.removeAttribute 'height' if @autoHeight
-    @zIndex = extractZIndex @xml.documentElement
+    @autoWidth = isAuto @dom, 'width'
+    @autoHeight = isAuto @dom, 'height'
+    @dom.documentElement.removeAttribute 'width' if @autoWidth
+    @dom.documentElement.removeAttribute 'height' if @autoHeight
+    @zIndex = extractZIndex @dom.documentElement
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
       @text = []
-      domRecurse @xml.documentElement, (node, parent) =>
+      domRecurse @dom.documentElement, (node, parent) =>
         if node.nodeName == 'text'
           @text.push node
           parent.removeChild node
           false # don't recurse into <text>'s children
         else
           true
-    @xml
+    @dom
 
 ## Tile to fall back to when encountering an unrecognized key.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
@@ -1116,7 +1116,7 @@ class Render extends HasSettings
           ## Include new <symbol> in SVG
           unless found?
             tile.setId @id key unless tile.id?  # unrecognizedTile has id
-            svg.appendChild tile.makeXML().documentElement
+            svg.appendChild tile.makeDOM().documentElement
             if symbolIds.has tile.id
               console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
