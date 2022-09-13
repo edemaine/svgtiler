@@ -6,6 +6,15 @@
 |-----------|------------|--------|
 | ![Initial chessboard](board-init.svg) | [ASCII input](board-init.asc)<br>[SVG output](board-init.svg) | [Wikipedia: Chess](https://en.wikipedia.org/wiki/Chess) |
 | ![Immortal Game chessboard](board-immortal.svg) | [ASCII input](board-immortal.asc)<br>[SVG output](board-immortal.svg) | [Wikipedia: Immortal Game](https://en.wikipedia.org/wiki/Immortal_Game) (last position) |
+| ![Kasparov's Immortal chessboard](board-kasparov-immortal.svg) | [ASCII input](board-kasparov-immortal.asc)<br>[SVG output](board-karparov-immortal.svg) | [Wikipedia: Karparov's Immortal](https://en.wikipedia.org/wiki/Kasparov%27s_Immortal) (last position) |
+
+## Drawings with Attack Graph
+
+| Rendering | Repo Files | Source |
+|-----------|------------|--------|
+| ![Initial chessboard](graph/board-init.svg) | [ASCII input](board-init.asc)<br>[SVG output](board-init.svg) | [Wikipedia: Chess](https://en.wikipedia.org/wiki/Chess) |
+| ![Immortal Game chessboard](graph/board-immortal.svg) | [ASCII input](board-immortal.asc)<br>[SVG output](board-immortal.svg) | [Wikipedia: Immortal Game](https://en.wikipedia.org/wiki/Immortal_Game) (last position) |
+| ![Kasparov's Immortal chessboard](graph/board-kasparov-immortal.svg) | [ASCII input](board-kasparov-immortal.asc)<br>[SVG output](board-karparov-immortal.svg) | [Wikipedia: Karparov's Immortal](https://en.wikipedia.org/wiki/Kasparov%27s_Immortal) (last position) |
 
 ## Mapping
 
@@ -15,7 +24,9 @@
   * Using `require` to load and modify external SVG files
     (strip off unnecessary `<svg>` wrapper)
   * JSX notation for creating and composing symbols
-  * `svgtiler.afterRender` for rendering a background
+  * `svgtiler.afterRender` for rendering a background white rectangle
+* [CoffeeScript file](graph.coffee) for rendering the graph of attacks,
+  illustrating more advanced `svgtiler.afterRender` usage.
 
 ## Piece Shapes
 

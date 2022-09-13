@@ -161,7 +161,7 @@
       <path d="M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18" style="fill:none; stroke:#ffffff; stroke-linejoin:miter;"/>
     </g>
   </symbol>
-  <svg overflow="visible">
+  <svg viewBox="0 0 360 360" overflow="visible">
     <rect fill="white" x="0" y="0" width="360" height="360"/>
   </svg>
   <use xlink:href="#r" x="0" y="0" width="45" height="45"/>
@@ -228,4 +228,11 @@
   <use xlink:href="#_2E_v1" x="225" y="315" width="45" height="45"/>
   <use xlink:href="#b_v1" x="270" y="315" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="315" y="315" width="45" height="45"/>
+  <svg viewBox="0 0 360 360" overflow="visible">
+    <line x1="157.5" y1="22.5" x2="202.5" y2="67.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="202.5" y1="67.5" x2="247.5" y2="112.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="247.5" y1="112.5" x2="157.5" y2="157.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="247.5" y1="112.5" x2="292.5" y2="202.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="247.5" y1="112.5" x2="337.5" y2="157.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
+  </svg>
 </svg>

@@ -207,7 +207,7 @@
       <path d="M 11,14 L 34,14" style="fill:none; stroke:#000000; stroke-linejoin:miter;"/>
     </g>
   </symbol>
-  <svg overflow="visible">
+  <svg viewBox="0 0 360 360" overflow="visible">
     <rect fill="white" x="0" y="0" width="360" height="360"/>
   </svg>
   <use xlink:href="#r" x="0" y="0" width="45" height="45"/>
@@ -274,4 +274,5 @@
   <use xlink:href="#B_v1" x="225" y="315" width="45" height="45"/>
   <use xlink:href="#N_v1" x="270" y="315" width="45" height="45"/>
   <use xlink:href="#R_v1" x="315" y="315" width="45" height="45"/>
+  <svg viewBox="0 0 360 360" overflow="visible"/>
 </svg>
