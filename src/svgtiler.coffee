@@ -1184,7 +1184,7 @@ class Render extends HasSettings
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
-          context.move i, j
+          context.move j, i
           tile = @mappings.lookup key, context
           unless tile?
             missing.add key
@@ -1493,8 +1493,9 @@ class Context
     #@keys = @drawing.keys
     #@filename = @drawing.filename
     #@subname = @drawing.subname
-    @move i, j if i? and j?
-  move: (@i, @j) ->
+    @move j, i if i? and j?
+  move: (@j, @i) ->
+    ## Change location in-place
     @key = @drawing.keys[@i]?[@j]
   at: (j, i) ->
     if i < 0
