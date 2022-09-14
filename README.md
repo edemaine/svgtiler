@@ -259,6 +259,9 @@ The `Context` object has the following properties and methods:
   method on this array to do bulk tests on the row.
 * `context.column(dj = 0)` returns an array of `Context` objects, one for each
   tile in column `j + dj`.
+* `context.set(key)` changes the key at the context's position to the
+  specified value.  This can be useful for changing keys that haven't been
+  processed yet (later in reading order) to affect later processing.
 * `context.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
 * `context.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the drawing input format does allow multiple sheets.

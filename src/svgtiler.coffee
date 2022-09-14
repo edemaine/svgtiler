@@ -1015,8 +1015,19 @@ class Drawing extends Input
     r.writeTeX() if getSetting settings, 'texText'
     filename
   get: (j, i) ->
+    ## No special negative number handling
     @keys[i]?[j]
+  set: (j, i, key) ->
+    if i < 0 or j < 0
+      throw new SVGTilerError "Cannot set key for negative index (#{i}, #{j})"
+    while i >= @keys.length
+      @keys.push []
+    row = @keys[i]
+    while j >= row.length
+      row.push ''
+    row[j] = key
   at: (j, i) ->
+    ## Negative numbers wrap around
     if i < 0
       i += @keys.length
     if j < 0
@@ -1175,6 +1186,7 @@ class Render extends HasSettings
     for style in @styles
       svg.appendChild styleTag = @dom.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
+
     ## Render all tiles in the drawing.
     @mappings.doBeforeRender @
     missing = new Set
@@ -1218,6 +1230,7 @@ class Render extends HasSettings
     missing = ("'#{key}'" for key from missing)
     if missing.length
       console.warn "Failed to recognize tiles:", missing.join ', '
+
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = new Map
     inlineImageVersions = new Map
@@ -1260,6 +1273,7 @@ class Render extends HasSettings
         symbol.appendChild node
       use.setAttribute @hrefAttr(), '#' + id
       false
+
     ## Lay out the symbols in the drawing via SVG <use>.
     @xMin = @yMin = @xMax = @yMax = 0
     @layers = {}
@@ -1497,7 +1511,11 @@ class Context
   move: (@j, @i) ->
     ## Change location in-place
     @key = @drawing.keys[@i]?[@j]
+  set: (key) ->
+    ## Change key for this location
+    @drawing.set @j, @i, key
   at: (j, i) ->
+    ## Negative numbers wrap around
     if i < 0
       i += @drawing.keys.length
     if j < 0
