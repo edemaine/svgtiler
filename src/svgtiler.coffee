@@ -136,6 +136,9 @@ class HasSettings
   getSetting: (key) -> getSetting @settings, key
   getOutputDir: (extension) -> getOutputDir @settings, extension
 
+currentMapping = null
+currentContext = null
+
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
 
@@ -745,7 +748,6 @@ class ArrayWrapper extends Array
 class Styles extends ArrayWrapper
   @itemClass: Style
 
-currentMapping = null
 getMapping = ->
   ## Returns current `Mapping` object,
   ## when used at top level of a JS/CS mapping file.
@@ -1192,12 +1194,12 @@ class Render extends HasSettings
     missing = new Set
     cache = new Map
     symbolIds = new Set
-    context = new Context @
+    currentContext = new Context @
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
-          context.move j, i
-          tile = @mappings.lookup key, context
+          currentContext.move j, i
+          tile = @mappings.lookup key, currentContext
           unless tile?
             missing.add key
             tile = unrecognizedTile
@@ -1227,6 +1229,7 @@ class Render extends HasSettings
             else
               symbolIds.add tile.id
           tile
+    currentContext = null
     missing = ("'#{key}'" for key from missing)
     if missing.length
       console.warn "Failed to recognize tiles:", missing.join ', '
@@ -1499,6 +1502,19 @@ class Render extends HasSettings
       for dep in depGroup
         return true if dep.modified? and dep.modified > modified
     false
+
+getContext = ->
+  ## Returns current `Context` object, when used within a mapping function.
+  currentContext
+runWithContext = (context, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## within the specified `context`.
+  oldContext = currentContext
+  currentContext = context
+  try
+    fn()
+  finally
+    currentContext = oldContext
 
 class Context
   constructor: (@render, i, j) ->
@@ -1794,8 +1810,8 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
-  Render, Context,
-  beforeRender, afterRender,
+  Render, beforeRender, afterRender,
+  Context, getContext, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
   static: wrapStatic,

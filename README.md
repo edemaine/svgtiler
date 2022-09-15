@@ -223,6 +223,8 @@ Functions get called with a **`Context`** object as both a second argument and
 as `this` (if the function is defined via `function`;
 [`=>` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 can't have `this` bound).
+Instead of passing the `Context` object to other functions, they can access
+the currently active `Context` via `svgtiler.getContext()`.
 The `Context` object has the following properties and methods:
 
 * `context.key` is the tile name, or `null` if the `Context` is out of bounds
@@ -272,14 +274,14 @@ The `Context` object has the following properties and methods:
 
 The top-level code of your .js or .coffee mapping file can also call:
 
-* `beforeRender(callback)` to schedule calling `callback(render)`
+* `svgtiler.beforeRender(callback)` to schedule calling `callback(render)`
   before rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.
   The `callback`'s argument (and `this`) is set to a `Render` instance,
   which in particular has `drawing`, `mappings`, and `styles` attributes.
   You can even modify the drawing's `keys` at this stage,
   by modifying `render.drawing.keys`.
-* `afterRender(callback)` to schedule calling `callback(render)`
+* `svgtiler.afterRender(callback)` to schedule calling `callback(render)`
   after rendering each drawing.  In particular,
   to render an overlay or underlay, return the content to render
   as a string or Preact VDOM (ideally in an `<svg>` wrapper).
