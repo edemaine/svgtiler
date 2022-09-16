@@ -673,6 +673,7 @@ unrecognizedTile = new Tile '_unrecognized', '''
   </symbol>
 '''
 unrecognizedTile.id = '_unrecognized' # cannot be output of escapeId()
+unrecognizedTile.isStatic = true      # need to clone on use
 
 class Input extends HasSettings
   ###
