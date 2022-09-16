@@ -141,9 +141,6 @@ class HasSettings
   getSetting: (key) -> getSetting @settings, key
   getOutputDir: (extension) -> getOutputDir @settings, extension
 
-currentMapping = null
-currentContext = null
-
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
 
@@ -393,6 +390,51 @@ removeSVGComments = (svg) ->
   ## Remove SVG/XML comments such as <?xml...?> and <!DOCTYPE>
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
+
+currentMapping = null
+currentRender = null
+currentContext = null
+
+getMapping = ->
+  ## Returns current `Mapping` object,
+  ## when used at top level of a JS/CS mapping file.
+  currentMapping
+runWithMapping = (mapping, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## at the top level of the specified mapping.
+  oldMapping = currentMapping
+  currentMapping = mapping
+  try
+    fn()
+  finally
+    currentMapping = oldMapping
+
+getRender = ->
+  ## Returns current `Mapping` object,
+  ## when used at top level of a JS/CS mapping file.
+  currentRender
+runWithRender = (render, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## from the specified `render`.
+  oldRender = currentRender
+  currentRender = render
+  try
+    fn()
+  finally
+    currentRender = oldRender
+
+getContext = ->
+  ## Returns current `Context` object, when used within a mapping function.
+  currentContext
+runWithContext = (context, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## within the specified `context`.
+  oldContext = currentContext
+  currentContext = context
+  try
+    fn()
+  finally
+    currentContext = oldContext
 
 class Tile extends HasSettings
   constructor: (@key, @value, @settings) ->
@@ -753,29 +795,6 @@ class ArrayWrapper extends Array
 class Styles extends ArrayWrapper
   @itemClass: Style
 
-getMapping = ->
-  ## Returns current `Mapping` object,
-  ## when used at top level of a JS/CS mapping file.
-  currentMapping
-runWithMapping = (mapping, fn) ->
-  ## Runs the specified function `fn` as if it were called
-  ## at the top level of the specified mapping.
-  oldMapping = currentMapping
-  currentMapping = mapping
-  try
-    fn()
-  finally
-    currentMapping = oldMapping
-
-beforeRender = (fn) ->
-  unless currentMapping?
-    throw new SVGTilerError "svgtiler.beforeRender called outside mapping file"
-  currentMapping.beforeRender fn
-afterRender = (fn) ->
-  unless currentMapping?
-    throw new SVGTilerError "svgtiler.afterRender called outside mapping file"
-  currentMapping.afterRender fn
-
 class Mapping extends Input
   ###
   Base Mapping class.
@@ -848,6 +867,15 @@ class Mapping extends Input
     for callback in @afterRenderQueue
       result = callback.call render, render
       onResult? result
+
+beforeRender = (fn) ->
+  unless currentMapping?
+    throw new SVGTilerError "svgtiler.beforeRender called outside mapping file"
+  currentMapping.beforeRender fn
+afterRender = (fn) ->
+  unless currentMapping?
+    throw new SVGTilerError "svgtiler.afterRender called outside mapping file"
+  currentMapping.afterRender fn
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -1177,7 +1205,7 @@ class Render extends HasSettings
       "#{escaped}_v#{version}"
     else
       escaped
-  makeDOM: ->
+  makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
     Also saves the table of tiles in `@tiles`, the corresponding
@@ -1199,7 +1227,6 @@ class Render extends HasSettings
     missing = new Set
     cache = new Map
     symbolIds = new Set
-    currentContext = new Context @
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
@@ -1508,19 +1535,6 @@ class Render extends HasSettings
         return true if dep.modified? and dep.modified > modified
     false
 
-getContext = ->
-  ## Returns current `Context` object, when used within a mapping function.
-  currentContext
-runWithContext = (context, fn) ->
-  ## Runs the specified function `fn` as if it were called
-  ## within the specified `context`.
-  oldContext = currentContext
-  currentContext = context
-  try
-    fn()
-  finally
-    currentContext = oldContext
-
 class Context
   constructor: (@render, i, j) ->
     @drawing = @render.drawing
@@ -1815,7 +1829,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
-  Render, beforeRender, afterRender,
+  Render, getRender, runWithRender, beforeRender, afterRender,
   Context, getContext, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,
