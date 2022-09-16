@@ -35,11 +35,16 @@ unless window?
           if types.isExportDefaultDeclaration part
             return  # already an export default, so don't add one
         last = body[body.length-1]
-        if last.node.type == 'ExpressionStatement'
-          exportLast = types.exportDefaultDeclaration last.node.expression
-          exportLast.leadingComments = last.node.leadingComments
-          exportLast.innerComments = last.node.innerComments
-          exportLast.trailingComments = last.node.trailingComments
+        lastNode = last.node
+        if types.isExpressionStatement(last) and (
+          types.isObjectExpression(lastNode.expression) or
+          types.isFunctionExpression(lastNode.expression)
+          # not AssignmentExpression
+        )
+          exportLast = types.exportDefaultDeclaration lastNode.expression
+          exportLast.leadingComments = lastNode.leadingComments
+          exportLast.innerComments = lastNode.innerComments
+          exportLast.trailingComments = lastNode.trailingComments
           last.replaceWith exportLast
         undefined
 

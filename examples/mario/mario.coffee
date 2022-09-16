@@ -41,7 +41,7 @@ map =
   spiny_left: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_left.png"/></symbol>
   spiny_right: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_right.png"/></symbol>
 
-build = (key) ->
+export default build = (key) ->
   ### Keys:
   "a,b" expands to the equivalent of a beneath b
   "a+x+y" expands to a shifted by (x, y)

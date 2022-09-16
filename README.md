@@ -172,7 +172,9 @@ The code specifies a `mapping` in one of three ways:
 
 1. `export default mapping` (ECMAScript modules style)
 2. `exports.default = mapping` (CommonJS modules style)
-3. Writing a `mapping` expression at the end of the file (implicit export).
+3. Writing a `mapping` expression at the end of the file (implicit export),
+   which must be a top-level object or function expression
+   (without e.g. being assigned to a variable).
 
 In any case, `mapping` should be one of the following types of **mapping**
 objects:

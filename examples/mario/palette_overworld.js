@@ -1,2 +1,1 @@
 share.palette = 'overworld'
-null

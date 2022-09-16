@@ -72,5 +72,3 @@ svgtiler.afterRender (render) ->
           />
 
   <svg>{edges}</svg>
-
-null
