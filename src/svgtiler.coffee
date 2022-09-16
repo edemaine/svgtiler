@@ -38,8 +38,9 @@ unless window?
         lastNode = last.node
         if types.isExpressionStatement(last) and (
           types.isObjectExpression(lastNode.expression) or
-          types.isFunctionExpression(lastNode.expression)
-          # not AssignmentExpression
+          types.isFunctionExpression(lastNode.expression) or
+          types.isArrowFunctionExpression(lastNode.expression)
+          # not AssignmentExpression or CallExpression
         )
           exportLast = types.exportDefaultDeclaration lastNode.expression
           exportLast.leadingComments = lastNode.leadingComments
@@ -82,7 +83,9 @@ unless window?
     #inlineMap: true  # rely on Babel's source map
     transpile: babelConfig
 
-  require('@babel/register') babelConfig
+  ## Prevent Babel from caching its results, for changes to our plugins.
+  require('@babel/register') {...babelConfig, cache: false}
+
   CoffeeScript = require 'coffeescript'
   CoffeeScript.FILE_EXTENSIONS = ['.coffee', '.cjsx']
   CoffeeScript.register()
@@ -906,11 +909,12 @@ class JSMapping extends Mapping
       ## Normally use `require` to load code as a real NodeJS module
       filename = path.resolve @filename
       ## Debug Babel output
-      #{code} = require('@babel/core').transform fs.readFileSync(filename), {
-      #  ...babelConfig
-      #  filename: @filename
-      #}
-      #console.log code
+      #if @constructor == JSMapping
+      #  {code} = require('@babel/core').transform fs.readFileSync(filename), {
+      #    ...babelConfig
+      #    filename: @filename
+      #  }
+      #  console.log code
       pirates?.settings = @settings
       @module = runWithMapping @, -> require filename
       super @module.default ? {}
