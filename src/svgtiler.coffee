@@ -1193,7 +1193,7 @@ class Drawings extends Input
   parse: (datas) ->
     @drawings =
       for data in datas
-        new Drawing parse,
+        new AutoDrawing data,
           settings: @settings
           filename: @filename
           subname: data.subname
@@ -1553,9 +1553,10 @@ class Render extends HasSettings
     works with both .pdf and .png auxiliary files).
     ###
     filename ?= @drawing.generateFilename '.svg_tex'
-    relativeDir ?= path.relative path.parse(filename).dir,
-      @getOutputDir('.pdf') ? @getOutputDir('.png') ?
-      @getOutputDir('.svg')
+    if not relativeDir? and (outputDir =
+      @getOutputDir('.pdf') ? @getOutputDir('.png') ? @getOutputDir('.svg')
+    )?
+      relativeDir = path.relative path.parse(filename).dir, outputDir
     unless @shouldGenerate filename, @mappings
       console.log '->', filename, '(SKIPPED)'
     else if maybeWrite filename, @makeTeX filename, relativeDir
