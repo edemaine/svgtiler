@@ -299,19 +299,20 @@ extractZIndex = (node) ->
 
 domRecurse = (node, callback) ->
   ###
-  Recurse through DOM starting at `node`, calling `callback(node, parent)`
-  on every recursive node except `node` itself.
+  Recurse through DOM starting at `node`, calling `callback(node)`
+  on every recursive node, including `node` itself.
   `callback()` should return a true value if you want to recurse into
   the specified node's children (typically, when there isn't a match).
+  Robust against node being replaced.
   ###
+  return unless callback node
   return unless node.hasChildNodes()
   child = node.lastChild
   while child?
     nextChild = child.previousSibling
-    if callback child, node
-      domRecurse child, callback
+    domRecurse child, callback
     child = nextChild
-  null
+  return
 
 contentType =
   '.png': 'image/png'
@@ -439,12 +440,16 @@ runWithContext = (context, fn) ->
   finally
     currentContext = oldContext
 
-class Tile extends HasSettings
-  constructor: (@key, @value, @settings) ->
-    ## `@value` can be a string or Preact VDOM.
+class SVGContent extends HasSettings
+  ###
+  Base helper for parsing SVG as specified in SVG Tiler:
+  SVG strings, Preact VDOM, or filenames, with special handling of image files.
+  In some cases, acquires `isStatic` Boolean attribute to indicate
+  re-usable content.
+  ###
+  constructor: (@name, @value, @settings) ->
+    ## `@value` can be a string (SVG or filename) or Preact VDOM.
     super()
-    unless @value?
-      throw new SVGTilerError "Attempt to create tile '#{@key}' without content"
 
   makeSVG: ->
     return @svg if @svg?
@@ -474,18 +479,18 @@ class Tile extends HasSettings
             @settings = {...@settings, dirname: path.dirname filename}
             @svg = loadSVG @filename, @settings
           else
-            throw new SVGTilerError "Unrecognized extension in filename '#{@value}' for tile '#{@key}'"
+            throw new SVGTilerError "Unrecognized extension in filename '#{@value}' for #{@name}"
       else
         @svg = @value
     else
-      throw new SVGTilerError "Invalid value for tile '#{@key}': #{typeof @value}"
+      throw new SVGTilerError "Invalid value for #{@name}: #{typeof @value}"
     ## Remove initial SVG/XML comments (for broader duplication detection,
     ## and the next replace rule).
     @svg = removeSVGComments @svg
 
   setId: (@id) ->
     @dom.documentElement.setAttribute 'id', @id if @dom?
-  makeDOM: (wrapper = 'symbol') ->
+  makeDOM: ->
     return @dom if @dom?
     @makeSVG()
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
@@ -509,7 +514,7 @@ class Tile extends HasSettings
           indent + lines[line-1] + '\n' +
           indent + ' '.repeat(col-1) + '^^^' +
           (if line < lines.length then '\n' + indent + lines[line] else '')
-        console.error "SVG parse #{level} in tile '#{@key}': #{msg}"
+        console.error "SVG parse #{level} in #{@name}: #{msg}"
     .parseFromString svg, 'image/svg+xml'
     ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     ## in the original parsed content or possibly added above,
@@ -517,29 +522,6 @@ class Tile extends HasSettings
     @dom.documentElement.removeAttribute 'xmlns'
     unless @getSetting 'useHref'
       @dom.documentElement.removeAttribute 'xmlns:xlink'
-
-    ## Wrap XML in <symbol> if not already.
-    symbol = @dom.createElementNS SVGNS, wrapper
-    ## Force `id` to be first attribute.
-    symbol.setAttribute 'id', @id if @id?
-    # Avoid a layer of indirection for <symbol>/<svg> at top level
-    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
-       not @dom.documentElement.nextSibling?
-      for attribute in @dom.documentElement.attributes
-        unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
-          symbol.setAttribute attribute.name, attribute.value
-      @dom.removeChild doc = @dom.documentElement
-    else
-      doc = @dom
-      ## Allow top-level object to specify <symbol> data.
-      for attribute in ['z-index', 'viewBox', 'overflowBox']
-        if doc.documentElement.hasAttribute attribute
-          symbol.setAttribute attribute,
-            doc.documentElement.getAttribute attribute
-          doc.documentElement.removeAttribute attribute
-    for child in (node for node in doc.childNodes)
-      symbol.appendChild child
-    @dom.appendChild symbol
 
     ## <image> processing
     domRecurse @dom.documentElement, (node) =>
@@ -605,9 +587,49 @@ class Tile extends HasSettings
         false
       else
         true
+    @dom
+  useDOM: ->
+    @makeDOM()
+    ## Clone if content is static, to enable later re-use
+    if @isStatic
+      @dom.documentElement.cloneNode true
+    else
+      @dom.documentElement
+
+class SVGTopLevel extends SVGContent
+  ###
+  Abstract base class for `SVGSymbol` and `SVGSVG` which have support for
+  `viewBox`, `overflowBox`, and `z-index`.
+  Subclass should define `wrapper` of 'symbol' or 'svg'.
+  Parser will enforce that the content is wrapped in this element.
+  ###
+  makeDOM: ->
+    super()
+    ## Wrap XML in <wrapper>.
+    symbol = @dom.createElementNS SVGNS, @wrapper
+    ## Force `id` to be first attribute.
+    symbol.setAttribute 'id', @id if @id?
+    ## Avoid a layer of indirection for <symbol>/<svg> at top level
+    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
+       not @dom.documentElement.nextSibling?
+      for attribute in @dom.documentElement.attributes
+        unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
+          symbol.setAttribute attribute.name, attribute.value
+      @dom.removeChild doc = @dom.documentElement
+    else
+      doc = @dom
+      ## Allow top-level object to specify <symbol> data.
+      for attribute in ['z-index', 'viewBox', 'overflowBox']
+        if doc.documentElement.hasAttribute attribute
+          symbol.setAttribute attribute,
+            doc.documentElement.getAttribute attribute
+          doc.documentElement.removeAttribute attribute
+    for child in (node for node in doc.childNodes)
+      symbol.appendChild child
+    @dom.appendChild symbol
 
     ## Compute viewBox attribute if absent and wrapping in <symbol>.
-    @viewBox = svgBBox @dom, wrapper == 'symbol'
+    @viewBox = svgBBox @dom, @wrapper == 'symbol'
 
     ## Overflow behavior
     overflow = attributeOrStyle @dom.documentElement, 'overflow'
@@ -615,7 +637,6 @@ class Tile extends HasSettings
       @dom.documentElement.setAttribute 'overflow',
         overflow = overflowDefault
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
-    @width = @height = null
     if @viewBox?
       @width = @viewBox[2]
       @height = @viewBox[3]
@@ -630,35 +651,55 @@ class Tile extends HasSettings
         if @height == 0
           @viewBox[3] = zeroSizeReplacement
       ## Reset viewBox attribute in case either absent (and computed via
-      ## svgBBox) or changed to avoid zeroes.
+      ## `svgBBox`) or changed to avoid zeroes.
       @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+    else
+      @width = @height = null
     @overflowBox = extractOverflowBox @dom
-    if wrapper == 'symbol'
-      @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
-      @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
-      warnings = []
-      unless @width?
-        warnings.push 'width'
-        @width = 0
-      unless @height?
-        warnings.push 'height'
-        @height = 0
-      if warnings.length > 0
-        console.warn "Failed to detect #{warnings.join ' and '} of SVG for tile '#{@key}'"
+    @zIndex = extractZIndex @dom.documentElement
+    @dom
+
+class SVGSVG extends SVGTopLevel
+  ###
+  SVG content wrapped in <svg>, used for `afterRender` content.
+  ###
+  wrapper: 'svg'
+
+class SVGSymbol extends SVGTopLevel
+  ###
+  SVG content wrapped in `<symbol>`, with special width/height handling,
+  used for tiles.  An alternative title for this class would be `Tile`,
+  but often the same symbol is re-used by many tiles.
+  ###
+  wrapper: 'symbol'
+  makeDOM: ->
+    super()
+    ## `SVGTop` sets @width and @height according to viewBox.
+    ## Check for overrides and missing width/height needed for symbols.
+    @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
+    @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
+    warnings = []
+    unless @width?
+      warnings.push 'width'
+      @width = 0
+    unless @height?
+      warnings.push 'height'
+      @height = 0
+    if warnings.length > 0
+      console.warn "Failed to detect #{warnings.join ' and '} of SVG for #{@name}"
     ## Detect special `width="auto"` and/or `height="auto"` fields for future
     ## processing, and remove them to ensure valid SVG.
     @autoWidth = isAuto @dom, 'width'
     @autoHeight = isAuto @dom, 'height'
     @dom.documentElement.removeAttribute 'width' if @autoWidth
     @dom.documentElement.removeAttribute 'height' if @autoHeight
-    @zIndex = extractZIndex @dom.documentElement
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
       @text = []
       domRecurse @dom.documentElement, (node, parent) =>
         if node.nodeName == 'text'
           @text.push node
-          parent.removeChild node
+          node.parentNode.removeChild node
           false # don't recurse into <text>'s children
         else
           true
@@ -667,14 +708,14 @@ class Tile extends HasSettings
 ## Tile to fall back to when encountering an unrecognized key.
 ## Path from https://commons.wikimedia.org/wiki/File:Replacement_character.svg
 ## by Amit6, released into the public domain.
-unrecognizedTile = new Tile '_unrecognized', '''
+unrecognizedSymbol = new SVGSymbol 'unrecognized tile', '''
   <symbol viewBox="0 0 200 200" preserveAspectRatio="none" width="auto" height="auto">
     <rect width="200" height="200" fill="yellow"/>
     <path stroke="none" fill="red" d="M 200,100 100,200 0,100 100,0 200,100 z M 135.64709,74.70585 q 0,-13.52935 -10.00006,-22.52943 -9.99999,-8.99999 -24.35289,-8.99999 -17.29415,0 -30.117661,5.29409 L 69.05879,69.52938 q 9.764731,-6.23528 21.52944,-6.23528 8.82356,0 14.58824,4.82351 5.76469,4.82351 5.76469,12.70589 0,8.5883 -9.94117,21.70588 -9.94117,13.11766 -9.94117,26.76473 l 17.88236,0 q 0,-6.3529 6.9412,-14.9412 11.76471,-14.58816 12.82351,-16.35289 6.9412,-11.05887 6.9412,-23.29417 z m -22.00003,92.11771 0,-24.70585 -27.29412,0 0,24.70585 27.29412,0 z"/>
   </symbol>
 '''
-unrecognizedTile.id = '_unrecognized' # cannot be output of escapeId()
-unrecognizedTile.isStatic = true      # need to clone on use
+unrecognizedSymbol.id = '_unrecognized' # cannot be output of escapeId()
+unrecognizedSymbol.isStatic = true      # need to clone on use
 
 class Input extends HasSettings
   ###
@@ -851,12 +892,12 @@ class Mapping extends Input
           value = undefined
     isStatic ?= true  # static unless we saw a function and no static wrapper
 
-    ## Build tile if non-null, and save in cache if it's static.
+    ## Build symbol if non-null, and save in cache if it's static.
     if value?
-      tile = new Tile key, value, @settings
-      tile.isStatic = isStatic
-      @cache.set key, tile if isStatic
-      tile
+      symbol = new SVGSymbol "tile '#{key}'", value, @settings
+      symbol.isStatic = isStatic
+      @cache.set key, symbol if isStatic
+      symbol
     else
       @cache.set key, value if isStatic
       value
@@ -867,11 +908,11 @@ class Mapping extends Input
   doBeforeRender: (render, onResult) ->
     for callback in @beforeRenderQueue
       result = callback.call render, render
-      onResult? result
+      onResult? result, @
   doAfterRender: (render, onResult) ->
     for callback in @afterRenderQueue
       result = callback.call render, render
-      onResult? result
+      onResult? result, @
 
 beforeRender = (fn) ->
   unless currentMapping?
@@ -1214,8 +1255,9 @@ class Render extends HasSettings
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
-    Also saves the table of tiles in `@tiles`, the corresponding
-    coordinates in `@coords`, and overall `@width` and `@height`,
+    Also saves the table of `SVGSymbol`s in `@symbols`, the corresponding
+    coordinates in `@coords`, bounding box in `@xMin`, `@xMax`, `@yMin`,
+    `@yMax`, `@width`, and `@height`, and text content in `@text`
     for use by `makeTeX`.
     ###
     @dom = domImplementation.createDocument SVGNS, 'svg'
@@ -1232,41 +1274,38 @@ class Render extends HasSettings
     @mappings.doBeforeRender @
     missing = new Set
     cache = new Map
-    symbolIds = new Set
-    @tiles =
+    ids = new Set
+    @symbols =
       for row, i in @drawing.keys
         for key, j in row
           currentContext.move j, i
-          tile = @mappings.lookup key, currentContext
-          unless tile?
+          symbol = @mappings.lookup key, currentContext
+          unless symbol?
             missing.add key
-            tile = unrecognizedTile
-          ## Check cache by tile value if it's a string (e.g. filename,
+            symbol = unrecognizedSymbol
+          ## Check cache by symbol value if it's a string (e.g. filename,
           ## to avoid loading file again), and by computed SVG string
           ## (in case multiple paths lead to the same SVG content).
-          if typeof tile.value == 'string' and
-              (found = cache.get tile.value)?
-            tile = found
+          if typeof symbol.value == 'string' and
+              (found = cache.get symbol.value)?
+            symbol = found
           else
-            tile.makeSVG()
-            unless tile.value == tile.svg
-              if (found = cache.get tile.svg)?
-                tile = found
+            symbol.makeSVG()
+            unless symbol.value == symbol.svg
+              if (found = cache.get symbol.svg)?
+                symbol = found
               else
-                cache.set tile.svg, tile
-            cache.set tile.value, tile
+                cache.set symbol.svg, symbol
+            cache.set symbol.value, symbol
           ## Include new <symbol> in SVG
           unless found?
-            tile.setId @id key unless tile.id?  # unrecognizedTile has id
-            dom = tile.makeDOM().documentElement
-            ## Clone if tile is static, to enable later re-use
-            dom = dom.cloneNode true if tile.isStatic
-            svg.appendChild dom
-            if symbolIds.has tile.id
-              console.warn "Multiple symbols with id '#{tile.id}': This shouldn't happen, and SVG likely won't load correctly."
+            symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
+            svg.appendChild symbol.useDOM()
+            if ids.has symbol.id
+              console.warn "Multiple symbols with id '#{symbol.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
-              symbolIds.add tile.id
-          tile
+              ids.add symbol.id
+          symbol
     currentContext = null
     missing = ("'#{key}'" for key from missing)
     if missing.length
@@ -1289,7 +1328,8 @@ class Render extends HasSettings
       height = node.getAttribute 'data-height'
       node.removeAttribute 'data-height'
       # Transfer x/y/width/height to <use> element, for more re-usability.
-      parent.replaceChild (use = @dom.createElementNS SVGNS, 'use'), node
+      node.parentNode.replaceChild (use = @dom.createElementNS SVGNS, 'use'),
+        node
       for attr in ['x', 'y', 'width', 'height']
         use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
         node.removeAttribute attr
@@ -1321,7 +1361,7 @@ class Render extends HasSettings
     y = 0
     colWidths = {}
     @coords = []
-    for row, i in @tiles
+    for row, i in @symbols
       @coords.push coordsRow = []
       rowHeight = 0
       for tile in row when not tile.autoHeight
@@ -1339,7 +1379,7 @@ class Render extends HasSettings
         scaleX = scaleY = 1
         if tile.autoWidth
           colWidths[j] ?= Math.max 0, ...(
-            for row2 in @tiles when row2[j]? and not row2[j].autoWidth
+            for row2 in @symbols when row2[j]? and not row2[j].autoWidth
               row2[j].width
           )
           scaleX = colWidths[j] / tile.width unless tile.width == 0
@@ -1368,20 +1408,20 @@ class Render extends HasSettings
     do updateSize = =>
       @width = @xMax - @xMin
       @height = @yMax - @yMin
-    @mappings.doAfterRender @, (out) =>
+    @mappings.doAfterRender @, (out, mapping) =>
       return unless out
-      tile = new Tile '_afterRender', out
+      overlay = new SVGSVG "afterRender content from '#{mapping.filename}'", out
       ## Wrap in <svg> instead of <symbol>, with default viewBox of drawing.
-      dom = tile.makeDOM 'svg'
-      @layers[tile.zIndex] ?= []
-      box = tile.overflowBox ? tile.viewBox
+      dom = overlay.makeDOM()
+      @layers[overlay.zIndex] ?= []
+      box = overlay.overflowBox ? overlay.viewBox
       if box?
         @xMin = Math.min @xMin, box[0]
         @yMin = Math.min @yMin, box[1]
         @xMax = Math.max @xMax, box[0] + box[2]
         @yMax = Math.max @yMax, box[1] + box[3]
       updateSize()
-      @layers[tile.zIndex].push dom.documentElement
+      @layers[overlay.zIndex].push dom.documentElement
     ## Sort by layer
     layerOrder = (layer for layer of @layers).sort (x, y) -> x-y
     for layer in layerOrder
@@ -1406,7 +1446,7 @@ class Render extends HasSettings
 
 ''' + out
   makeTeX: (filename, relativeDir) ->
-    @makeDOM() unless @tiles?
+    @makeDOM() unless @symbols?
     filename = path.parse filename
     basename = filename.base[...-filename.ext.length]
     if relativeDir
@@ -1469,10 +1509,10 @@ class Render extends HasSettings
         \\begin{picture}(#{@width},#{@height})%
           \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{relativeDir ? ''}#{basename}}}%
     """]
-    for row, i in @tiles
-      for tile, j in row
+    for row, i in @symbols
+      for symbol, j in row
         {x, y} = @coords[i][j]
-        for text in tile.text
+        for text in symbol.text
           tx = parseNum(text.getAttribute('x')) ? 0
           ty = parseNum(text.getAttribute('y')) ? 0
           content = (
@@ -1570,7 +1610,7 @@ class Context
     @key? and @key.match ...args
   row: (di = 0) ->
     i = @i + di
-    for tile, j in @drawing.keys[i] ? []
+    for key, j in @drawing.keys[i] ? []
       new Context @render, i, j
   column: (dj = 0) ->
     j = @j + dj
@@ -1826,7 +1866,7 @@ main = (args = process.argv[2..]) ->
     help()
 
 svgtiler = {
-  Tile, unrecognizedTile,
+  SVGContent, SVGTopLevel, SVGSVG, SVGSymbol, unrecognizedSymbol,
   Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
   getMapping, runWithMapping,
   Drawing, AutoDrawing, ASCIIDrawing,
