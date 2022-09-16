@@ -633,17 +633,18 @@ class Tile extends HasSettings
       ## svgBBox) or changed to avoid zeroes.
       @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
     @overflowBox = extractOverflowBox @dom
-    @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
-    @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
-    warnings = []
-    unless @width?
-      warnings.push 'width'
-      @width = 0
-    unless @height?
-      warnings.push 'height'
-      @height = 0
-    if warnings.length > 0
-      console.warn "Failed to detect #{warnings.join ' and '} of SVG for tile '#{@key}'"
+    if wrapper == 'symbol'
+      @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
+      @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
+      warnings = []
+      unless @width?
+        warnings.push 'width'
+        @width = 0
+      unless @height?
+        warnings.push 'height'
+        @height = 0
+      if warnings.length > 0
+        console.warn "Failed to detect #{warnings.join ' and '} of SVG for tile '#{@key}'"
     ## Detect special `width="auto"` and/or `height="auto"` fields for future
     ## processing, and remove them to ensure valid SVG.
     @autoWidth = isAuto @dom, 'width'
