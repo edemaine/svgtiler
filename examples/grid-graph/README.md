@@ -17,7 +17,7 @@ the edges are explicit in the ASCII input.
 
 ## Fig. 2.8 from [Itai, Papadimitriou, and Szwarcfiter 1982](https://doi.org/10.1137/0211056)
 
-These examples use [flip_parity.js](flip_parity.js) to flip the parity of
+* These examples use [flip_parity.js](flip_parity.js) to flip the parity of
 the vertex coloring, to match the figure in the paper.
 
 ### Hamiltonian cycle
@@ -26,7 +26,15 @@ the vertex coloring, to match the figure in the paper.
 
 [ASCII input](ips_example_ham.asc), [SVG output](ips_example_ham.svg)
 
-### Underlying graph cycle
+### Directed Hamiltonian cycle
+
+* Illustrating the use of `svgtiler.def` to instantiate `<marker>`.
+
+<img alt="Directed Hamiltonian cycle figure" src="ips_example_dir_ham.svg" style="background:#bbb">
+
+[ASCII input](ips_example_dir_ham.asc), [SVG output](ips_example_dir_ham.svg)
+
+### Underlying graph
 
 <img alt="Underlying graph figure" src="ips_example_graph.svg" style="background:#bbb">
 
