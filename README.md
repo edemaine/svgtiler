@@ -654,6 +654,7 @@ while others are more demonstrations of particular SVG Tiler features.
 * [Tilt](examples/tilt)
 
 ### Demos:
+* [Grid graph Hamiltonicity](examples/grid-graph)
 * [Polyomino outline drawing and JSX](examples/polyomino)
 * [Auto width/height](examples/auto)
 * [Unicode](examples/unicode)
