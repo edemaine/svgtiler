@@ -1635,7 +1635,12 @@ class Render extends HasSettings
         return true if dep.modified? and dep.modified > modified
     false
 
-def = (content) ->
+idHelper = (baseId) ->
+  if currentRender?
+    currentRender.id baseId ? 'id'
+  else
+    throw new SVGTilerError 'svgtiler.id() used outside rendering context'
+defHelper = (content) ->
   if currentRender?
     currentRender.def content
   else
@@ -1935,7 +1940,8 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
-  Render, getRender, runWithRender, beforeRender, afterRender, def,
+  Render, getRender, runWithRender, beforeRender, afterRender,
+  id: idHelper, def: defHelper,
   Context, getContext, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,

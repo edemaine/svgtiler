@@ -230,6 +230,13 @@ and returns the `id` for the object.  By default, the `id` starts with
 `marker`, `filter`, etc. according to the top-level tag of `tag`.
 You can choose a better name by giving the tag an initial `id`, e.g.,
 `svgtiler.def(<marker id="arrow">...</marker>)`.
+See [the grid-graph example](examples/grid-graph) for an example with markers.
+
+Similarly, if you need to assign an `id` within your tile definition
+(e.g., to render and then re-use an object multiple times), define the tile
+with a function, and have that function call `svgtiler.id(baseId)`
+to generate and return a unique `id` string starting with `baseId`
+(which defaults to `"id"`).
 
 Functions get called with a **`Context`** object as both a second argument and
 as `this` (if the function is defined via `function`;
