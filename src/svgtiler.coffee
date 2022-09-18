@@ -440,6 +440,16 @@ runWithContext = (context, fn) ->
   finally
     currentContext = oldContext
 
+getContextString = ->
+  if currentContext?
+    "tile '#{currentContext.tile}' in row #{currentContext.i+1}, column #{currentContext.j+1} of drawing '#{currentContext.drawing.filename}'"
+  else if currentMapping?
+    "mapping '#{currentMapping.filename}'"
+  else if currentRender?
+    "render of '#{currentRender.drawing.filename}'"
+  else
+    ''
+
 class SVGContent extends HasSettings
   ###
   Base helper for parsing SVG as specified in SVG Tiler:
@@ -1234,6 +1244,22 @@ class SVGFile extends DummyInput
   @title: "SVG file (convert to PDF/PNG without any tiling)"
   @skipRead: true  # svgink/Inkscape will do actual file reading
 
+## Do not need to wrap the following elements in <defs>.
+skipDef = new Set [
+  'clipPath'
+  'defs'
+  'desc'
+  'filter'
+  'linearGradient'
+  'marker'
+  'mask'
+  'metadata'
+  'pattern'
+  'radialGradient'
+  'script'
+  'title'
+]
+
 class Render extends HasSettings
   constructor: (@drawing, @settings) ->
     super()
@@ -1241,6 +1267,7 @@ class Render extends HasSettings
     @idVersions = new Map
     @mappings = Mappings.from @getSetting 'mappings'
     @styles = Styles.from @getSetting 'styles'
+    @defs = []
   hrefAttr: -> hrefAttr @settings
   id: (key) ->
     ## Generate unique ID starting with an escaped version of `key`.
@@ -1252,6 +1279,30 @@ class Render extends HasSettings
       "#{escaped}_v#{version}"
     else
       escaped
+  cacheLookup: (def) ->
+    ###
+    Given `SVGContent` for a `def` (e.g. <symbol>),
+    check cache by `value` if it's a string (e.g. filename,
+    to avoid loading file again), and by computed SVG string
+    (in case multiple paths lead to the same SVG content).
+    Returns the cached `SVGContent` if found, or `undefined` if new.
+    ###
+    unless typeof def.value == 'string' and (found = @cache.get def.value)?
+      unless def.value == def.makeSVG()
+        unless (found = @cache.get def.svg)?
+          @cache.set def.svg, def
+      @cache.set def.value, def
+    found
+  def: (content) ->
+    content = new SVGContent getContextString(), content
+    if (found = @cacheLookup content)?
+      found.id
+    else
+      content.setId @id \
+        content.makeDOM().documentElement.getAttribute('id') or
+        content.makeDOM().documentElement.tagName or 'def'
+      @defs.push content
+      content.id
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1273,7 +1324,7 @@ class Render extends HasSettings
     ## Render all tiles in the drawing.
     @mappings.doBeforeRender @
     missing = new Set
-    cache = new Map
+    @cache = new Map
     ids = new Set
     @symbols =
       for row, i in @drawing.keys
@@ -1283,77 +1334,22 @@ class Render extends HasSettings
           unless symbol?
             missing.add key
             symbol = unrecognizedSymbol
-          ## Check cache by symbol value if it's a string (e.g. filename,
-          ## to avoid loading file again), and by computed SVG string
-          ## (in case multiple paths lead to the same SVG content).
-          if typeof symbol.value == 'string' and
-              (found = cache.get symbol.value)?
-            symbol = found
+          ## Check cache for this symbol
+          if (found = @cacheLookup symbol)?
+            found
           else
-            symbol.makeSVG()
-            unless symbol.value == symbol.svg
-              if (found = cache.get symbol.svg)?
-                symbol = found
-              else
-                cache.set symbol.svg, symbol
-            cache.set symbol.value, symbol
-          ## Include new <symbol> in SVG
-          unless found?
+            ## Include new <symbol> in SVG
             symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
             svg.appendChild symbol.useDOM()
             if ids.has symbol.id
               console.warn "Multiple symbols with id '#{symbol.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
               ids.add symbol.id
-          symbol
+            symbol
     currentContext = null
     missing = ("'#{key}'" for key from missing)
     if missing.length
       console.warn "Failed to recognize tiles:", missing.join ', '
-
-    ## Factor out duplicate inline <image>s into separate <symbol>s.
-    inlineImages = new Map
-    inlineImageVersions = new Map
-    domRecurse svg, (node, parent) =>
-      return true unless node.nodeName == 'image'
-      {href} = getHref node
-      return true unless href?.startsWith 'data:'
-      # data-filename gets set to the original filename when inlining,
-      # which we use for key labels so isn't needed as an exposed attribute.
-      # Ditto for width and height of image.
-      filename = node.getAttribute('data-filename') ? ''
-      node.removeAttribute 'data-filename'
-      width = node.getAttribute 'data-width'
-      node.removeAttribute 'data-width'
-      height = node.getAttribute 'data-height'
-      node.removeAttribute 'data-height'
-      # Transfer x/y/width/height to <use> element, for more re-usability.
-      node.parentNode.replaceChild (use = @dom.createElementNS SVGNS, 'use'),
-        node
-      for attr in ['x', 'y', 'width', 'height']
-        use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
-        node.removeAttribute attr
-      # Memoize versions
-      attributes =
-        for attr in node.attributes
-          "#{attr.name}=#{attr.value}"
-      attributes.sort()
-      attributes = attributes.join ' '
-      unless (id = inlineImages.get attributes)?
-        version = inlineImageVersions.get(filename) ? 0
-        inlineImageVersions.set filename, version + 1
-        id = "_image_#{escapeId filename}_v#{version}"
-        inlineImages.set attributes, id
-        svg.appendChild symbol = @dom.createElementNS SVGNS, 'symbol'
-        symbol.setAttribute 'id', id
-        # If we don't have width/height set from data-width/height fields,
-        # we take the first used width/height as the defining height.
-        node.setAttribute 'width', width or use.getAttribute 'width'
-        node.setAttribute 'height', height or use.getAttribute 'height'
-        symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
-        symbol.appendChild node
-      use.setAttribute @hrefAttr(), '#' + id
-      false
 
     ## Lay out the symbols in the drawing via SVG <use>.
     @xMin = @yMin = @xMax = @yMax = 0
@@ -1404,6 +1400,7 @@ class Render extends HasSettings
         @xMax = Math.max @xMax, x
       y += rowHeight
       @yMax = Math.max @yMax, y
+
     ## afterRender callbacks: render as <symbol> and then strip off that wrapper
     do updateSize = =>
       @width = @xMax - @xMin
@@ -1422,6 +1419,61 @@ class Render extends HasSettings
         @yMax = Math.max @yMax, box[1] + box[3]
       updateSize()
       @layers[overlay.zIndex].push dom.documentElement
+
+    ## Include any <defs> from mapping lookups or callbacks.
+    if @defs.length
+      firstSymbol = svg.firstChild
+      if @defs.every (def) -> skipDef.has def.makeDOM().documentElement.tagName
+        svg.insertBefore def.useDOM(), firstSymbol for def in @defs
+      else
+        defs = @dom.createElementNS SVGNS, 'defs'
+        defs.appendChild def.useDOM() for def in @defs
+        svg.insertBefore defs, firstSymbol
+
+    ## Factor out duplicate inline <image>s into separate <symbol>s.
+    inlineImages = new Map
+    inlineImageVersions = new Map
+    domRecurse svg, (node, parent) =>
+      return true unless node.nodeName == 'image'
+      {href} = getHref node
+      return true unless href?.startsWith 'data:'
+      # data-filename gets set to the original filename when inlining,
+      # which we use for key labels so isn't needed as an exposed attribute.
+      # Ditto for width and height of image.
+      filename = node.getAttribute('data-filename') ? ''
+      node.removeAttribute 'data-filename'
+      width = node.getAttribute 'data-width'
+      node.removeAttribute 'data-width'
+      height = node.getAttribute 'data-height'
+      node.removeAttribute 'data-height'
+      # Transfer x/y/width/height to <use> element, for more re-usability.
+      node.parentNode.replaceChild (use = @dom.createElementNS SVGNS, 'use'),
+        node
+      for attr in ['x', 'y', 'width', 'height']
+        use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
+        node.removeAttribute attr
+      # Memoize versions
+      attributes =
+        for attr in node.attributes
+          "#{attr.name}=#{attr.value}"
+      attributes.sort()
+      attributes = attributes.join ' '
+      unless (id = inlineImages.get attributes)?
+        version = inlineImageVersions.get(filename) ? 0
+        inlineImageVersions.set filename, version + 1
+        id = "_image_#{escapeId filename}_v#{version}"
+        inlineImages.set attributes, id
+        svg.appendChild symbol = @dom.createElementNS SVGNS, 'symbol'
+        symbol.setAttribute 'id', id
+        # If we don't have width/height set from data-width/height fields,
+        # we take the first used width/height as the defining height.
+        node.setAttribute 'width', width or use.getAttribute 'width'
+        node.setAttribute 'height', height or use.getAttribute 'height'
+        symbol.setAttribute 'viewBox', "0 0 #{width} #{height}"
+        symbol.appendChild node
+      use.setAttribute @hrefAttr(), '#' + id
+      false
+
     ## Sort by layer
     layerOrder = (layer for layer of @layers).sort (x, y) -> x-y
     for layer in layerOrder
@@ -1581,6 +1633,12 @@ class Render extends HasSettings
       for dep in depGroup
         return true if dep.modified? and dep.modified > modified
     false
+
+def = (content) ->
+  if currentRender?
+    currentRender.def content
+  else
+    throw new SVGTilerError 'svgtiler.def() used outside rendering context'
 
 class Context
   constructor: (@render, i, j) ->
@@ -1876,7 +1934,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
-  Render, getRender, runWithRender, beforeRender, afterRender,
+  Render, getRender, runWithRender, beforeRender, afterRender, def,
   Context, getContext, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, convert,

@@ -221,6 +221,16 @@ or return value of a function) should be specified as one of the following:
    mapping is always the same for this tile name, and does not depend on
    `Context` (e.g. adjacent tiles), enabling SVG Tiler to do more caching.
 
+If you need to use a `<marker>`, `<filter>`, gradient, or other element
+intended for `<defs>`, define the tile with a function,
+and have that function call `svgtiler.def(tag)`, where `tag`
+is one of the above representations of the marker, filter, gradient, etc.
+This function adds the object to `<defs>` (if needed) at the top of the SVG,
+and returns the `id` for the object.  By default, the `id` starts with
+`marker`, `filter`, etc. according to the top-level tag of `tag`.
+You can choose a better name by giving the tag an initial `id`, e.g.,
+`svgtiler.def(<marker id="arrow">...</marker>)`.
+
 Functions get called with a **`Context`** object as both a second argument and
 as `this` (if the function is defined via `function`;
 [`=>` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
