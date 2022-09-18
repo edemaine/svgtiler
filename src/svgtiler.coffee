@@ -1257,6 +1257,7 @@ skipDef = new Set [
   'pattern'
   'radialGradient'
   'script'
+  'style'
   'title'
 ]
 
