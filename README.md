@@ -592,8 +592,9 @@ that SVG Tiler also accepts:
 * You can change where to put converted files via the
   `--op`/`--output-pdf` and `--oP`/`--output-png` command-line options.
   In addition, SVG Tiler supports `--os`/`--output-svg` to control where
-  to put generated SVG files, and `-o`/`--output` to control the default
-  place to put all generated/converted files.
+  to put generated SVG files, `-o`/`--output` to control the default
+  place to put all generated/converted files, and `-O`/`--output-stem`
+  to override the generated/converted filenames for the next drawing.
 * If Inkscape isn't on your PATH, you can specify its location via
   `-i`/`--inkscape`.
 
@@ -736,6 +737,7 @@ Optional arguments:
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
+  -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR

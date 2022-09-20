@@ -100,7 +100,10 @@ defaultSettings =
   keepHidden: false
   ## Don't delete blank extreme rows/columns.
   keepMargins: false
+  ## Override for output file's stem (basename without extension).
+  outputStem: null
   ## Directories to output all or some files.
+  ## Can also include stem overrides like "prefix_*_suffix".
   outputDir: null  ## default: same directory as input
   outputDirExt:  ## by extension; default is to use outputDir
     '.svg': null
@@ -785,7 +788,9 @@ class Input extends HasSettings
   filenameSeparator: '_'
   generateFilename: (ext, filename = @filename, subname = @subname) ->
     filename = path.parse filename
-    delete filename.base
+    delete filename.base  # force generation from filename.name & filename.ext
+    if (outputStem = @getSetting 'outputStem')?
+      filename.name = outputStem
     if subname
       filename.name += (@filenameSeparator ? '') + subname
     if filename.ext == ext
@@ -1773,6 +1778,7 @@ Optional arguments:
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
+  -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR
@@ -1876,6 +1882,9 @@ main = (args = process.argv[2..]) ->
       when '-o', '--output'
         skip = 1
         settings.outputDir = args[i+1]
+      when '-O', '--output-stem'
+        skip = 1
+        settings.outputStem = args[i+1]
       when '--os', '--output-svg'
         skip = 1
         settings.outputDirExt['.svg'] = args[i+1]
@@ -1924,6 +1933,8 @@ main = (args = process.argv[2..]) ->
           ## change, we may not have done these conversions before or in the
           ## last run of SVG Tiler, so let svgink compare mod times and decide.
           convert filenames, formats, settings
+          ## Reset -O output filename stem override.
+          settings.outputStem = null
         else if input instanceof SVGFile
           convert input.filename, formats, settings
   unless files
