@@ -598,9 +598,14 @@ that SVG Tiler also accepts:
 * You can change where to put converted files via the
   `--op`/`--output-pdf` and `--oP`/`--output-png` command-line options.
   In addition, SVG Tiler supports `--os`/`--output-svg` to control where
-  to put generated SVG files, `-o`/`--output` to control the default
-  place to put all generated/converted files, and `-O`/`--output-stem`
-  to override the generated/converted filenames for the next drawing.
+  to put generated SVG files, and `-o`/`--output` to control the default
+  place to put all generated/converted files.
+* You can override the generated/converted filenames for the next drawing
+  using the `-O`/`--output-stem` command-line option.
+  You can also specify a stem pattern like `-O prefix_*_suffix`,
+  where `*` represents the input stem,
+  in which case the override applies until the next `-O` option.
+  (In particular, `-O *` restores the initial behavior.)
 * If Inkscape isn't on your PATH, you can specify its location via
   `-i`/`--inkscape`.
 
