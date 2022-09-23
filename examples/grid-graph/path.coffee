@@ -18,14 +18,14 @@ vertex = ->
   </symbol>
 
 ## Arrowhead based on https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker#example
-arrow = svgtiler.def \
+arrow = svgtiler.def(
   <marker overflow="visible" orient="auto-start-reverse"
     viewBox="0 0 10 10" refX="10" refY="5"
     markerWidth={arrowSize} markerHeight={arrowSize}>
     <path d="M 4 0 L 10 5 L 4 10"
       fill="none" stroke={edgeColor} stroke-width={arrowStroke}/>
   </marker>
-arrow = "url(##{arrow})"
+).url()
 
 horizontal = (start, end) ->
   <symbol viewBox={viewBox}

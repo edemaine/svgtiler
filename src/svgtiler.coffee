@@ -493,12 +493,22 @@ class SVGContent extends HasSettings
   ###
   Base helper for parsing SVG as specified in SVG Tiler:
   SVG strings, Preact VDOM, or filenames, with special handling of image files.
+  Usually acquires an `id` attribute via `setId`, which can be formatted
+  via `url()` and `hash()`.
   In some cases, acquires `isStatic` Boolean attribute to indicate
-  re-usable content.
+  re-usable content, or `isForced` Boolean attribute to indicate
+  a def that should be included by force.
   ###
   constructor: (@name, @value, @settings) ->
     ## `@value` can be a string (SVG or filename) or Preact VDOM.
     super()
+  url: ->
+    "url(##{@id})"
+  hash: ->
+    "##{@id}"
+  force: (value = true) ->
+    @isForced = value
+    @  # allow chaining
 
   makeSVG: ->
     return @svg if @svg?
@@ -538,6 +548,7 @@ class SVGContent extends HasSettings
     @svg = removeSVGComments @svg
 
   setId: (@id) ->
+    ## Can be called before or after makeDOM, updating DOM in latter case.
     @dom.documentElement.setAttribute 'id', @id if @dom?
   defaultId: (base = 'id') ->
     ###
@@ -1349,11 +1360,11 @@ class Render extends HasSettings
     content = new SVGContent getContextString(), content,
       getSettings() ? @settings
     if (found = @cacheLookup content)?
-      found.id
+      found
     else
       content.setId @id content.defaultId 'def'
       @defs.push content
-      content.id
+      content
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1743,7 +1754,7 @@ globalDef = (content) ->
     content.setId globalId content.defaultId 'def'
     content.isStatic = true  # global def may get re-used in multiple renders
     globalDefs.set content.id, content
-    content.id
+    content
 
 class Context
   constructor: (@render, i, j) ->
