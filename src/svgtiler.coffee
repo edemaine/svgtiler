@@ -148,6 +148,8 @@ class HasSettings
   getSetting: (key) -> getSetting @settings, key
   getOutputDir: (extension) -> getOutputDir @settings, extension
 
+globalShare = {}  # for shared data between mapping modules
+
 SVGNS = 'http://www.w3.org/2000/svg'
 XLINKNS = 'http://www.w3.org/1999/xlink'
 
@@ -1892,6 +1894,7 @@ Optional arguments:
   --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
   -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
+  -s KEY=VALUE / --share KEY=VALUE  Set share.KEY to VALUE (undefined if no =)
   -m / --margin         Don't delete blank extreme rows/columns
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
@@ -1986,6 +1989,10 @@ main = (args = process.argv[2..]) ->
           settings.forceHeight = arg
         else
           console.warn "Invalid argument to --tile-height: #{args[i+1]}"
+      when '-s', '--share'
+        skip = 1
+        [key, ...value] = args[i+1].split '='
+        globalShare[key] = value.join '='
       when '-o', '--output'
         skip = 1
         settings.outputDir = args[i+1]
@@ -2065,7 +2072,7 @@ svgtiler = {
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, defaultSettings, getSettings, convert,
   static: wrapStatic,
-  share: {}  # for shared data between mapping modules
+  share: globalShare
   version: metadata.version
 }
 module?.exports = svgtiler
