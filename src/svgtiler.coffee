@@ -101,6 +101,7 @@ defaultSettings =
   ## Don't delete blank extreme rows/columns.
   keepMargins: false
   ## Override for output file's stem (basename without extension).
+  ## Can use `*` to refer to input file's stem, to add prefix or suffix.
   outputStem: null
   ## Directories to output all or some files.
   ## Can also include stem overrides like "prefix_*_suffix".
@@ -847,7 +848,7 @@ class Input extends HasSettings
     filename = path.parse filename
     delete filename.base  # force generation from filename.name & filename.ext
     if (outputStem = @getSetting 'outputStem')?
-      filename.name = outputStem
+      filename.name = outputStem.replace '*', filename.name
     if subname
       filename.name += (@filenameSeparator ? '') + subname
     if filename.ext == ext
@@ -1884,6 +1885,7 @@ Optional arguments:
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
   -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
+                                (STEM can use * to refer to input stem)
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR
@@ -2038,8 +2040,9 @@ main = (args = process.argv[2..]) ->
           ## change, we may not have done these conversions before or in the
           ## last run of SVG Tiler, so let svgink compare mod times and decide.
           convert filenames, formats, settings
-          ## Reset -O output filename stem override.
-          settings.outputStem = null
+          ## Reset -O output filename stem override unless it uses `*`.
+          if settings.outputStem? and not settings.outputStem.includes '*'
+            settings.outputStem = null
         else if input instanceof SVGFile
           convert input.filename, formats, settings
   unless files

@@ -740,6 +740,7 @@ Optional arguments:
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
   -o DIR / --output DIR Write all output files to directory DIR
   -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
+                                (STEM can use * to refer to input stem)
   --os DIR / --output-svg DIR   Write all .svg files to directory DIR
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR
