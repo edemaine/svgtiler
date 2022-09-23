@@ -222,14 +222,16 @@ or return value of a function) should be specified as one of the following:
    `Context` (e.g. adjacent tiles), enabling SVG Tiler to do more caching.
 
 If you need to use a `<marker>`, `<filter>`, gradient, or other element
-intended for `<defs>`, define the tile with a function,
-and have that function call `svgtiler.def(tag)`, where `tag`
+intended for `<defs>`, call `svgtiler.def(tag)`, where `tag`
 is one of the above representations of the marker, filter, gradient, etc.
 This function adds the object to `<defs>` (if needed) at the top of the SVG,
 and returns the `id` for the object.  By default, the `id` starts with
 `marker`, `filter`, etc. according to the top-level tag of `tag`.
 You can choose a better name by giving the tag an initial `id`, e.g.,
 `svgtiler.def(<marker id="arrow">...</marker>)`.
+You can call `svgtiler.def` within a tile function (where repeated calls
+with the same argument produce the same def and `id`) or at the global level
+of your mapping file (for static defs).
 See [the grid-graph example](examples/grid-graph) for an example with markers.
 
 Similarly, if you need to assign an `id` within your tile definition

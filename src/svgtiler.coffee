@@ -317,6 +317,26 @@ domRecurse = (node, callback) ->
     child = nextChild
   return
 
+refRegExp = ///
+  # url() without quotes
+  ^\s* url \s* \( \s* \# ([^()]*) \) \s*$
+  # url() with quotes, or src() which requires quotes
+| ^\s* (?: url | src) \s* \( \s* (['"]) \s* \# ([^'"]*) \2 \s* \) \s*$
+///
+findRefs = (root) =>
+  ## Returns an array of id-based references to other elements in the SVG.
+  refs = []
+  domRecurse root, (node) =>
+    return unless node.attributes?
+    for attr in node.attributes
+      if (match = refRegExp.exec attr.value)?
+        refs.push {id: (match[1] or match[3]).trim(), node, attr: attr.name}
+      else if attr.name in ['href', 'xlink:href'] and
+              (value = attr.value.trim()).startsWith '#'
+        refs.push {id: value[1..].trim(), node, attr: attr.name}
+    true
+  refs
+
 contentType =
   '.png': 'image/png'
   '.jpg': 'image/jpeg'
@@ -444,6 +464,7 @@ runWithContext = (context, fn) ->
     currentContext = oldContext
 
 getContextString = ->
+  ## Returns string describing the current context
   if currentContext?
     "tile '#{currentContext.tile}' in row #{currentContext.i+1}, column #{currentContext.j+1} of drawing '#{currentContext.drawing.filename}'"
   else if currentMapping?
@@ -452,6 +473,21 @@ getContextString = ->
     "render of '#{currentRender.drawing.filename}'"
   else
     ''
+
+getSettings = ->
+  ###
+  Returns currently active `Settings` object, if any, from the current Render
+  process (which includes the case of an active Context) or the current Mapping.
+  Returns `null` if neither is currently active.
+  ###
+  #if currentContext?
+  #  currentContext.render.settings
+  if currentRender?
+    currentRender.settings
+  else if currentMapping?
+    currentMapping.settings
+  else
+    null
 
 class SVGContent extends HasSettings
   ###
@@ -503,6 +539,16 @@ class SVGContent extends HasSettings
 
   setId: (@id) ->
     @dom.documentElement.setAttribute 'id', @id if @dom?
+  defaultId: (base = 'id') ->
+    ###
+    Generate a "default" id (typically for use in def) using these rules:
+    1. If the root element has an `id` attribute, use that (manual spec).
+    2. Use the root element's tag name, if any
+    3. Fallback to use first argument `base`, which defaults to `"id"`.
+    The returned id is not yet escaped; you should pass it to `escapeId`.
+    ###
+    doc = @makeDOM().documentElement
+    doc.getAttribute('id') or doc.tagName or base
   makeDOM: ->
     return @dom if @dom?
     @makeSVG()
@@ -1300,13 +1346,12 @@ class Render extends HasSettings
       @cache.set def.value, def
     found
   def: (content) ->
-    content = new SVGContent getContextString(), content
+    content = new SVGContent getContextString(), content,
+      getSettings() ? @settings
     if (found = @cacheLookup content)?
       found.id
     else
-      content.setId @id \
-        content.makeDOM().documentElement.getAttribute('id') or
-        content.makeDOM().documentElement.tagName or 'def'
+      content.setId @id content.defaultId 'def'
       @defs.push content
       content.id
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
@@ -1413,7 +1458,8 @@ class Render extends HasSettings
       @height = @yMax - @yMin
     @mappings.doAfterRender @, (out, mapping) =>
       return unless out
-      overlay = new SVGSVG "afterRender content from '#{mapping.filename}'", out
+      overlay = new SVGSVG "afterRender content from '#{mapping.filename}'",
+        out, @settings
       ## Wrap in <svg> instead of <symbol>, with default viewBox of drawing.
       dom = overlay.makeDOM()
       @layers[overlay.zIndex] ?= []
@@ -1426,20 +1472,54 @@ class Render extends HasSettings
       updateSize()
       @layers[overlay.zIndex].push dom.documentElement
 
+    ## Check for global <defs> used by the symbols so far.
+    usedIds = new Set
+    globalIdMap = new Map
+    findGlobalDefs = (root) =>
+      for {id, node, attr} in findRefs root
+        desireId = unglobalId id
+        if id == desireId  # local id
+          usedIds.add id
+        else  # global id
+          unless (newId = globalIdMap.get id)?  # first use
+            unless (def = globalDefs.get id)?
+              throw new SVGTilerError "Referenced global ID '#{id}' in node #{node} not found"
+            if (found = @cacheLookup def)?
+              newId = found.id
+            else
+              globalIdMap.set id, newId = @id desireId
+              usedIds.add newId
+              def.setId newId
+              @defs.push def
+          node.setAttribute attr, node.getAttribute(attr).replace "##{id}",
+            "##{newId}"
+    findGlobalDefs svg
+
     ## Include any <defs> from mapping lookups or callbacks.
-    if @defs.length
-      firstSymbol = svg.firstChild
-      if @defs.every (def) -> skipDef.has def.makeDOM().documentElement.tagName
-        svg.insertBefore def.useDOM(), firstSymbol for def in @defs
+    firstSymbol = svg.firstChild
+    defsWrapper = null
+    ## `for def in @defs` but allowing @defs to change in length
+    ## from additional global <defs> encountered along the way.
+    i = 0
+    while i < @defs.length
+      def = @defs[i++]
+      ## Omit unused <defs> unless forced.
+      continue unless def.isForced or usedIds.has def.id
+      dom = def.useDOM()
+      ## Look for more global <defs> used by this def.
+      findGlobalDefs dom
+      ## Wrap in <defs> if needed.
+      if skipDef.has dom.tagName
+        svg.insertBefore dom, firstSymbol
       else
-        defs = @dom.createElementNS SVGNS, 'defs'
-        defs.appendChild def.useDOM() for def in @defs
-        svg.insertBefore defs, firstSymbol
+        defsWrapper ?= @dom.createElementNS SVGNS, 'defs'
+        defsWrapper.appendChild dom
+    svg.insertBefore defsWrapper, svg.firstChild if defsWrapper?
 
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = new Map
     inlineImageVersions = new Map
-    domRecurse svg, (node, parent) =>
+    domRecurse svg, (node) =>
       return true unless node.nodeName == 'image'
       {href} = getHref node
       return true unless href?.startsWith 'data:'
@@ -1640,16 +1720,30 @@ class Render extends HasSettings
         return true if dep.modified? and dep.modified > modified
     false
 
-idHelper = (baseId) ->
+###
+ids generated at the top level have the temporary form "_globalN_ID",
+where "N" is a globally unique integer and "ID" is the (escaped) desired id
+(to be assigned a version number later).
+###
+globalIdCount = 0
+globalId = (baseId = 'id') ->
   if currentRender?
-    currentRender.id baseId ? 'id'
+    currentRender.id baseId
   else
-    throw new SVGTilerError 'svgtiler.id() used outside rendering context'
-defHelper = (content) ->
+    "_global#{globalIdCount++}_#{escapeId baseId}"
+unglobalId = (id) ->
+  id.replace /^_global\d+_/, ''
+
+globalDefs = new Map
+globalDef = (content) ->
   if currentRender?
     currentRender.def content
   else
-    throw new SVGTilerError 'svgtiler.def() used outside rendering context'
+    content = new SVGContent getContextString(), content, getSettings()
+    content.setId globalId content.defaultId 'def'
+    content.isStatic = true  # global def may get re-used in multiple renders
+    globalDefs.set content.id, content
+    content.id
 
 class Context
   constructor: (@render, i, j) ->
@@ -1952,10 +2046,10 @@ svgtiler = {
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
   Render, getRender, runWithRender, beforeRender, afterRender,
-  id: idHelper, def: defHelper,
-  Context, getContext, runWithContext,
+  id: globalId, def: globalDef,
+  Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, defaultSettings, convert,
+  main, renderDOM, defaultSettings, getSettings, convert,
   static: wrapStatic,
   share: {}  # for shared data between mapping modules
   version: metadata.version
