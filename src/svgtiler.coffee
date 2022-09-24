@@ -1519,19 +1519,23 @@ class Render extends HasSettings
             "##{newId}"
     findGlobalDefs svg
 
-    ## Include any <defs> from mapping lookups or callbacks.
-    firstSymbol = svg.firstChild
-    defsWrapper = null
+    ## Render all <defs> so far and check for additional <defs> used by them.
     ## `for def in @defs` but allowing @defs to change in length
     ## from additional global <defs> encountered along the way.
     i = 0
-    while i < @defs.length
-      def = @defs[i++]
+    defDoms =
+      while i < @defs.length
+        def = @defs[i++]
+        dom = def.useDOM()
+        ## Look for more global <defs> used by this def.
+        findGlobalDefs dom
+        {def, dom}
+    ## Add <defs> to DOM if they're used or forced.
+    firstSymbol = svg.firstChild
+    defsWrapper = null
+    for {def, dom} in defDoms
       ## Omit unused <defs> unless forced.
       continue unless def.isForced or usedIds.has def.id
-      dom = def.useDOM()
-      ## Look for more global <defs> used by this def.
-      findGlobalDefs dom
       ## Wrap in <defs> if needed.
       if skipDef.has dom.tagName
         svg.insertBefore dom, firstSymbol
