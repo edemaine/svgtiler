@@ -1,4 +1,9 @@
-all: castle underground underwater overworld
+all:
+	svgtiler -f mario.coffee \
+	\( -s palette=castle -O \*_castle door.tsv \) \
+	\( -s palette=overworld -O \*_overworld door.tsv \) \
+	\( -s palette=underground -O \*_underground door.tsv \) \
+	\( -s palette=underwater -O \*_underwater door.tsv \)
 
 castle:
 	svgtiler -f -s palette=castle -O \*_castle mario.coffee door.tsv

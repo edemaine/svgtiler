@@ -130,9 +130,16 @@ defaultSettings =
   keepParent: false
   keepClass: false
   ## Major state
-  mappings: null  # should be Mappings instance
-  styles: null  # should be Styles instance
+  mappings: null  # should be valid argument to Mappings.from
+  styles: null    # should be valid argument to Styles.from
 
+cloneSettings = (settings) ->
+  settings = {...settings}
+  if settings.mappings?
+    settings.mappings = Mappings.from settings.mappings, true
+  if settings.styles?
+    settings.styles = Styles.from settings.styles, true
+  settings
 getSetting = (settings, key) ->
   settings?[key] ? defaultSettings[key]
 getOutputDir = (settings, extension) ->
@@ -887,11 +894,11 @@ class ArrayWrapper extends Array
   For example, `Styles` is like an array of `Style`s; and
   `Mappings` is like an array of `Mapping`s.
   ###
-  @from: (data) ->
+  @from: (data, clone) ->
     ###
     Enforce `data` to be `ArrayWrapper` (sub)class.
     Supported formats:
-      * `ArrayWrapper` (do nothing)
+      * `ArrayWrapper` (do nothing, unless clone requested)
       * `@itemClass` (wrap in singleton)
       * raw data to pass to `new @itemClass`
       * `Array` of `@itemClass`
@@ -900,7 +907,10 @@ class ArrayWrapper extends Array
       * `undefined`/`null` (empty)
     ###
     if data instanceof @
-      data
+      if clone
+        new @ ...data
+      else
+        data
     else if data?
       data = [data] unless Array.isArray data
       new @ ...(
@@ -1962,6 +1972,8 @@ main = (args = process.argv[2..]) ->
     mappings: new Mappings
     styles: new Styles
   }
+  settingsStack = []
+  shareStack = [{}]
   for arg, i in args
     if skip
       skip--
@@ -1992,7 +2004,8 @@ main = (args = process.argv[2..]) ->
       when '-s', '--share'
         skip = 1
         [key, ...value] = args[i+1].split '='
-        globalShare[key] = value.join '='
+        shareStack.at(-1)[key] = globalShare[key]  # save old value
+        globalShare[key] = value.join '='  # ignore later =s
       when '-o', '--output'
         skip = 1
         settings.outputDir = args[i+1]
@@ -2033,6 +2046,16 @@ main = (args = process.argv[2..]) ->
           settings.jobs = arg
         else
           console.warn "Invalid argument to --jobs: #{args[i+1]}"
+      when '('
+        shareStack.push {}
+        settingsStack.push settings
+        settings = cloneSettings settings
+      when ')'
+        if settingsStack.length
+          settings = settingsStack.pop()
+          Object.assign globalShare, shareStack.pop()
+        else
+          console.warn "Unmatched ')'"
       else
         files++
         console.log '*', arg
@@ -2070,7 +2093,8 @@ svgtiler = {
   id: globalId, def: globalDef,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, defaultSettings, getSettings, convert,
+  main, renderDOM, convert,
+  defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   static: wrapStatic,
   share: globalShare
   version: metadata.version
