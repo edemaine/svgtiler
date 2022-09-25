@@ -17,7 +17,6 @@
   <symbol id="X" viewBox="-10 -10 20 20" overflow="visible">
     <circle r="10" fill="red"/>
   </symbol>
-  <symbol id="_20" viewBox="-10 -10 20 20" overflow="visible"/>
   <use xlink:href="#_2B" x="0" y="0" width="10" height="10"/>
   <use xlink:href="#_2D" x="10" y="0" width="20" height="10"/>
   <use xlink:href="#_2B" x="30" y="0" width="10" height="10"/>
@@ -28,7 +27,6 @@
   <use xlink:href="#_7C" x="0" y="10" width="10" height="20"/>
   <use xlink:href="#X" x="10" y="10" width="20" height="20"/>
   <use xlink:href="#_7C" x="30" y="10" width="10" height="20"/>
-  <use xlink:href="#_20" x="40" y="10" width="20" height="20"/>
   <use xlink:href="#_7C" x="60" y="10" width="10" height="20"/>
   <use xlink:href="#_unrecognized" x="70" y="10" width="20" height="20"/>
   <use xlink:href="#_7C" x="90" y="10" width="10" height="20"/>
@@ -40,11 +38,9 @@
   <use xlink:href="#_2D" x="70" y="30" width="20" height="10"/>
   <use xlink:href="#_2B" x="90" y="30" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="40" width="10" height="20"/>
-  <use xlink:href="#_20" x="10" y="40" width="20" height="20"/>
   <use xlink:href="#_7C" x="30" y="40" width="10" height="20"/>
   <use xlink:href="#X" x="40" y="40" width="20" height="20"/>
   <use xlink:href="#_7C" x="60" y="40" width="10" height="20"/>
-  <use xlink:href="#_20" x="70" y="40" width="20" height="20"/>
   <use xlink:href="#_unrecognized" x="90" y="40" width="10" height="20"/>
   <use xlink:href="#_2B" x="0" y="60" width="10" height="10"/>
   <use xlink:href="#_2D" x="10" y="60" width="20" height="10"/>
@@ -54,9 +50,7 @@
   <use xlink:href="#_2D" x="70" y="60" width="20" height="10"/>
   <use xlink:href="#_2B" x="90" y="60" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="70" width="10" height="20"/>
-  <use xlink:href="#_20" x="10" y="70" width="20" height="20"/>
   <use xlink:href="#_7C" x="30" y="70" width="10" height="20"/>
-  <use xlink:href="#_20" x="40" y="70" width="20" height="20"/>
   <use xlink:href="#_7C" x="60" y="70" width="10" height="20"/>
   <use xlink:href="#X" x="70" y="70" width="20" height="20"/>
   <use xlink:href="#_7C" x="90" y="70" width="10" height="20"/>

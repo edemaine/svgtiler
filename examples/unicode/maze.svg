@@ -10,7 +10,6 @@
     <circle cx="2" cy="-2" r="1" fill="white"/>
     <path d="M -3 1 Q 0 4, 3 1" fill="none" stroke="white"/>
   </symbol>
-  <symbol id="_20" viewBox="-10 -10 20 20" overflow="visible"/>
   <symbol id="_F0_9F_91_8D_F0_9F_8F_BD" viewBox="-10 -10 20 20" overflow="visible">
     <line x1="-5" y1="-5" x2="5" y2="5" stroke="green" stroke-width="2" stroke-linecap="round"/>
     <line x1="-5" y1="5" x2="5" y2="-5" stroke="green" stroke-width="2" stroke-linecap="round"/>
@@ -24,38 +23,22 @@
   <use xlink:href="#_E2_96_88" x="120" y="0" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="20" width="20" height="20"/>
   <use xlink:href="#_F0_9F_98_8A" x="20" y="20" width="20" height="20"/>
-  <use xlink:href="#_20" x="40" y="20" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="60" y="20" width="20" height="20"/>
-  <use xlink:href="#_20" x="80" y="20" width="20" height="20"/>
-  <use xlink:href="#_20" x="100" y="20" width="20" height="20"/>
   <use xlink:href="#_F0_9F_91_8D_F0_9F_8F_BD" x="120" y="20" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="40" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="20" y="40" width="20" height="20"/>
-  <use xlink:href="#_20" x="40" y="40" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="60" y="40" width="20" height="20"/>
-  <use xlink:href="#_20" x="80" y="40" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="100" y="40" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="120" y="40" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="60" width="20" height="20"/>
-  <use xlink:href="#_20" x="20" y="60" width="20" height="20"/>
-  <use xlink:href="#_20" x="40" y="60" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="60" y="60" width="20" height="20"/>
-  <use xlink:href="#_20" x="80" y="60" width="20" height="20"/>
-  <use xlink:href="#_20" x="100" y="60" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="120" y="60" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="80" width="20" height="20"/>
-  <use xlink:href="#_20" x="20" y="80" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="40" y="80" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="60" y="80" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="80" y="80" width="20" height="20"/>
-  <use xlink:href="#_20" x="100" y="80" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="120" y="80" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="100" width="20" height="20"/>
-  <use xlink:href="#_20" x="20" y="100" width="20" height="20"/>
-  <use xlink:href="#_20" x="40" y="100" width="20" height="20"/>
-  <use xlink:href="#_20" x="60" y="100" width="20" height="20"/>
-  <use xlink:href="#_20" x="80" y="100" width="20" height="20"/>
-  <use xlink:href="#_20" x="100" y="100" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="120" y="100" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="0" y="120" width="20" height="20"/>
   <use xlink:href="#_E2_96_88" x="20" y="120" width="20" height="20"/>

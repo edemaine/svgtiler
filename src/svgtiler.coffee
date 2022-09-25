@@ -684,6 +684,7 @@ class SVGTopLevel extends SVGContent
   Parser will enforce that the content is wrapped in this element.
   ###
   makeDOM: ->
+    return @dom if @dom?
     super()
     ## Wrap XML in <wrapper>.
     symbol = @dom.createElementNS SVGNS, @wrapper
@@ -707,6 +708,7 @@ class SVGTopLevel extends SVGContent
     for child in (node for node in doc.childNodes)
       symbol.appendChild child
     @dom.appendChild symbol
+    @isEmpty = symbol.childNodes.length == 0
 
     ## Compute viewBox attribute if absent and wrapping in <symbol>.
     @viewBox = svgBBox @dom, @wrapper == 'symbol'
@@ -753,6 +755,7 @@ class SVGSymbol extends SVGTopLevel
   ###
   wrapper: 'symbol'
   makeDOM: ->
+    return @dom if @dom?
     super()
     ## `SVGTop` sets @width and @height according to viewBox.
     ## Check for overrides and missing width/height needed for symbols.
@@ -1325,7 +1328,7 @@ class Tile
   * the input `key` (usually a `String`) and coordinates (`i` and `j`);
   * an `SVGSymbol` (`symbol`); and
   * a layout (`xMin`, `yMin`, `xMax`, `yMax`, `width`, `height`).
-  We also store `zIndex` (from the symbol).
+  We also store `zIndex` and `isEmpty` (from the symbol).
   Note that typically several `Tile`s use the same `SVGSymbol`
   (assuming some re-use of tiles, e.g., repeated keys).
   ###
@@ -1368,6 +1371,10 @@ class Render extends HasSettings
       "#{key}_v#{version}"
     else
       key
+  undoId: (key) ->
+    ## Undoes the effect of `@id(key)` by decrementing the version counter.
+    key = escapeId key
+    @idVersions.set key, @idVersions.get(key) - 1
   cacheLookup: (def) ->
     ###
     Given `SVGContent` for a `def` (e.g. <symbol>),
@@ -1424,10 +1431,18 @@ class Render extends HasSettings
           if (found = @cacheLookup symbol)?
             symbol = found
           else
-            ## Include new <symbol> in SVG
+            ## Set id before generating DOM (needed for `isEmpty`)
+            ## to make `id` the first attribute.
             symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
-            svg.appendChild symbol.useDOM()
+            symbol.makeDOM()
+            if symbol.isEmpty
+              @undoId key
+              symbol.setId '_empty'
+            else
+              ## Include new non-empty <symbol> in SVG
+              svg.appendChild symbol.useDOM()
           new Tile {i, j, key, symbol,
+            isEmpty: symbol.isEmpty
             zIndex: symbol.zIndex
           }
     currentContext = null
@@ -1456,11 +1471,12 @@ class Render extends HasSettings
           tile.xMax = x
           tile.yMax = y
           continue
-        @layers[tile.zIndex] ?= []
-        @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
-        use.setAttribute @hrefAttr(), '#' + symbol.id
-        use.setAttribute 'x', x
-        use.setAttribute 'y', y
+        unless tile.isEmpty
+          @layers[tile.zIndex] ?= []
+          @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
+          use.setAttribute @hrefAttr(), '#' + symbol.id
+          use.setAttribute 'x', x
+          use.setAttribute 'y', y
         scaleX = scaleY = 1
         if symbol.autoWidth
           colWidths[j] ?= Math.max 0, ...(
@@ -1476,13 +1492,14 @@ class Render extends HasSettings
         tile.height = symbol.height * scaleY
         tile.xMax = x + tile.width
         tile.yMax = y + tile.height
-        ## Scaling of tile is relative to viewBox (which may differ from
-        ## width and height, e.g. when width is actually zero but viewBox
-        ## grows), so use viewBox to define width and height attributes:
-        use.setAttribute 'width',
-          (symbol.viewBox?[2] ? symbol.width) * scaleX
-        use.setAttribute 'height',
-          (symbol.viewBox?[3] ? symbol.height) * scaleY
+        unless tile.isEmpty
+          ## Scaling of tile is relative to viewBox (which may differ from
+          ## width and height, e.g. when width is actually zero but viewBox
+          ## grows), so use viewBox to define width and height attributes:
+          use.setAttribute 'width',
+            (symbol.viewBox?[2] ? symbol.width) * scaleX
+          use.setAttribute 'height',
+            (symbol.viewBox?[3] ? symbol.height) * scaleY
         if symbol.overflowBox?
           dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
           dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY

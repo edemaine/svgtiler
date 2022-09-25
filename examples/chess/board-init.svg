@@ -110,7 +110,6 @@
   <symbol id="p_v1" viewBox="0 0 45 45" overflow="visible">
     <path d="m 22.5,9 c -2.21,0 -4,1.79 -4,4 0,0.89 0.29,1.71 0.78,2.38 C 17.33,16.5 16,18.59 16,21 c 0,2.03 0.94,3.84 2.41,5.03 C 15.41,27.09 11,31.58 11,39.5 H 34 C 34,31.58 29.59,27.09 26.59,26.03 28.06,24.84 29,23.03 29,21 29,18.59 27.67,16.5 25.72,15.38 26.21,14.71 26.5,13.89 26.5,13 c 0,-2.21 -1.79,-4 -4,-4 z" style="opacity:1; fill:#000000; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;"/>
   </symbol>
-  <symbol id="_2E" viewBox="0 0 45 45" overflow="visible"/>
   <symbol id="_2E_v1" viewBox="0 0 45 45" overflow="visible">
     <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>
   </symbol>
@@ -226,38 +225,22 @@
   <use xlink:href="#p_v1" x="225" y="45" width="45" height="45"/>
   <use xlink:href="#p" x="270" y="45" width="45" height="45"/>
   <use xlink:href="#p_v1" x="315" y="45" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="90" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="45" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="90" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="135" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="90" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="225" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="90" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="315" y="90" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="0" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="45" y="135" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="90" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="135" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="180" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="135" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="270" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="180" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="45" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="180" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="135" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="180" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="225" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="180" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="315" y="180" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="0" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="45" y="225" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="90" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="225" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="180" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="225" width="45" height="45"/>
   <use xlink:href="#_2E_v1" x="270" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="225" width="45" height="45"/>
   <use xlink:href="#P" x="0" y="270" width="45" height="45"/>
   <use xlink:href="#P_v1" x="45" y="270" width="45" height="45"/>
   <use xlink:href="#P" x="90" y="270" width="45" height="45"/>

@@ -6,7 +6,6 @@
   <symbol id="O" viewBox="-5 -5 10 10" overflow="visible">
     <circle r="5" stroke="black" stroke-width="2" fill="white"/>
   </symbol>
-  <symbol id="_20" viewBox="-5 -5 10 10" overflow="visible"/>
   <symbol id="O_v1" viewBox="-5 -5 10 10" overflow="visible">
     <circle r="5" stroke="black" stroke-width="2" fill="black"/>
   </symbol>
@@ -16,81 +15,21 @@
   <symbol id="_2D" viewBox="-5 -5 10 10" overflow="visible">
     <line x1="-5" x2="5" stroke="purple" stroke-width="4"/>
   </symbol>
-  <use xlink:href="#_20" x="10" y="0" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="0" width="10" height="10"/>
-  <use xlink:href="#_20" x="0" y="10" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="10" width="10" height="10"/>
-  <use xlink:href="#_20" x="20" y="10" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="10" width="10" height="10"/>
-  <use xlink:href="#_20" x="40" y="10" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="20" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="20" width="10" height="10"/>
-  <use xlink:href="#_20" x="0" y="30" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="30" width="10" height="10"/>
-  <use xlink:href="#_20" x="20" y="30" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="30" width="10" height="10"/>
-  <use xlink:href="#_20" x="40" y="30" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="40" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="40" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="50" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="50" width="10" height="10"/>
   <use xlink:href="#_7C" x="20" y="50" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="60" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="70" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="70" width="10" height="10"/>
   <use xlink:href="#_7C" x="20" y="70" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="80" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="90" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="90" width="10" height="10"/>
   <use xlink:href="#_7C" x="20" y="90" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="40" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="50" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="60" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="70" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="80" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="90" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="100" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="110" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="130" y="100" width="10" height="10"/>
-  <use xlink:href="#_20" x="150" y="100" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="110" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="110" width="10" height="10"/>
   <use xlink:href="#_7C" x="20" y="110" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="40" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="50" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="60" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="70" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="80" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="90" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="100" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="110" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="130" y="120" width="10" height="10"/>
-  <use xlink:href="#_20" x="150" y="120" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="130" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="130" width="10" height="10"/>
   <use xlink:href="#_7C" x="20" y="130" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="140" width="10" height="10"/>
   <use xlink:href="#_2D" x="30" y="140" width="10" height="10"/>
   <use xlink:href="#_2D" x="50" y="140" width="10" height="10"/>
   <use xlink:href="#_2D" x="70" y="140" width="10" height="10"/>
   <use xlink:href="#_2D" x="90" y="140" width="10" height="10"/>
-  <use xlink:href="#_20" x="110" y="140" width="10" height="10"/>
-  <use xlink:href="#_20" x="130" y="140" width="10" height="10"/>
-  <use xlink:href="#_20" x="150" y="140" width="10" height="10"/>
   <use xlink:href="#_7C" x="0" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="10" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="20" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="30" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="40" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="50" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="60" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="70" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="80" y="150" width="10" height="10"/>
-  <use xlink:href="#_20" x="90" y="150" width="10" height="10"/>
   <use xlink:href="#_7C" x="100" y="150" width="10" height="10"/>
   <use xlink:href="#_2D" x="10" y="160" width="10" height="10"/>
   <use xlink:href="#_2D" x="30" y="160" width="10" height="10"/>
