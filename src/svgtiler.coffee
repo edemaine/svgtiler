@@ -1412,7 +1412,6 @@ class Render extends HasSettings
     @mappings.doBeforeRender @
     missing = new Set
     @cache = new Map
-    ids = new Set
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
@@ -1428,10 +1427,6 @@ class Render extends HasSettings
             ## Include new <symbol> in SVG
             symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
             svg.appendChild symbol.useDOM()
-            if ids.has symbol.id
-              console.warn "Multiple symbols with id '#{symbol.id}': This shouldn't happen, and SVG likely won't load correctly."
-            else
-              ids.add symbol.id
           new Tile {i, j, key, symbol,
             zIndex: symbol.zIndex
           }
