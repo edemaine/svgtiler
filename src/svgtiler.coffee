@@ -1358,16 +1358,16 @@ class Render extends HasSettings
     @styles = Styles.from @getSetting 'styles'
     @defs = []
   hrefAttr: -> hrefAttr @settings
-  id: (key) ->
+  id: (key) -> #, noEscape) ->
     ## Generate unique ID starting with an escaped version of `key`.
     ## If necessary, appends _v0, _v1, _v2, etc. to make unique.
-    escaped = escapeId key
+    key = escapeId key #unless noEscape
     version = @idVersions.get(key) ? 0
     @idVersions.set key, version + 1
     if version
-      "#{escaped}_v#{version}"
+      "#{key}_v#{version}"
     else
-      escaped
+      key
   cacheLookup: (def) ->
     ###
     Given `SVGContent` for a `def` (e.g. <symbol>),
@@ -1570,7 +1570,6 @@ class Render extends HasSettings
 
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = new Map
-    inlineImageVersions = new Map
     domRecurse svg, (node) =>
       return true unless node.nodeName == 'image'
       {href} = getHref node
@@ -1597,10 +1596,7 @@ class Render extends HasSettings
       attributes.sort()
       attributes = attributes.join ' '
       unless (id = inlineImages.get attributes)?
-        version = inlineImageVersions.get(filename) ? 0
-        inlineImageVersions.set filename, version + 1
-        id = "_image_#{escapeId filename}_v#{version}"
-        inlineImages.set attributes, id
+        inlineImages.set attributes, id = @id filename
         svg.appendChild symbol = @dom.createElementNS SVGNS, 'symbol'
         symbol.setAttribute 'id', id
         # If we don't have width/height set from data-width/height fields,
