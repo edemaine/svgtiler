@@ -1319,6 +1319,19 @@ class SVGFile extends DummyInput
   @title: "SVG file (convert to PDF/PNG without any tiling)"
   @skipRead: true  # svgink/Inkscape will do actual file reading
 
+class Tile
+  ###
+  `Tile` represents a rendered tile, which consists of
+  * the input `key` (usually a `String`) and coordinates (`i` and `j`);
+  * an `SVGSymbol` (`symbol`); and
+  * a layout (`xMin`, `yMin`, `xMax`, `yMax`, `width`, `height`).
+  We also store `zIndex` (from the symbol).
+  Note that typically several `Tile`s use the same `SVGSymbol`
+  (assuming some re-use of tiles, e.g., repeated keys).
+  ###
+  constructor: (opts) ->
+    @[key] = value for key, value of opts if opts?
+
 ## Do not need to wrap the following elements in <defs>.
 skipDef = new Set [
   'clipPath'
@@ -1381,10 +1394,9 @@ class Render extends HasSettings
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
-    Also saves the table of `SVGSymbol`s in `@symbols`, the corresponding
-    coordinates in `@coords`, bounding box in `@xMin`, `@xMax`, `@yMin`,
-    `@yMax`, `@width`, and `@height`, and text content in `@text`
-    for use by `makeTeX`.
+    Also saves the table of `Tile`s (symbols with layout geometry) in `@tiles`,
+    and bounding box in `@xMin`, `@xMax`, `@yMin`, `@yMax`,
+    `@width`, and `@height`.
     ###
     @dom = domImplementation.createDocument SVGNS, 'svg'
     svg = @dom.documentElement
@@ -1401,7 +1413,7 @@ class Render extends HasSettings
     missing = new Set
     @cache = new Map
     ids = new Set
-    @symbols =
+    @tiles =
       for row, i in @drawing.keys
         for key, j in row
           currentContext.move j, i
@@ -1411,7 +1423,7 @@ class Render extends HasSettings
             symbol = unrecognizedSymbol
           ## Check cache for this symbol
           if (found = @cacheLookup symbol)?
-            found
+            symbol = found
           else
             ## Include new <symbol> in SVG
             symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
@@ -1420,58 +1432,70 @@ class Render extends HasSettings
               console.warn "Multiple symbols with id '#{symbol.id}': This shouldn't happen, and SVG likely won't load correctly."
             else
               ids.add symbol.id
-            symbol
+          new Tile {i, j, key, symbol,
+            zIndex: symbol.zIndex
+          }
     currentContext = null
     missing = ("'#{key}'" for key from missing)
     if missing.length
       console.warn "Failed to recognize tiles:", missing.join ', '
 
-    ## Lay out the symbols in the drawing via SVG <use>.
+    ## Lay out the tiles in the drawing via SVG <use>.
     @xMin = @yMin = @xMax = @yMax = 0
     @layers = {}
     y = 0
     colWidths = {}
     @coords = []
-    for row, i in @symbols
-      @coords.push coordsRow = []
+    for row, i in @tiles
       rowHeight = 0
-      for tile in row when not tile.autoHeight
-        if tile.height > rowHeight
-          rowHeight = tile.height
+      for tile in row when not tile.symbol.autoHeight
+        if tile.symbol.height > rowHeight
+          rowHeight = tile.symbol.height
       x = 0
       for tile, j in row
-        coordsRow.push {x, y}
-        continue unless tile?
+        {symbol} = tile
+        tile.xMin = x
+        tile.yMin = y
+        unless symbol?
+          tile.width = tile.height = 0
+          tile.xMax = x
+          tile.yMax = y
+          continue
         @layers[tile.zIndex] ?= []
         @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
-        use.setAttribute @hrefAttr(), '#' + tile.id
+        use.setAttribute @hrefAttr(), '#' + symbol.id
         use.setAttribute 'x', x
         use.setAttribute 'y', y
         scaleX = scaleY = 1
-        if tile.autoWidth
+        if symbol.autoWidth
           colWidths[j] ?= Math.max 0, ...(
-            for row2 in @symbols when row2[j]? and not row2[j].autoWidth
-              row2[j].width
+            for row2 in @tiles when row2[j]? and not row2[j].symbol.autoWidth
+              row2[j].symbol.width
           )
-          scaleX = colWidths[j] / tile.width unless tile.width == 0
-          scaleY = scaleX unless tile.autoHeight
-        if tile.autoHeight
-          scaleY = rowHeight / tile.height unless tile.height == 0
-          scaleX = scaleY unless tile.autoWidth
-        ## Scaling of tile is relative to viewBox, so use that to define
-        ## width and height attributes:
+          scaleX = colWidths[j] / symbol.width unless symbol.width == 0
+          scaleY = scaleX unless symbol.autoHeight
+        if symbol.autoHeight
+          scaleY = rowHeight / symbol.height unless symbol.height == 0
+          scaleX = scaleY unless symbol.autoWidth
+        tile.width = symbol.width * scaleX
+        tile.height = symbol.height * scaleY
+        tile.xMax = x + tile.width
+        tile.yMax = y + tile.height
+        ## Scaling of tile is relative to viewBox (which may differ from
+        ## width and height, e.g. when width is actually zero but viewBox
+        ## grows), so use viewBox to define width and height attributes:
         use.setAttribute 'width',
-          (tile.viewBox?[2] ? tile.width) * scaleX
+          (symbol.viewBox?[2] ? symbol.width) * scaleX
         use.setAttribute 'height',
-          (tile.viewBox?[3] ? tile.height) * scaleY
-        if tile.overflowBox?
-          dx = (tile.overflowBox[0] - tile.viewBox[0]) * scaleX
-          dy = (tile.overflowBox[1] - tile.viewBox[1]) * scaleY
+          (symbol.viewBox?[3] ? symbol.height) * scaleY
+        if symbol.overflowBox?
+          dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
+          dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
           @xMin = Math.min @xMin, x + dx
           @yMin = Math.min @yMin, y + dy
-          @xMax = Math.max @xMax, x + dx + tile.overflowBox[2] * scaleX
-          @yMax = Math.max @yMax, y + dy + tile.overflowBox[3] * scaleY
-        x += tile.width * scaleX
+          @xMax = Math.max @xMax, x + dx + symbol.overflowBox[2] * scaleX
+          @yMax = Math.max @yMax, y + dy + symbol.overflowBox[3] * scaleY
+        x = tile.xMax
         @xMax = Math.max @xMax, x
       y += rowHeight
       @yMax = Math.max @yMax, y
@@ -1612,7 +1636,7 @@ class Render extends HasSettings
 
 ''' + out
   makeTeX: (filename, relativeDir) ->
-    @makeDOM() unless @symbols?
+    @makeDOM() unless @tiles?
     filename = path.parse filename
     basename = filename.base[...-filename.ext.length]
     if relativeDir
@@ -1675,10 +1699,10 @@ class Render extends HasSettings
         \\begin{picture}(#{@width},#{@height})%
           \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{relativeDir ? ''}#{basename}}}%
     """]
-    for row, i in @symbols
-      for symbol, j in row
-        {x, y} = @coords[i][j]
-        for text in symbol.text
+    for row, i in @tiles
+      for tile, j in row
+        {xMin, yMin} = tile
+        for text in tile.symbol.text
           tx = parseNum(text.getAttribute('x')) ? 0
           ty = parseNum(text.getAttribute('y')) ? 0
           content = (
@@ -1693,7 +1717,7 @@ class Render extends HasSettings
           else #if /^start\b/.test anchor  # default
             wrap = '\\llap{'
           # "@height -" is to flip between y down (SVG) and y up (picture)
-          lines.push "    \\put(#{x+tx},#{@height - (y+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
+          lines.push "    \\put(#{xMin+tx},#{@height - (yMin+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
     lines.push """
         \\end{picture}%
       \\endgroup
