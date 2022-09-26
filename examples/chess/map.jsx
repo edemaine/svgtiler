@@ -12,7 +12,7 @@ function read(filename) {
 }
 
 svgtiler.afterRender((render) =>
-  <rect fill="white" z-index="-1"
+  <rect fill="white" z-index="-2"
    x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
 );
 
@@ -21,12 +21,13 @@ svgtiler.afterRender((render) =>
   key = key.trim();
   if (key === '.') key = '';
   const piece = key.toLowerCase();
-  return (
-    <symbol viewBox={`0 0 ${size} ${size}`}>
+  return [
+    <symbol viewBox={`0 0 ${size} ${size}`} z-index="-1">
       {(context.i + context.j) % 2 === 0 ? light : dark}
-      {key.trim() && key !== '.' &&
-       read(`./Chess_${piece}${piece === key ? "d" : "l"}t45.svg`)
-      }
     </symbol>
-  );
+  ,
+    <symbol viewBox={`0 0 ${size} ${size}`}>
+      {key && read(`./Chess_${piece}${piece === key ? "d" : "l"}t45.svg`)}
+    </symbol>
+  ];
 }

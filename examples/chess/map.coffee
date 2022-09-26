@@ -11,7 +11,7 @@ read = (filename) ->
   dom.props.children
 
 svgtiler.afterRender (render) ->
-  <rect fill="white" z-index="-1"
+  <rect fill="white" z-index="-2"
    x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
 
 (key) ->
@@ -19,13 +19,16 @@ svgtiler.afterRender (render) ->
   key = key.trim()
   key = '' if key == '.'
   piece = key.toLowerCase()
-  <symbol viewBox="0 0 #{size} #{size}">
-    {if (@i + @j) % 2 == 0
-      light
-    else
-      dark
-    }
-    {if key.trim() and key != '.'
-      read "./Chess_#{piece}#{if piece == key then "d" else "l"}t45.svg"
-    }
-  </symbol>
+  [
+    <symbol viewBox="0 0 #{size} #{size}" z-index="-1">
+      {if (@i + @j) % 2 == 0
+        light
+      else
+        dark
+      }
+    </symbol>
+    if key
+      <symbol viewBox="0 0 #{size} #{size}">
+        {read "./Chess_#{piece}#{if piece == key then "d" else "l"}t45.svg"}
+      </symbol>
+  ]

@@ -962,7 +962,8 @@ class Mapping extends Input
     ## null/undefined.
     value = @map
     isStatic = undefined
-    while value? and typeof value != 'string' and not isPreact value
+    while value? and typeof value != 'string' and not Array.isArray(value) and
+          not isPreact value
       if value instanceof Map or value instanceof WeakMap
         value = value.get key
       else if typeof value == 'function'
@@ -982,10 +983,19 @@ class Mapping extends Input
 
     ## Build symbol if non-null, and save in cache if it's static.
     if value?
-      symbol = new SVGSymbol "tile '#{key}'", value, @settings
-      symbol.isStatic = isStatic
-      @cache.set key, symbol if isStatic
-      symbol
+      makeSymbol = (data) =>
+        symbol = new SVGSymbol "tile '#{key}'", data, @settings
+        symbol.isStatic = isStatic
+        symbol
+      if Array.isArray value
+        ## Enforce `value` to be a (flat) array with no nulls
+        symbols =
+          for part in value.flat Infinity when part?
+            makeSymbol part
+      else
+        symbols = makeSymbol value
+      @cache.set key, symbols if isStatic
+      symbols
     else
       @cache.set key, value if isStatic
       value
@@ -1423,28 +1433,30 @@ class Render extends HasSettings
       for row, i in @drawing.keys
         for key, j in row
           currentContext.move j, i
-          symbol = @mappings.lookup key, currentContext
-          unless symbol?
+          symbols = @mappings.lookup key, currentContext
+          unless symbols? and symbols.length != 0
             missing.add key
-            symbol = unrecognizedSymbol
-          ## Check cache for this symbol
-          if (found = @cacheLookup symbol)?
-            symbol = found
-          else
-            ## Set id before generating DOM (needed for `isEmpty`)
-            ## to make `id` the first attribute.
-            symbol.setId @id key unless symbol.id?  # unrecognizedSymbol has id
-            symbol.makeDOM()
-            if symbol.isEmpty
-              @undoId key
-              symbol.setId '_empty'
+            symbols = unrecognizedSymbol
+          symbols = [symbols] unless Array.isArray symbols
+          for symbol, k in symbols
+            ## Check cache for this symbol
+            if (found = @cacheLookup symbol)?
+              symbol = found
             else
-              ## Include new non-empty <symbol> in SVG
-              svg.appendChild symbol.useDOM()
-          new Tile {i, j, key, symbol,
-            isEmpty: symbol.isEmpty
-            zIndex: symbol.zIndex
-          }
+              ## Set id before generating DOM (needed for `isEmpty`)
+              ## to make `id` the first attribute.
+              symbol.setId id = @id key unless symbol.id?  # unrecognizedSymbol has id
+              symbol.makeDOM()
+              if symbol.isEmpty
+                @undoId key
+                symbol.setId '_empty'
+              else
+                ## Include new non-empty <symbol> in SVG
+                svg.appendChild symbol.useDOM()
+            new Tile {i, j, k, key, symbol,
+              isEmpty: symbol.isEmpty
+              zIndex: symbol.zIndex
+            }
     currentContext = null
     missing = ("'#{key}'" for key from missing)
     if missing.length
@@ -1458,56 +1470,63 @@ class Render extends HasSettings
     @coords = []
     for row, i in @tiles
       rowHeight = 0
-      for tile in row when not tile.symbol.autoHeight
-        if tile.symbol.height > rowHeight
-          rowHeight = tile.symbol.height
+      for tiles in row
+        for tile in tiles
+          if not tile.symbol.autoHeight and tile.symbol.height > rowHeight
+            rowHeight = tile.symbol.height
       x = 0
-      for tile, j in row
-        {symbol} = tile
-        tile.xMin = x
-        tile.yMin = y
-        unless symbol?
-          tile.width = tile.height = 0
-          tile.xMax = x
-          tile.yMax = y
-          continue
-        unless tile.isEmpty
-          @layers[tile.zIndex] ?= []
-          @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
-          use.setAttribute @hrefAttr(), '#' + symbol.id
-          use.setAttribute 'x', x
-          use.setAttribute 'y', y
-        scaleX = scaleY = 1
-        if symbol.autoWidth
-          colWidths[j] ?= Math.max 0, ...(
-            for row2 in @tiles when row2[j]? and not row2[j].symbol.autoWidth
-              row2[j].symbol.width
-          )
-          scaleX = colWidths[j] / symbol.width unless symbol.width == 0
-          scaleY = scaleX unless symbol.autoHeight
-        if symbol.autoHeight
-          scaleY = rowHeight / symbol.height unless symbol.height == 0
-          scaleX = scaleY unless symbol.autoWidth
-        tile.width = symbol.width * scaleX
-        tile.height = symbol.height * scaleY
-        tile.xMax = x + tile.width
-        tile.yMax = y + tile.height
-        unless tile.isEmpty
-          ## Scaling of tile is relative to viewBox (which may differ from
-          ## width and height, e.g. when width is actually zero but viewBox
-          ## grows), so use viewBox to define width and height attributes:
-          use.setAttribute 'width',
-            (symbol.viewBox?[2] ? symbol.width) * scaleX
-          use.setAttribute 'height',
-            (symbol.viewBox?[3] ? symbol.height) * scaleY
-        if symbol.overflowBox?
-          dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
-          dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
-          @xMin = Math.min @xMin, x + dx
-          @yMin = Math.min @yMin, y + dy
-          @xMax = Math.max @xMax, x + dx + symbol.overflowBox[2] * scaleX
-          @yMax = Math.max @yMax, y + dy + symbol.overflowBox[3] * scaleY
-        x = tile.xMax
+      for tiles, j in row
+        for tile, k in tiles
+          {symbol} = tile
+          tile.xMin = x
+          tile.yMin = y
+          unless symbol?
+            tile.width = tile.height = 0
+            tile.xMax = x
+            tile.yMax = y
+            continue
+          scaleX = scaleY = 1
+          if symbol.autoWidth and symbol.width > 0
+            if k == 0
+              colWidths[j] ?= Math.max 0, ...(
+                for row2 in @tiles when row2[j]?[0]?.symbol? and not row2[j][0].symbol.autoWidth
+                  row2[j][0].symbol.width
+              )
+              scaleX = colWidths[j] / symbol.width
+            else
+              scaleX = tiles[0].width / symbol.width
+            scaleY = scaleX unless symbol.autoHeight
+          if symbol.autoHeight and symbol.height > 0
+            if k == 0
+              scaleY = rowHeight / symbol.height
+            else
+              scaleX = tiles[0].height / symbol.height
+            scaleX = scaleY unless symbol.autoWidth
+          tile.width = symbol.width * scaleX
+          tile.height = symbol.height * scaleY
+          tile.xMax = x + tile.width
+          tile.yMax = y + tile.height
+          unless tile.isEmpty
+            @layers[tile.zIndex] ?= []
+            @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
+            use.setAttribute @hrefAttr(), '#' + symbol.id
+            use.setAttribute 'x', x
+            use.setAttribute 'y', y
+            ## Scaling of tile is relative to viewBox (which may differ from
+            ## width and height, e.g. when width is actually zero but viewBox
+            ## grows), so use viewBox to define width and height attributes:
+            use.setAttribute 'width',
+              (symbol.viewBox?[2] ? symbol.width) * scaleX
+            use.setAttribute 'height',
+              (symbol.viewBox?[3] ? symbol.height) * scaleY
+          if symbol.overflowBox?
+            dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
+            dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
+            @xMin = Math.min @xMin, x + dx
+            @yMin = Math.min @yMin, y + dy
+            @xMax = Math.max @xMax, x + dx + symbol.overflowBox[2] * scaleX
+            @yMax = Math.max @yMax, y + dy + symbol.overflowBox[3] * scaleY
+        x = tiles[0].xMax
         @xMax = Math.max @xMax, x
       y += rowHeight
       @yMax = Math.max @yMax, y
@@ -1529,7 +1548,7 @@ class Render extends HasSettings
         @yMin = Math.min @yMin, box[1]
         @xMax = Math.max @xMax, box[0] + box[2]
         @yMax = Math.max @yMax, box[1] + box[3]
-      updateSize()
+        updateSize()
       @layers[overlay.zIndex].push dom.documentElement
 
     ## Check for global <defs> used by the symbols so far.
@@ -1708,24 +1727,25 @@ class Render extends HasSettings
           \\put(0,0){\\includegraphics[width=#{@width}\\unitlength]{\\currfiledir #{relativeDir ? ''}#{basename}}}%
     """]
     for row, i in @tiles
-      for tile, j in row
-        {xMin, yMin} = tile
-        for text in tile.symbol.text
-          tx = parseNum(text.getAttribute('x')) ? 0
-          ty = parseNum(text.getAttribute('y')) ? 0
-          content = (
-            for child in text.childNodes when child.nodeType == 3 # TEXT_NODE
-              child.data
-          ).join ''
-          anchor = attributeOrStyle text, 'text-anchor'
-          if /^middle\b/.test anchor
-            wrap = '\\clap{'
-          else if /^end\b/.test anchor
-            wrap = '\\rlap{'
-          else #if /^start\b/.test anchor  # default
-            wrap = '\\llap{'
-          # "@height -" is to flip between y down (SVG) and y up (picture)
-          lines.push "    \\put(#{xMin+tx},#{@height - (yMin+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
+      for tiles, j in row
+        for tile, k in tiles
+          {xMin, yMin} = tile
+          for text in tile.symbol.text
+            tx = parseNum(text.getAttribute('x')) ? 0
+            ty = parseNum(text.getAttribute('y')) ? 0
+            content = (
+              for child in text.childNodes when child.nodeType == 3 # TEXT_NODE
+                child.data
+            ).join ''
+            anchor = attributeOrStyle text, 'text-anchor'
+            if /^middle\b/.test anchor
+              wrap = '\\clap{'
+            else if /^end\b/.test anchor
+              wrap = '\\rlap{'
+            else #if /^start\b/.test anchor  # default
+              wrap = '\\llap{'
+            # "@height -" is to flip between y down (SVG) and y up (picture)
+            lines.push "    \\put(#{xMin+tx},#{@height - (yMin+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
     lines.push """
         \\end{picture}%
       \\endgroup
