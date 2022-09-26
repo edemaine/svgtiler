@@ -12,9 +12,9 @@
 
 | Rendering | Repo Files | Source |
 |-----------|------------|--------|
-| ![Initial chessboard](graph/board-init.svg) | [ASCII input](board-init.asc)<br>[SVG output](board-init.svg) | [Wikipedia: Chess](https://en.wikipedia.org/wiki/Chess) |
-| ![Immortal Game chessboard](graph/board-immortal.svg) | [ASCII input](board-immortal.asc)<br>[SVG output](board-immortal.svg) | [Wikipedia: Immortal Game](https://en.wikipedia.org/wiki/Immortal_Game) (last position) |
-| ![Kasparov's Immortal chessboard](graph/board-kasparov-immortal.svg) | [ASCII input](board-kasparov-immortal.asc)<br>[SVG output](board-karparov-immortal.svg) | [Wikipedia: Karparov's Immortal](https://en.wikipedia.org/wiki/Kasparov%27s_Immortal) (last position) |
+| ![Initial chessboard](graph-board-init.svg) | [ASCII input](board-init.asc)<br>[SVG output](board-init.svg) | [Wikipedia: Chess](https://en.wikipedia.org/wiki/Chess) |
+| ![Immortal Game chessboard](graph-board-immortal.svg) | [ASCII input](board-immortal.asc)<br>[SVG output](board-immortal.svg) | [Wikipedia: Immortal Game](https://en.wikipedia.org/wiki/Immortal_Game) (last position) |
+| ![Kasparov's Immortal chessboard](graph-board-kasparov-immortal.svg) | [ASCII input](board-kasparov-immortal.asc)<br>[SVG output](board-karparov-immortal.svg) | [Wikipedia: Karparov's Immortal](https://en.wikipedia.org/wiki/Kasparov%27s_Immortal) (last position) |
 
 ## Mapping
 
