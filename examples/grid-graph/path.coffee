@@ -40,6 +40,7 @@ vertical = (start, end) ->
      marker-start={start} marker-end={end}/>
   </symbol>
 
+'': blank
 ' ': blank
 O: vertex
 o: vertex
