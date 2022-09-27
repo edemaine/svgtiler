@@ -42,6 +42,7 @@ unless window?
         path.traverse(
           ExportDefaultDeclaration: (path) ->
             exportedDefault = true
+            return
           MemberExpression: (path) ->
             {node} = path
             check = (key, value) ->
