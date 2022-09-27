@@ -124,6 +124,9 @@ defaultSettings =
   keepHidden: false
   ## Don't delete blank extreme rows/columns.
   keepMargins: false
+  ## Don't make all rows have the same number of columns by padding with
+  ## empty strings.
+  keepUneven: false
   ## Override for output file's stem (basename without extension).
   ## Can use `*` to refer to input file's stem, to add prefix or suffix.
   outputStem: null
@@ -1271,6 +1274,7 @@ class AutoDrawing extends Drawing
   Extended Drawing base class that preprocesses the drawing as follows:
   * Casts all keys to strings, in particular to handle Number data.
   * Optionally removes margins according to `keepMargins` setting.
+  * Optionally pads rows to same length according to `keepUneven` setting.
   ###
   parse: (data) ->
     ## Turn strings into arrays, and turn numbers (e.g. from XLSX) into strings.
@@ -1298,7 +1302,20 @@ class AutoDrawing extends Drawing
             if j < row.length
               row.pop()
           j--
+    unless @getSetting 'keepUneven'
+      width = Math.max 0, ...(row.length for row in data)
+      for row in data
+        while row.length < width
+          row.push ''
     super data
+  set: (j, i, key) ->
+    oldHeight = @keys.length
+    super j, i, key
+    ## If we added new rows, make them match row 0's length.
+    unless oldHeight == @keys.length or @getSetting 'keepUneven'
+      for row in @keys[oldHeight..]
+        while row.length < @keys[0].length
+          row.push ''
 
 class ASCIIDrawing extends AutoDrawing
   @title: "ASCII drawing (one character per tile)"
@@ -2014,6 +2031,7 @@ Optional arguments:
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
   -s KEY=VALUE / --share KEY=VALUE  Set share.KEY to VALUE (undefined if no =)
   -m / --margin         Don't delete blank extreme rows/columns
+  --uneven              Don't make all rows have same length by padding with ''
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all tiles to have specified width
@@ -2093,6 +2111,8 @@ main = (args = process.argv[2..]) ->
         settings.force = true
       when '-m', '--margin'
         settings.keepMargins = true
+      when '--uneven'
+        settings.keepUneven = true
       when '--hidden'
         settings.keepHidden = true
       when '--tw', '--tile-width'

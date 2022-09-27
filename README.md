@@ -768,6 +768,7 @@ Optional arguments:
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
   -s KEY=VALUE / --share KEY=VALUE  Set share.KEY to VALUE (undefined if no =)
   -m / --margin         Don't delete blank extreme rows/columns
+  --uneven              Don't make all rows have same length by padding with ''
   --hidden              Process hidden sheets within spreadsheet files
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
