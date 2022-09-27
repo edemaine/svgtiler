@@ -28,8 +28,8 @@ unless window?
   Babel plugin to add implicit `export default` to last line of program,
   to simulate the effect of `eval` but in a module context.
   Only added if there isn't already an `export default` or `exports.default`
-  in the code, and when the last line is an object or function expression
-  (with the idea that it wouldn't do much by itself).
+  in the code, and when the last line is an object, array, or function
+  expression (with the idea that it wouldn't do much by itself).
   ###
   implicitFinalExportDefault = ({types}) ->
     visitor:
@@ -62,7 +62,8 @@ unless window?
         if types.isExpressionStatement(last) and (
           types.isObjectExpression(lastNode.expression) or
           types.isFunctionExpression(lastNode.expression) or
-          types.isArrowFunctionExpression(lastNode.expression)
+          types.isArrowFunctionExpression(lastNode.expression) or
+          types.isArrayExpression(lastNode.expression)
           # not AssignmentExpression or CallExpression
         )
           exportLast = types.exportDefaultDeclaration lastNode.expression
@@ -984,46 +985,71 @@ class Mapping extends Input
       return found
 
     ## Repeatedly expand `@map` until we get string, Preact VDOM, or
-    ## null/undefined.
-    value = @map
-    isStatic = undefined
-    while value? and typeof value != 'string' and not Array.isArray(value) and
-          not isPreact value
-      if value instanceof Map or value instanceof WeakMap
-        value = value.get key
-      else if typeof value == 'function'
-        value = value.call context, key, context
-        ## Use of a function implies dynamic, unless there's a static wrapper.
-        isStatic ?= false
-      else if $static of value  # static wrapper from wrapStatic
-        value = value[$static]
-        ## Static wrapper forces static, even if there are functions.
-        isStatic = true
-      else  # typeof value == 'object'
-        if value.hasOwnProperty key  # avoid inherited property e.g. toString
-          value = value[key]
+    ## null/undefined.  Arrays get expanded recursively.
+    recurse = (value, isStatic = undefined) =>
+      while value?
+        #console.log key, (
+        #  switch
+        #    when Array.isArray value then 'array'
+        #    when isPreact value then 'preact'
+        #    else typeof value
+        #), isStatic
+        if typeof value == 'string' or isPreact value
+          ## Static unless we saw a function and no static wrapper.
+          isStatic ?= true
+          ## Symbol ends up getting `isStatic` set to global `isStatic` value,
+          ## instead of this local value.  For example, not helpful to mark
+          ## this symbol as static if another one in an array isn't static.
+          value = new SVGSymbol "tile '#{key}'", value, @settings
+          #value.isStatic = isStatic
+          return {value, isStatic}
+        else if value instanceof Map or value instanceof WeakMap
+          value = value.get key
+        else if typeof value == 'function'
+          value = value.call context, key, context
+          ## Use of a function implies dynamic, unless there's a static wrapper.
+          isStatic ?= false
+        else if $static of value  # static wrapper from wrapStatic
+          value = value[$static]
+          ## Static wrapper forces static, even if there are functions.
+          isStatic = true
+        else if Array.isArray value
+          ## Items in an array inherit parent staticness if any,
+          ## with no influence between items.
+          ## Overall array is static if every item is.
+          allStatic = true
+          value =
+            for item in value
+              result = recurse item, isStatic
+              allStatic = false if result.isStatic == false
+              result.value
+          return {value, isStatic: allStatic}
+        else if typeof value == 'object'
+          if value.hasOwnProperty key  # avoid inherited property e.g. toString
+            value = value[key]
+          else
+            value = undefined
         else
+          console.warn "Unsupported data type #{typeof value} in looking up tile '#{key}'"
           value = undefined
-    isStatic ?= true  # static unless we saw a function and no static wrapper
+      ## Static unless we saw a function and no static wrapper
+      isStatic ?= true
+      {value, isStatic}
+    {value, isStatic} = recurse @map
 
-    ## Build symbol if non-null, and save in cache if it's static.
-    if value?
-      makeSymbol = (data) =>
-        symbol = new SVGSymbol "tile '#{key}'", data, @settings
-        symbol.isStatic = isStatic
-        symbol
-      if Array.isArray value
-        ## Enforce `value` to be a (flat) array with no nulls
-        symbols =
-          for part in value.flat Infinity when part?
-            makeSymbol part
-      else
-        symbols = makeSymbol value
-      @cache.set key, symbols if isStatic
-      symbols
-    else
-      @cache.set key, value if isStatic
-      value
+    ## Set each symbol's `isStatic` flag to the global `isStatic` value.
+    ## Enforce arrays to be flat with no nulls.
+    if Array.isArray value
+      value =
+        for symbol in value.flat Infinity when symbol?
+          symbol.isStatic = isStatic
+          symbol
+    else if value?
+      value.isStatic = isStatic
+
+    ## Save in cache if overall static.
+    @cache.set key, value if isStatic
+    value
   beforeRender: (fn) ->
     @beforeRenderQueue.push fn
   afterRender: (fn) ->

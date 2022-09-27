@@ -173,7 +173,7 @@ The code specifies a `mapping` in one of three ways:
 1. `export default mapping` (ECMAScript modules style)
 2. `exports.default = mapping` (CommonJS modules style)
 3. Writing a `mapping` expression at the end of the file (implicit export),
-   which must be a top-level object or function expression
+   which must be a top-level object, array, or function expression
    (without e.g. being assigned to a variable).
 
 In any case, `mapping` should be one of the following types of **mapping**
@@ -211,23 +211,25 @@ or return value of a function) should be specified as one of the following:
 6. An empty string, short for the empty symbol `<symbol viewBox="0 0 0 0"/>`.
 7. `undefined` or `null`, indicating that this mapping doesn't define a tile
    for this tile name (and the next mapping should be checked).
-8. An `Array` of tiles of any of the above formats (or more `Array`s, which
-   get flattened), meaning to stack multiple tiles on top of each other,
-   where the first non-null tile defines the `viewBox` and size
-   (but all can influence the [`overflowBox`](#overflow-and-bounding-box)).
-   Use [`z-index`](#z-index-stacking-order-of-tiles)
-   to control stacking order.
-   Null items in the array get ignored, and an empty array acts like `null`
-   (this mapping does not define a tile for this tile name).
-9. Another mapping (JavaScript object, `Map` object, or function) that gets
+8. Another mapping (JavaScript object, `Map` object, or function) that gets
    recursively evaluated as described above (with the same tile name and
    context).  For example, a top-level JavaScript object could map some tile
    names to functions (when they need to be dynamic); or a top-level function
    could return different mappings depending on context.
-10. One of the tiles above wrapped in a call to `svgtiler.static`, e.g.,
-    `svgtiler.static(<symbol/>)`.  This wrapper tells SVG Tiler that the tile
-    mapping is always the same for this tile name, and does not depend on
-    `Context` (e.g. adjacent tiles), enabling SVG Tiler to do more caching.
+9. A tile in one of the listed formats wrapped in a call to `svgtiler.static`,
+   e.g., `svgtiler.static(<symbol/>)`.  This wrapper tells SVG Tiler that the
+   tile mapping is always the same for this tile name, and does not depend on
+   `Context` (e.g. adjacent tiles), enabling SVG Tiler to do more caching.
+   This is only necessary if you use functions to define tiles; otherwise,
+   SVG Tiler will automatically mark the tiles as static.
+10. An `Array` of tiles of any of the listed formats (including more `Array`s,
+    which get flattened), meaning to stack multiple tiles on top of each other,
+    where the first non-null tile defines the `viewBox` and size
+    (but all can influence the [`overflowBox`](#overflow-and-bounding-box)).
+    Use [`z-index`](#z-index-stacking-order-of-tiles)
+    to control stacking order.
+    Null items in the array get ignored, and an empty array acts like `null`
+    (this mapping does not define a tile for this tile name).
 
 If you need to use a `<marker>`, `<filter>`, gradient, or other element
 intended for `<defs>`, call `svgtiler.def(tag)`, where `tag`
