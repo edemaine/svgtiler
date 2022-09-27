@@ -24,16 +24,39 @@ else
 ## Register `require` hooks of Babel and CoffeeScript,
 ## so that imported/required modules are similarly processed.
 unless window?
-  ## Babel plugin to add implicit `export default` to last line of program,
-  ## to simulate the effect of `eval` but in a module context.
+  ###
+  Babel plugin to add implicit `export default` to last line of program,
+  to simulate the effect of `eval` but in a module context.
+  Only added if there isn't already an `export default` or `exports.default`
+  in the code, and when the last line is an object or function expression
+  (with the idea that it wouldn't do much by itself).
+  ###
   implicitFinalExportDefault = ({types}) ->
     visitor:
       Program: (path) ->
         body = path.get 'body'
         return unless body.length  # empty program
-        for part in body
-          if types.isExportDefaultDeclaration part
-            return  # already an export default, so don't add one
+        ## Check for existing `export default` or `exports.default` or
+        ## `exports['default']`, in which case definitely don't add one.
+        exportedDefault = false
+        path.traverse(
+          ExportDefaultDeclaration: (path) ->
+            exportedDefault = true
+          MemberExpression: (path) ->
+            {node} = path
+            check = (key, value) ->
+              types.isIdentifier(node.object) and
+              node.object.name == key and (
+                (types.isIdentifier(node.property) and
+                 node.property.name == value) or
+                (types.isStringLiteral(node.property) and
+                 node.property.value == value)
+              )
+            exportedDefault or= check('exports', 'default') or
+                                check('module', 'exports')
+            return
+        )
+        return if exportedDefault
         last = body[body.length-1]
         lastNode = last.node
         if types.isExpressionStatement(last) and (
@@ -47,7 +70,7 @@ unless window?
           exportLast.innerComments = lastNode.innerComments
           exportLast.trailingComments = lastNode.trailingComments
           last.replaceWith exportLast
-        undefined
+        return
 
   babelConfig =
     plugins: [
