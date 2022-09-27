@@ -946,7 +946,7 @@ class Mapping extends Input
     }
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
   parse: (@map) ->
-    unless typeof @map in ['function', 'object']
+    unless typeof @map in ['function', 'object', 'undefined']
       console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @map}): should be function or object"
       @map = null
     if isPreact @map
@@ -954,6 +954,8 @@ class Mapping extends Input
       @map = null
   lookup: (key, context) ->
     ## `key` normally should be a String (via `AutoDrawing::parse` coercion).
+    ## Don't do anything if this is an empty mapping.
+    return unless @map?
     ## Check cache (used for static tiles).
     if (found = @cache.get key)?
       return found
@@ -1058,7 +1060,8 @@ class JSMapping extends Mapping
       #  console.log code
       pirates?.settings = @settings
       @module = runWithMapping @, -> require filename
-      super @module.default ? {}
+      #console.log filename, @module
+      super @module.default
       @walkDeps filename
     else
       ## But if file has been explicitly loaded (e.g. in browser),
