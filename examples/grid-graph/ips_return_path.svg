@@ -3,75 +3,75 @@
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-1 -1 172 172" width="172" height="172" xmlns="http://www.w3.org/2000/svg">
   <style>svg { background: #bbb }
   </style>
-  <symbol id="O" viewBox="-5 -5 10 10" overflow="visible">
+  <symbol id="O" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
     <circle r="5" stroke="black" stroke-width="2" fill="white"/>
   </symbol>
-  <symbol id="O_v1" viewBox="-5 -5 10 10" overflow="visible">
+  <symbol id="O_v1" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
     <circle r="5" stroke="black" stroke-width="2" fill="black"/>
   </symbol>
-  <symbol id="_7C" viewBox="-5 -5 10 10" overflow="visible">
+  <symbol id="_7C" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
     <line y1="-5" y2="5" stroke="purple" stroke-width="4"/>
   </symbol>
-  <symbol id="_2D" viewBox="-5 -5 10 10" overflow="visible">
+  <symbol id="_2D" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
     <line x1="-5" x2="5" stroke="purple" stroke-width="4"/>
   </symbol>
-  <use xlink:href="#_7C" x="0" y="50" width="10" height="10"/>
-  <use xlink:href="#_7C" x="20" y="50" width="10" height="10"/>
-  <use xlink:href="#_7C" x="0" y="70" width="10" height="10"/>
-  <use xlink:href="#_7C" x="20" y="70" width="10" height="10"/>
-  <use xlink:href="#_7C" x="0" y="90" width="10" height="10"/>
-  <use xlink:href="#_7C" x="20" y="90" width="10" height="10"/>
-  <use xlink:href="#_7C" x="0" y="110" width="10" height="10"/>
-  <use xlink:href="#_7C" x="20" y="110" width="10" height="10"/>
-  <use xlink:href="#_7C" x="0" y="130" width="10" height="10"/>
-  <use xlink:href="#_7C" x="20" y="130" width="10" height="10"/>
-  <use xlink:href="#_2D" x="30" y="140" width="10" height="10"/>
-  <use xlink:href="#_2D" x="50" y="140" width="10" height="10"/>
-  <use xlink:href="#_2D" x="70" y="140" width="10" height="10"/>
-  <use xlink:href="#_2D" x="90" y="140" width="10" height="10"/>
-  <use xlink:href="#_7C" x="0" y="150" width="10" height="10"/>
-  <use xlink:href="#_7C" x="100" y="150" width="10" height="10"/>
-  <use xlink:href="#_2D" x="10" y="160" width="10" height="10"/>
-  <use xlink:href="#_2D" x="30" y="160" width="10" height="10"/>
-  <use xlink:href="#_2D" x="50" y="160" width="10" height="10"/>
-  <use xlink:href="#_2D" x="70" y="160" width="10" height="10"/>
-  <use xlink:href="#_2D" x="90" y="160" width="10" height="10"/>
-  <use xlink:href="#O" x="0" y="0" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="20" y="0" width="10" height="10"/>
-  <use xlink:href="#O" x="40" y="0" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="0" y="20" width="10" height="10"/>
-  <use xlink:href="#O" x="20" y="20" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="40" y="20" width="10" height="10"/>
-  <use xlink:href="#O" x="0" y="40" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="20" y="40" width="10" height="10"/>
-  <use xlink:href="#O" x="40" y="40" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="0" y="60" width="10" height="10"/>
-  <use xlink:href="#O" x="20" y="60" width="10" height="10"/>
-  <use xlink:href="#O" x="0" y="80" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="20" y="80" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="0" y="100" width="10" height="10"/>
-  <use xlink:href="#O" x="20" y="100" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="120" y="100" width="10" height="10"/>
-  <use xlink:href="#O" x="140" y="100" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="160" y="100" width="10" height="10"/>
-  <use xlink:href="#O" x="0" y="120" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="20" y="120" width="10" height="10"/>
-  <use xlink:href="#O" x="120" y="120" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="140" y="120" width="10" height="10"/>
-  <use xlink:href="#O" x="160" y="120" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="0" y="140" width="10" height="10"/>
-  <use xlink:href="#O" x="20" y="140" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="40" y="140" width="10" height="10"/>
-  <use xlink:href="#O" x="60" y="140" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="80" y="140" width="10" height="10"/>
-  <use xlink:href="#O" x="100" y="140" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="120" y="140" width="10" height="10"/>
-  <use xlink:href="#O" x="140" y="140" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="160" y="140" width="10" height="10"/>
-  <use xlink:href="#O" x="0" y="160" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="20" y="160" width="10" height="10"/>
-  <use xlink:href="#O" x="40" y="160" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="60" y="160" width="10" height="10"/>
-  <use xlink:href="#O" x="80" y="160" width="10" height="10"/>
-  <use xlink:href="#O_v1" x="100" y="160" width="10" height="10"/>
+  <use xlink:href="#_7C" x="0" y="50"/>
+  <use xlink:href="#_7C" x="20" y="50"/>
+  <use xlink:href="#_7C" x="0" y="70"/>
+  <use xlink:href="#_7C" x="20" y="70"/>
+  <use xlink:href="#_7C" x="0" y="90"/>
+  <use xlink:href="#_7C" x="20" y="90"/>
+  <use xlink:href="#_7C" x="0" y="110"/>
+  <use xlink:href="#_7C" x="20" y="110"/>
+  <use xlink:href="#_7C" x="0" y="130"/>
+  <use xlink:href="#_7C" x="20" y="130"/>
+  <use xlink:href="#_2D" x="30" y="140"/>
+  <use xlink:href="#_2D" x="50" y="140"/>
+  <use xlink:href="#_2D" x="70" y="140"/>
+  <use xlink:href="#_2D" x="90" y="140"/>
+  <use xlink:href="#_7C" x="0" y="150"/>
+  <use xlink:href="#_7C" x="100" y="150"/>
+  <use xlink:href="#_2D" x="10" y="160"/>
+  <use xlink:href="#_2D" x="30" y="160"/>
+  <use xlink:href="#_2D" x="50" y="160"/>
+  <use xlink:href="#_2D" x="70" y="160"/>
+  <use xlink:href="#_2D" x="90" y="160"/>
+  <use xlink:href="#O" x="0" y="0"/>
+  <use xlink:href="#O_v1" x="20" y="0"/>
+  <use xlink:href="#O" x="40" y="0"/>
+  <use xlink:href="#O_v1" x="0" y="20"/>
+  <use xlink:href="#O" x="20" y="20"/>
+  <use xlink:href="#O_v1" x="40" y="20"/>
+  <use xlink:href="#O" x="0" y="40"/>
+  <use xlink:href="#O_v1" x="20" y="40"/>
+  <use xlink:href="#O" x="40" y="40"/>
+  <use xlink:href="#O_v1" x="0" y="60"/>
+  <use xlink:href="#O" x="20" y="60"/>
+  <use xlink:href="#O" x="0" y="80"/>
+  <use xlink:href="#O_v1" x="20" y="80"/>
+  <use xlink:href="#O_v1" x="0" y="100"/>
+  <use xlink:href="#O" x="20" y="100"/>
+  <use xlink:href="#O_v1" x="120" y="100"/>
+  <use xlink:href="#O" x="140" y="100"/>
+  <use xlink:href="#O_v1" x="160" y="100"/>
+  <use xlink:href="#O" x="0" y="120"/>
+  <use xlink:href="#O_v1" x="20" y="120"/>
+  <use xlink:href="#O" x="120" y="120"/>
+  <use xlink:href="#O_v1" x="140" y="120"/>
+  <use xlink:href="#O" x="160" y="120"/>
+  <use xlink:href="#O_v1" x="0" y="140"/>
+  <use xlink:href="#O" x="20" y="140"/>
+  <use xlink:href="#O_v1" x="40" y="140"/>
+  <use xlink:href="#O" x="60" y="140"/>
+  <use xlink:href="#O_v1" x="80" y="140"/>
+  <use xlink:href="#O" x="100" y="140"/>
+  <use xlink:href="#O_v1" x="120" y="140"/>
+  <use xlink:href="#O" x="140" y="140"/>
+  <use xlink:href="#O_v1" x="160" y="140"/>
+  <use xlink:href="#O" x="0" y="160"/>
+  <use xlink:href="#O_v1" x="20" y="160"/>
+  <use xlink:href="#O" x="40" y="160"/>
+  <use xlink:href="#O_v1" x="60" y="160"/>
+  <use xlink:href="#O" x="80" y="160"/>
+  <use xlink:href="#O_v1" x="100" y="160"/>
 </svg>

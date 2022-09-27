@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1 11" width="1" height="11" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="_5F" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_5F" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="red"/>
   </symbol>
-  <symbol id="_2D" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_2D" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="blue"/>
   </symbol>
-  <symbol id="_30" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_30" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="purple"/>
   </symbol>
-  <symbol id="_21" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_21" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="orange"/>
   </symbol>
-  <symbol id="_7E" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_7E" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="green"/>
   </symbol>
-  <symbol id="_2A" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_2A" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="yellow"/>
   </symbol>
-  <symbol id="_27" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_27" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="black"/>
   </symbol>
-  <symbol id="_28" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_28" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="gray"/>
   </symbol>
-  <symbol id="_29" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_29" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="cyan"/>
   </symbol>
-  <symbol id="_3A" overflow="visible" viewBox="0 0 1 1">
+  <symbol id="_3A" viewBox="0 0 1 1" width="1" height="1" overflow="visible">
     <rect width="1" height="1" fill="magenta"/>
   </symbol>
-  <use xlink:href="#_5F" x="0" y="0" width="1" height="1"/>
-  <use xlink:href="#_2D" x="0" y="1" width="1" height="1"/>
-  <use xlink:href="#_30" x="0" y="2" width="1" height="1"/>
-  <use xlink:href="#_30" x="0" y="3" width="1" height="1"/>
-  <use xlink:href="#_21" x="0" y="4" width="1" height="1"/>
-  <use xlink:href="#_7E" x="0" y="5" width="1" height="1"/>
-  <use xlink:href="#_2A" x="0" y="6" width="1" height="1"/>
-  <use xlink:href="#_27" x="0" y="7" width="1" height="1"/>
-  <use xlink:href="#_28" x="0" y="8" width="1" height="1"/>
-  <use xlink:href="#_29" x="0" y="9" width="1" height="1"/>
-  <use xlink:href="#_3A" x="0" y="10" width="1" height="1"/>
+  <use xlink:href="#_5F" x="0" y="0"/>
+  <use xlink:href="#_2D" x="0" y="1"/>
+  <use xlink:href="#_30" x="0" y="2"/>
+  <use xlink:href="#_30" x="0" y="3"/>
+  <use xlink:href="#_21" x="0" y="4"/>
+  <use xlink:href="#_7E" x="0" y="5"/>
+  <use xlink:href="#_2A" x="0" y="6"/>
+  <use xlink:href="#_27" x="0" y="7"/>
+  <use xlink:href="#_28" x="0" y="8"/>
+  <use xlink:href="#_29" x="0" y="9"/>
+  <use xlink:href="#_3A" x="0" y="10"/>
 </svg>

@@ -22,11 +22,11 @@ svgtiler.afterRender((render) =>
   if (key === '.') key = '';
   const piece = key.toLowerCase();
   return [
-    <symbol viewBox={`0 0 ${size} ${size}`} z-index="-1">
+    <symbol width={size} height={size} z-index="-1">
       {(context.i + context.j) % 2 === 0 ? light : dark}
     </symbol>
   ,
-    <symbol viewBox={`0 0 ${size} ${size}`}>
+    <symbol width={size} height={size}>
       {key && read(`./Chess_${piece}${piece === key ? "d" : "l"}t45.svg`)}
     </symbol>
   ];

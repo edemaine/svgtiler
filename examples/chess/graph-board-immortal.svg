@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 360 360" width="360" height="360" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="r" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="r" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:#000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.3)">
       <path d="M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z " style="stroke-linecap:butt;"/>
       <path d="M 12.5,32 L 14,29.5 L 31,29.5 L 32.5,32 L 12.5,32 z " style="stroke-linecap:butt;"/>
@@ -16,10 +16,10 @@
       <path d="M 11,14 L 34,14" style="fill:none; stroke:#ffffff; stroke-width:1; stroke-linejoin:miter;"/>
     </g>
   </symbol>
-  <symbol id="_2E" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="_2E" width="45" height="45" overflow="visible">
     <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>
   </symbol>
-  <symbol id="b" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="b" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.6)">
       <g style="fill:#000000; stroke:#000000; stroke-linecap:butt;">
         <path d="M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.65,38.99 6.68,38.97 6,38 C 7.35,36.54 9,36 9,36 z"/>
@@ -29,7 +29,7 @@
       <path d="M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18" style="fill:none; stroke:#ffffff; stroke-linejoin:miter;"/>
     </g>
   </symbol>
-  <symbol id="k" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="k" width="45" height="45" overflow="visible">
     <g style="fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;">
       <path d="M 22.5,11.63 L 22.5,6" style="fill:none; stroke:#000000; stroke-linejoin:miter;" id="path6570"/>
       <path d="M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25" style="fill:#000000;fill-opacity:1; stroke-linecap:butt; stroke-linejoin:miter;"/>
@@ -39,10 +39,10 @@
       <path d="M 12.5,30 C 18,27 27,27 32.5,30 M 12.5,33.5 C 18,30.5 27,30.5 32.5,33.5 M 12.5,37 C 18,34 27,34 32.5,37" style="fill:none; stroke:#ffffff;"/>
     </g>
   </symbol>
-  <symbol id="p" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="p" width="45" height="45" overflow="visible">
     <path d="m 22.5,9 c -2.21,0 -4,1.79 -4,4 0,0.89 0.29,1.71 0.78,2.38 C 17.33,16.5 16,18.59 16,21 c 0,2.03 0.94,3.84 2.41,5.03 C 15.41,27.09 11,31.58 11,39.5 H 34 C 34,31.58 29.59,27.09 26.59,26.03 28.06,24.84 29,23.03 29,21 29,18.59 27.67,16.5 25.72,15.38 26.21,14.71 26.5,13.89 26.5,13 c 0,-2.21 -1.79,-4 -4,-4 z" style="opacity:1; fill:#000000; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;"/>
   </symbol>
-  <symbol id="B" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="B" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.6)">
       <g style="fill:#ffffff; stroke:#000000; stroke-linecap:butt;">
         <path d="M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.65,38.99 6.68,38.97 6,38 C 7.35,36.54 9,36 9,36 z"/>
@@ -52,7 +52,7 @@
       <path d="M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18" style="fill:none; stroke:#000000; stroke-linejoin:miter;"/>
     </g>
   </symbol>
-  <symbol id="N" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="N" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.3)">
       <path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" style="fill:#ffffff; stroke:#000000;"/>
       <path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" style="fill:#ffffff; stroke:#000000;"/>
@@ -60,7 +60,7 @@
       <path d="M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z" transform="matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)" style="fill:#000000; stroke:#000000;"/>
     </g>
   </symbol>
-  <symbol id="n" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="n" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.3)">
       <path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" style="fill:#000000; stroke:#000000;"/>
       <path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" style="fill:#000000; stroke:#000000;"/>
@@ -69,10 +69,10 @@
       <path d="M 24.55,10.4 L 24.1,11.85 L 24.6,12 C 27.75,13 30.25,14.49 32.5,18.75 C 34.75,23.01 35.75,29.06 35.25,39 L 35.2,39.5 L 37.45,39.5 L 37.5,39 C 38,28.94 36.62,22.15 34.25,17.66 C 31.88,13.17 28.46,11.02 25.06,10.5 L 24.55,10.4 z " style="fill:#ffffff; stroke:none;"/>
     </g>
   </symbol>
-  <symbol id="P" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="P" width="45" height="45" overflow="visible">
     <path d="m 22.5,9 c -2.21,0 -4,1.79 -4,4 0,0.89 0.29,1.71 0.78,2.38 C 17.33,16.5 16,18.59 16,21 c 0,2.03 0.94,3.84 2.41,5.03 C 15.41,27.09 11,31.58 11,39.5 H 34 C 34,31.58 29.59,27.09 26.59,26.03 28.06,24.84 29,23.03 29,21 29,18.59 27.67,16.5 25.72,15.38 26.21,14.71 26.5,13.89 26.5,13 c 0,-2.21 -1.79,-4 -4,-4 z" style="opacity:1; fill:#ffffff; fill-opacity:1; fill-rule:nonzero; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:miter; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;"/>
   </symbol>
-  <symbol id="K" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="K" width="45" height="45" overflow="visible">
     <g style="fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;">
       <path d="M 22.5,11.63 L 22.5,6" style="fill:none; stroke:#000000; stroke-linejoin:miter;"/>
       <path d="M 20,8 L 25,8" style="fill:none; stroke:#000000; stroke-linejoin:miter;"/>
@@ -83,7 +83,7 @@
       <path d="M 12.5,37 C 18,34 27,34 32.5,37" style="fill:none; stroke:#000000;"/>
     </g>
   </symbol>
-  <symbol id="q" viewBox="0 0 45 45" overflow="visible">
+  <symbol id="q" width="45" height="45" overflow="visible">
     <g style="fill:#000000;stroke:#000000;stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round">
       <path d="M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z" style="stroke-linecap:butt;fill:#000000"/>
       <path d="m 9,26 c 0,2 1.5,2 2.5,4 1,1.5 1,1 0.5,3.5 -1.5,1 -1,2.5 -1,2.5 -1.5,1.5 0,2.5 0,2.5 6.5,1 16.5,1 23,0 0,0 1.5,-1 0,-2.5 0,0 0.5,-1.5 -1,-2.5 -0.5,-2.5 -0.5,-2 0.5,-3.5 1,-2 2.5,-2 2.5,-4 -8.5,-1.5 -18.5,-1.5 -27,0 z"/>
@@ -106,61 +106,61 @@
   <svg overflow="visible">
     <rect fill="white" x="0" y="0" width="360" height="360"/>
   </svg>
-  <use xlink:href="#_2E" x="45" y="0" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="0" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="0" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="0" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="45" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="45" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="45" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="45" width="45" height="45"/>
-  <use xlink:href="#_2E" x="45" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="90" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="135" width="45" height="45"/>
-  <use xlink:href="#_2E" x="45" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="180" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="225" width="45" height="45"/>
-  <use xlink:href="#_2E" x="45" y="270" width="45" height="45"/>
-  <use xlink:href="#_2E" x="135" y="270" width="45" height="45"/>
-  <use xlink:href="#_2E" x="225" y="270" width="45" height="45"/>
-  <use xlink:href="#_2E" x="315" y="270" width="45" height="45"/>
-  <use xlink:href="#_2E" x="0" y="315" width="45" height="45"/>
-  <use xlink:href="#_2E" x="90" y="315" width="45" height="45"/>
-  <use xlink:href="#_2E" x="180" y="315" width="45" height="45"/>
-  <use xlink:href="#_2E" x="270" y="315" width="45" height="45"/>
-  <use xlink:href="#r" x="0" y="0" width="45" height="45"/>
-  <use xlink:href="#b" x="90" y="0" width="45" height="45"/>
-  <use xlink:href="#k" x="135" y="0" width="45" height="45"/>
-  <use xlink:href="#r" x="315" y="0" width="45" height="45"/>
-  <use xlink:href="#p" x="0" y="45" width="45" height="45"/>
-  <use xlink:href="#p" x="135" y="45" width="45" height="45"/>
-  <use xlink:href="#B" x="180" y="45" width="45" height="45"/>
-  <use xlink:href="#p" x="225" y="45" width="45" height="45"/>
-  <use xlink:href="#N" x="270" y="45" width="45" height="45"/>
-  <use xlink:href="#p" x="315" y="45" width="45" height="45"/>
-  <use xlink:href="#n" x="0" y="90" width="45" height="45"/>
-  <use xlink:href="#n" x="225" y="90" width="45" height="45"/>
-  <use xlink:href="#p" x="45" y="135" width="45" height="45"/>
-  <use xlink:href="#N" x="135" y="135" width="45" height="45"/>
-  <use xlink:href="#P" x="180" y="135" width="45" height="45"/>
-  <use xlink:href="#P" x="315" y="135" width="45" height="45"/>
-  <use xlink:href="#P" x="270" y="180" width="45" height="45"/>
-  <use xlink:href="#P" x="135" y="225" width="45" height="45"/>
-  <use xlink:href="#P" x="0" y="270" width="45" height="45"/>
-  <use xlink:href="#P" x="90" y="270" width="45" height="45"/>
-  <use xlink:href="#K" x="180" y="270" width="45" height="45"/>
-  <use xlink:href="#q" x="0" y="315" width="45" height="45"/>
-  <use xlink:href="#b" x="270" y="315" width="45" height="45"/>
+  <use xlink:href="#_2E" x="45" y="0"/>
+  <use xlink:href="#_2E" x="135" y="0"/>
+  <use xlink:href="#_2E" x="225" y="0"/>
+  <use xlink:href="#_2E" x="315" y="0"/>
+  <use xlink:href="#_2E" x="0" y="45"/>
+  <use xlink:href="#_2E" x="90" y="45"/>
+  <use xlink:href="#_2E" x="180" y="45"/>
+  <use xlink:href="#_2E" x="270" y="45"/>
+  <use xlink:href="#_2E" x="45" y="90"/>
+  <use xlink:href="#_2E" x="135" y="90"/>
+  <use xlink:href="#_2E" x="225" y="90"/>
+  <use xlink:href="#_2E" x="315" y="90"/>
+  <use xlink:href="#_2E" x="0" y="135"/>
+  <use xlink:href="#_2E" x="90" y="135"/>
+  <use xlink:href="#_2E" x="180" y="135"/>
+  <use xlink:href="#_2E" x="270" y="135"/>
+  <use xlink:href="#_2E" x="45" y="180"/>
+  <use xlink:href="#_2E" x="135" y="180"/>
+  <use xlink:href="#_2E" x="225" y="180"/>
+  <use xlink:href="#_2E" x="315" y="180"/>
+  <use xlink:href="#_2E" x="0" y="225"/>
+  <use xlink:href="#_2E" x="90" y="225"/>
+  <use xlink:href="#_2E" x="180" y="225"/>
+  <use xlink:href="#_2E" x="270" y="225"/>
+  <use xlink:href="#_2E" x="45" y="270"/>
+  <use xlink:href="#_2E" x="135" y="270"/>
+  <use xlink:href="#_2E" x="225" y="270"/>
+  <use xlink:href="#_2E" x="315" y="270"/>
+  <use xlink:href="#_2E" x="0" y="315"/>
+  <use xlink:href="#_2E" x="90" y="315"/>
+  <use xlink:href="#_2E" x="180" y="315"/>
+  <use xlink:href="#_2E" x="270" y="315"/>
+  <use xlink:href="#r" x="0" y="0"/>
+  <use xlink:href="#b" x="90" y="0"/>
+  <use xlink:href="#k" x="135" y="0"/>
+  <use xlink:href="#r" x="315" y="0"/>
+  <use xlink:href="#p" x="0" y="45"/>
+  <use xlink:href="#p" x="135" y="45"/>
+  <use xlink:href="#B" x="180" y="45"/>
+  <use xlink:href="#p" x="225" y="45"/>
+  <use xlink:href="#N" x="270" y="45"/>
+  <use xlink:href="#p" x="315" y="45"/>
+  <use xlink:href="#n" x="0" y="90"/>
+  <use xlink:href="#n" x="225" y="90"/>
+  <use xlink:href="#p" x="45" y="135"/>
+  <use xlink:href="#N" x="135" y="135"/>
+  <use xlink:href="#P" x="180" y="135"/>
+  <use xlink:href="#P" x="315" y="135"/>
+  <use xlink:href="#P" x="270" y="180"/>
+  <use xlink:href="#P" x="135" y="225"/>
+  <use xlink:href="#P" x="0" y="270"/>
+  <use xlink:href="#P" x="90" y="270"/>
+  <use xlink:href="#K" x="180" y="270"/>
+  <use xlink:href="#q" x="0" y="315"/>
+  <use xlink:href="#b" x="270" y="315"/>
   <svg overflow="visible">
     <line x1="157.5" y1="22.5" x2="202.5" y2="67.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
     <line x1="202.5" y1="67.5" x2="247.5" y2="112.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>

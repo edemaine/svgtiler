@@ -25,7 +25,6 @@ see [more examples below](#examples).
 - [Overflow and Bounding Box](#overflow-and-bounding-box)
 - [Autosizing Tiles](#autosizing-tiles)
 - [Unrecognized Tiles](#unrecognized-tiles)
-- [Automatic `<symbol>` Wrapping](#automatic-symbol-wrapping)
 - [`<image>` Processing](#image-processing)
 - [Converting SVG to PDF/PNG](#converting-svg-to-pdfpng)
 - [LaTeX Text](#latex-text)
@@ -143,6 +142,15 @@ own JavaScript code, e.g., converting ASCII art embedded within a webpage
 into SVG drawings.
 
 ## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
+
+In general, mapping files provide a partial mapping from tile names
+(which are generally strings) to SVG content.  Most often, your SVG
+content should consist of a `<symbol>` or `<svg>` tag at the top level,
+with `width` and `height` attributes (for a coordinate system of
+[0, width] &times; [0, height]) or with a `viewBox` attribute
+(for a more general coordinate system e.g. starting at negative values).
+You can sometimes get away with less;
+see [Autosizing Tiles](#autosizing-tiles).
 
 In the **.txt format** for mapping files, each line consists of a tile name
 (either having no spaces, or consisting entirely of a single space),
@@ -512,11 +520,45 @@ widths and heights in the output `viewBox`.)
 
 ## Autosizing Tiles
 
-As a special non-SVG feature, `<symbol>`s can specify `width="auto"` and/or
-`height="auto"` to make their instantiated width and/or height match their
-column and/or row, respectively.
+Normally, a tile specifies its layout size by setting the
+`width` and `height` attributes or by setting the `viewBox` attribute
+of an outermost `<symbol>` or `<svg>` tag.
+But there is actually a long sequence of ways that SVG Tiler tries to
+figure out the width and height of the tile:
+
+1. If the tile's top-level tag is `<symbol>` or `<svg>`, then
+   `width` and `height` attributes of that tag take priority.
+   Normally these are specified in SVG units (`px`),
+   but you can also use
+   [CSS units](https://www.w3.org/TR/css-values-3/#absolute-lengths)
+   that get translated to `px`.
+2. The `--tw`/`--tile-width` and `--th`/`--tile-height` command-line options
+   define the default width and height for all tiles that don't have an
+   explicit `width` and `height`, including if you didn't use an outermost
+   tag of `<symbol>` or `<svg>`.
+3. [`viewBox`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox)
+   is considered next, and serves as an alternative to `width` and
+   `height` if you want your coordinate system to start somewhere other than
+   (0, 0) (as you get from the methods above).
+   If a tile's outermost tag is `<symbol>` or `<svg>`
+   with a `viewBox` attribute, then the width and height of that attribute
+   (the third and fourth numbers) are treated as the tile's width and height.
+4. If none of the above are found, then SVG Tiler attempts to set the
+   `viewBox` to the bounding box of the SVG elements in the symbol.
+   For example, the SVG `<rect x="-5" y="-5" width="10" height="10"/>`
+   will automatically get wrapped by
+   `<symbol viewBox="-5 -5 10 10">...</symbol>`.
+   However, the current computation has many limitations (see the code for
+   details), so it is recommended to specify your own `width`/`height` or
+   `viewBox` in your own `<symbol>` or `<svg>` wrapping element,
+   especially to control the layout bounding box
+   which may different from the contents' bounding box.
+
+As a special non-SVG feature, a tile `<symbol>` can specify `width="auto"`
+and/or `height="auto"` to make their instantiated width and/or height
+match their column and/or row, respectively.
 In this way, multiple uses of the same symbol can appear as different sizes.
-See the [auto sizing example](examples/auto).
+See the [auto-sizing example](examples/auto).
 
 If you want to nonuniformly scale the tile, you may want to also adjust
 the `<symbol>`'s [`preserveAspectRatio`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio) property.
@@ -527,19 +569,6 @@ Any undefined tile displays as a red-on-yellow diamond question mark
 (like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
 with automatic width and height, so that it is easy to spot.
 See the [auto sizing example](examples/auto).
-
-## Automatic `<symbol>` Wrapping
-
-In limited cases, you can avoid wrapping your tile definitions in
-`<symbol>` tags, or avoid specifying the `viewBox` of the `<symbol>` tag.
-In this case, SVG Tiler attempts to set the `viewBox` to the bounding box of
-the SVG elements in the symbol.
-For example, the SVG `<rect x="-5" y="-5" width="10" height="10"/>`
-will automatically get wrapped by `<symbol viewBox="-5 -5 10 10">...</symbol>`.
-However, the current computation has many limitations (see the code for
-details), so it is recommended to specify your own `viewBox`, especially to
-control the layout bounding box which may different from the contents'
-bounding box.
 
 ## `<image>` Processing
 

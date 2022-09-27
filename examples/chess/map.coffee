@@ -4,7 +4,7 @@ size = 45  # width and height of svg files
 light = null
 dark = <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>
 background = ->
-  <symbol viewBox="0 0 #{size} #{size}" z-index="-1">
+  <symbol width={size} height={size} z-index="-1">
     {if (@i + @j) % 2 == 0
       light
     else
@@ -14,9 +14,11 @@ background = ->
 
 read = (filename) ->
   dom = require filename
-  # Strip off top level <svg>...</svg>
-  console.assert dom.type == 'svg'
-  dom.props.children
+  ## Alternative: Strip off top level <svg>...</svg> and wrap in <symbol>
+  #console.assert dom.type == 'svg'
+  #<symbol width={size} height={size}">
+  #  {dom.props.children}
+  #</symbol>
 
 svgtiler.afterRender (render) ->
   <rect fill="white" z-index="-2"
@@ -30,7 +32,5 @@ svgtiler.afterRender (render) ->
     key = '' if key == '.'
     piece = key.toLowerCase()
     if key
-      <symbol viewBox="0 0 #{size} #{size}">
-        {read "./Chess_#{piece}#{if piece == key then "d" else "l"}t45.svg"}
-      </symbol>
+      read "./Chess_#{piece}#{if piece == key then "d" else "l"}t45.svg"
 ]

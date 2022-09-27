@@ -202,6 +202,34 @@ class SVGTilerError extends Error
     super message
     @name = 'SVGTilerError'
 
+parseNum = (x) ->
+  parsed = parseFloat x
+  if isNaN parsed
+    null
+  else
+    parsed
+
+## Conversion from arbitrary unit to px (SVG units),
+## from https://www.w3.org/TR/css-values-3/#absolute-lengths
+units =
+  cm: 96 / 2.54
+  mm: 96 / 25.4
+  Q: 96 / 25.4 / 4
+  in: 96
+  pc: 96 / 6
+  pt: 96 / 72
+  px: 1
+  undefined: 1
+
+parseDim = (x) ->
+  match = /^\s*([0-9.]+)\s*([a-zA-Z]\w+)?\s*$/.exec x
+  return null unless match?
+  if units.hasOwnProperty match[2]
+    parseNum(match[1]) * units[match[2]]
+  else
+    console.warn "Unrecognized unit #{match[2]}"
+    parseNum match[1]
+
 parseBox = (box) ->
   return null unless box
   box = box.split /\s*[\s,]\s*/
@@ -216,85 +244,74 @@ extractOverflowBox = (xml) ->
   xml.documentElement.removeAttribute 'overflowBox'
   parseBox box
 
-parseNum = (x) ->
-  parsed = parseFloat x
-  if isNaN parsed
-    null
-  else
-    parsed
-
-svgBBox = (dom, auto = true) ->
+svgBBox = (dom) ->
   ## xxx Many unsupported features!
   ##   - transformations
   ##   - used symbols/defs
   ##   - paths
   ##   - text
   ##   - line widths which extend bounding box
-  if dom.documentElement.hasAttribute 'viewBox'
-    parseBox dom.documentElement.getAttribute 'viewBox'
-  else if auto
-    recurse = (node) ->
-      if node.nodeType != node.ELEMENT_NODE or
-         node.nodeName in ['defs', 'use']
-        return null
-      # Ignore <symbol>s except the root <symbol> that we're bounding
-      if node.nodeName == 'symbol' and node != dom.documentElement
-        return null
-      switch node.tagName
-        when 'rect', 'image'
-          ## For <image>, should autodetect image size (#42)
-          [parseNum(node.getAttribute 'x') ? 0
-           parseNum(node.getAttribute 'y') ? 0
-           parseNum(node.getAttribute 'width') ? 0
-           parseNum(node.getAttribute 'height') ? 0]
-        when 'circle'
-          cx = parseNum(node.getAttribute 'cx') ? 0
-          cy = parseNum(node.getAttribute 'cy') ? 0
-          r = parseNum(node.getAttribute 'r') ? 0
-          [cx - r, cy - r, 2*r, 2*r]
-        when 'ellipse'
-          cx = parseNum(node.getAttribute 'cx') ? 0
-          cy = parseNum(node.getAttribute 'cy') ? 0
-          rx = parseNum(node.getAttribute 'rx') ? 0
-          ry = parseNum(node.getAttribute 'ry') ? 0
-          [cx - rx, cy - ry, 2*rx, 2*ry]
-        when 'line'
-          x1 = parseNum(node.getAttribute 'x1') ? 0
-          y1 = parseNum(node.getAttribute 'y1') ? 0
-          x2 = parseNum(node.getAttribute 'x2') ? 0
-          y2 = parseNum(node.getAttribute 'y2') ? 0
-          xmin = Math.min x1, x2
-          ymin = Math.min y1, y2
-          [xmin, ymin, Math.max(x1, x2) - xmin, Math.max(y1, y2) - ymin]
-        when 'polyline', 'polygon'
-          points = for point in node.getAttribute('points').trim().split /\s+/
-                     for coord in point.split /,/
-                       parseFloat coord
-          xs = (point[0] for point in points)
-          ys = (point[1] for point in points)
-          xmin = Math.min ...xs
-          ymin = Math.min ...ys
-          if isNaN(xmin) or isNaN(ymin) # invalid points attribute; don't render
-            null
-          else
-            [xmin, ymin, Math.max(...xs) - xmin, Math.max(...ys) - ymin]
+  recurse = (node) ->
+    if node.nodeType != node.ELEMENT_NODE or
+        node.nodeName in ['defs', 'use']
+      return null
+    # Ignore <symbol>s except the root <symbol> that we're bounding
+    if node.nodeName == 'symbol' and node != dom.documentElement
+      return null
+    switch node.tagName
+      when 'rect', 'image'
+        ## For <image>, should autodetect image size (#42)
+        [parseNum(node.getAttribute 'x') ? 0
+          parseNum(node.getAttribute 'y') ? 0
+          parseNum(node.getAttribute 'width') ? 0
+          parseNum(node.getAttribute 'height') ? 0]
+      when 'circle'
+        cx = parseNum(node.getAttribute 'cx') ? 0
+        cy = parseNum(node.getAttribute 'cy') ? 0
+        r = parseNum(node.getAttribute 'r') ? 0
+        [cx - r, cy - r, 2*r, 2*r]
+      when 'ellipse'
+        cx = parseNum(node.getAttribute 'cx') ? 0
+        cy = parseNum(node.getAttribute 'cy') ? 0
+        rx = parseNum(node.getAttribute 'rx') ? 0
+        ry = parseNum(node.getAttribute 'ry') ? 0
+        [cx - rx, cy - ry, 2*rx, 2*ry]
+      when 'line'
+        x1 = parseNum(node.getAttribute 'x1') ? 0
+        y1 = parseNum(node.getAttribute 'y1') ? 0
+        x2 = parseNum(node.getAttribute 'x2') ? 0
+        y2 = parseNum(node.getAttribute 'y2') ? 0
+        xMin = Math.min x1, x2
+        yMin = Math.min y1, y2
+        [xMin, yMin, Math.max(x1, x2) - xMin, Math.max(y1, y2) - yMin]
+      when 'polyline', 'polygon'
+        points = for point in node.getAttribute('points').trim().split /\s+/
+                    for coord in point.split /,/
+                      parseFloat coord
+        xs = (point[0] for point in points)
+        ys = (point[1] for point in points)
+        xMin = Math.min ...xs
+        yMin = Math.min ...ys
+        if isNaN(xMin) or isNaN(yMin) # invalid points attribute; don't render
+          null
         else
-          viewBoxes = (recurse(child) for child in node.childNodes)
-          viewBoxes = (viewBox for viewBox in viewBoxes when viewBox?)
-          xmin = Math.min ...(viewBox[0] for viewBox in viewBoxes)
-          ymin = Math.min ...(viewBox[1] for viewBox in viewBoxes)
-          xmax = Math.max ...(viewBox[0]+viewBox[2] for viewBox in viewBoxes)
-          ymax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
-          [xmin, ymin, xmax - xmin, ymax - ymin]
-    viewBox = recurse dom.documentElement
-    if not viewBox? or Infinity in viewBox or -Infinity in viewBox
-      null
-    else
-      viewBox
+          [xMin, yMin, Math.max(...xs) - xMin, Math.max(...ys) - yMin]
+      else
+        viewBoxes = (recurse(child) for child in node.childNodes)
+        viewBoxes = (viewBox for viewBox in viewBoxes when viewBox?)
+        xMin = Math.min ...(viewBox[0] for viewBox in viewBoxes)
+        yMin = Math.min ...(viewBox[1] for viewBox in viewBoxes)
+        xMax = Math.max ...(viewBox[0]+viewBox[2] for viewBox in viewBoxes)
+        yMax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
+        [xMin, yMin, xMax - xMin, yMax - yMin]
+  viewBox = recurse dom.documentElement
+  if not viewBox? or Infinity in viewBox or -Infinity in viewBox
+    null
+  else
+    viewBox
 
-isAuto = (dom, prop) ->
-  dom.documentElement.hasAttribute(prop) and
-  /^\s*auto\s*$/i.test dom.documentElement.getAttribute prop
+isAuto = (value) ->
+  typeof value == 'string' and /^\s*auto\s*$/i.test value
 
 attributeOrStyle = (node, attr, styleKey = attr) ->
   if value = node.getAttribute attr
@@ -738,8 +755,29 @@ class SVGTopLevel extends SVGContent
     @dom.appendChild symbol
     @isEmpty = symbol.childNodes.length == 0
 
-    ## Compute viewBox attribute if absent and wrapping in <symbol>.
-    @viewBox = svgBBox @dom, @wrapper == 'symbol'
+    ## Determine `viewBox`, `width`, and `height` attributes.
+    @viewBox = parseBox @dom.documentElement.getAttribute 'viewBox'
+    @width = parseDim @origWidth = @dom.documentElement.getAttribute 'width'
+    @height = parseDim @origHeight = @dom.documentElement.getAttribute 'height'
+    ## Check for default width/height specified by caller.
+    if @defaultWidth? and not @width?
+      @dom.documentElement.setAttribute 'width', @width = @defaultWidth
+    if @defaultHeight? and not @height?
+      @dom.documentElement.setAttribute 'height', @height = @defaultHeight
+    ## Absent viewBox becomes 0 0 <width> <height> if latter are present.
+    if @width? and @height? and not @viewBox?
+      @viewBox = [0, 0, @width, @height]
+    ## Absent viewBox set to automatic bounding box if wrapping in <symbol>.
+    if not @viewBox? and @wrapper == 'symbol'
+      if (@viewBox = svgBBox @dom)?
+        @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+    ## Absent width/height inherited from viewBox if latter is present.
+    ## (This deviates from SVG spec, which would default to meaningless 100%.)
+    if @viewBox?
+      unless @width?
+        @dom.documentElement.setAttribute 'width', @width = @viewBox[2]
+      unless @height?
+        @dom.documentElement.setAttribute 'height', @height = @viewBox[3]
 
     ## Overflow behavior
     overflow = attributeOrStyle @dom.documentElement, 'overflow'
@@ -747,24 +785,24 @@ class SVGTopLevel extends SVGContent
       @dom.documentElement.setAttribute 'overflow',
         overflow = overflowDefault
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
-    if @viewBox?
-      @width = @viewBox[2]
-      @height = @viewBox[3]
-      ###
-      SVG's viewBox has a special rule that "A value of zero [in <width>
-      or <height>] disables rendering of the element."  Avoid this.
-      [https://www.w3.org/TR/SVG11/coords.html#ViewBoxAttribute]
-      ###
-      if @overflowVisible
-        if @width == 0
-          @viewBox[2] = zeroSizeReplacement
-        if @height == 0
-          @viewBox[3] = zeroSizeReplacement
-      ## Reset viewBox attribute in case either absent (and computed via
-      ## `svgBBox`) or changed to avoid zeroes.
-      @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
-    else
-      @width = @height = null
+
+    ###
+    SVG's `viewBox`, `width`, and `height` attributes have a special rule that
+    "A value of zero disables rendering of the element."
+    [https://www.w3.org/TR/SVG11/coords.html#ViewBoxAttribute]
+    [https://www.w3.org/TR/SVG11/struct.html#SVGElementWidthAttribute]
+    Avoid this if overflow is visible.
+    ###
+    if @overflowVisible
+      if @width == 0
+        @dom.documentElement.setAttribute 'width', zeroSizeReplacement
+      if @height == 0
+        @dom.documentElement.setAttribute 'height', zeroSizeReplacement
+      if @viewBox? and (@viewBox[2] == 0 or @viewBox[3] == 0)
+        @viewBox[2] = zeroSizeReplacement if @viewBox[2] == 0
+        @viewBox[3] = zeroSizeReplacement if @viewBox[3] == 0
+        @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+
     @overflowBox = extractOverflowBox @dom
     @zIndex = extractZIndex @dom.documentElement
     @dom
@@ -784,11 +822,26 @@ class SVGSymbol extends SVGTopLevel
   wrapper: 'symbol'
   makeDOM: ->
     return @dom if @dom?
-    super()
-    ## `SVGTop` sets @width and @height according to viewBox.
+
     ## Check for overrides and missing width/height needed for symbols.
-    @width = forceWidth if (forceWidth = @getSetting 'forceWidth')?
-    @height = forceHeight if (forceHeight = @getSetting 'forceHeight')?
+    @defaultWidth = @getSetting 'forceWidth'
+    @defaultHeight = @getSetting 'forceHeight'
+
+    ## `SVGTop` sets `@width` and `@height` according to
+    ## `width`/`height`/`viewBox` attributes or our defaults.
+    super()
+
+    ## Detect special `width="auto"` and/or `height="auto"` fields for future
+    ## processing, and remove them to ensure valid SVG.
+    @autoWidth = isAuto @origWidth
+    @autoHeight = isAuto @origHeight
+
+    ## Remove `width="auto"` and `height="auto"` attributes
+    ## (or whatever `SVGTop` set them to).
+    @dom.documentElement.removeAttribute 'width' if @autoWidth
+    @dom.documentElement.removeAttribute 'height' if @autoHeight
+
+    ## Warning for missing width/height.
     warnings = []
     unless @width?
       warnings.push 'width'
@@ -798,12 +851,8 @@ class SVGSymbol extends SVGTopLevel
       @height = 0
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for #{@name}"
-    ## Detect special `width="auto"` and/or `height="auto"` fields for future
-    ## processing, and remove them to ensure valid SVG.
-    @autoWidth = isAuto @dom, 'width'
-    @autoHeight = isAuto @dom, 'height'
-    @dom.documentElement.removeAttribute 'width' if @autoWidth
-    @dom.documentElement.removeAttribute 'height' if @autoHeight
+      console.log @origWidth, @origHeight
+
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
       @text = []
@@ -1582,13 +1631,17 @@ class Render extends HasSettings
             use.setAttribute @hrefAttr(), '#' + symbol.id
             use.setAttribute 'x', x
             use.setAttribute 'y', y
-            ## Scaling of tile is relative to viewBox (which may differ from
-            ## width and height, e.g. when width is actually zero but viewBox
-            ## grows), so use viewBox to define width and height attributes:
-            use.setAttribute 'width',
-              (symbol.viewBox?[2] ? symbol.width) * scaleX
-            use.setAttribute 'height',
-              (symbol.viewBox?[3] ? symbol.height) * scaleY
+            ## Symbols generally set their own width and height,
+            ## so only need to set these on <use> when they are 'auto'.
+            ## SVG's scaling of tile is relative to viewBox (including possible
+            ## `zeroSizeReplacement`), so use viewBox to define width and
+            ## height attributes:
+            if symbol.autoWidth
+              use.setAttribute 'width',
+                (symbol.viewBox?[2] ? symbol.width) * scaleX
+            if symbol.autoHeight
+              use.setAttribute 'height',
+                (symbol.viewBox?[3] ? symbol.height) * scaleY
           if symbol.overflowBox?
             dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
             dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY

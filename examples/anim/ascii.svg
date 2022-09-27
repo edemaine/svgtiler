@@ -13,28 +13,28 @@
     50% { stroke-opacity: 0.4; fill-opacity: 0.2; stroke-width: 3; }
     }
   </style>
-  <symbol id="o" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="o" viewBox="-50 -50 100 100" width="100" height="100" overflow="visible">
     <circle class="light pulse" r="40"/>
   </symbol>
-  <symbol id="x" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="x" viewBox="-10 -10 100 100" width="100" height="100" overflow="visible">
     <rect class="light pulse" width="80" height="80"/>
   </symbol>
-  <symbol id="t" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="t" viewBox="-50 -50 100 100" width="100" height="100" overflow="visible">
     <path class="light pulse" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <symbol id="O" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="O" viewBox="-50 -50 100 100" width="100" height="100" overflow="visible">
     <circle class="dark pulse" r="40"/>
   </symbol>
-  <symbol id="X" viewBox="-10 -10 100 100" overflow="visible">
+  <symbol id="X" viewBox="-10 -10 100 100" width="100" height="100" overflow="visible">
     <rect class="dark pulse" width="80" height="80"/>
   </symbol>
-  <symbol id="T" viewBox="-50 -50 100 100" overflow="visible">
+  <symbol id="T" viewBox="-50 -50 100 100" width="100" height="100" overflow="visible">
     <path class="dark pulse" d="M38.97114317029974,22.499999999999996L-38.97114317029973,22.500000000000014L-8.266365894244634e-15,-45Z"/>
   </symbol>
-  <use xlink:href="#o" x="0" y="0" width="100" height="100"/>
-  <use xlink:href="#x" x="100" y="0" width="100" height="100"/>
-  <use xlink:href="#t" x="200" y="0" width="100" height="100"/>
-  <use xlink:href="#O" x="0" y="100" width="100" height="100"/>
-  <use xlink:href="#X" x="100" y="100" width="100" height="100"/>
-  <use xlink:href="#T" x="200" y="100" width="100" height="100"/>
+  <use xlink:href="#o" x="0" y="0"/>
+  <use xlink:href="#x" x="100" y="0"/>
+  <use xlink:href="#t" x="200" y="0"/>
+  <use xlink:href="#O" x="0" y="100"/>
+  <use xlink:href="#X" x="100" y="100"/>
+  <use xlink:href="#T" x="200" y="100"/>
 </svg>
