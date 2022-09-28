@@ -198,6 +198,16 @@ objects:
    or parity of the tile location).
 4. An `svgtiler.Mapping` object containing one of the listed formats, e.g.,
    `new svgtiler.Mapping((key, context) => ...)`
+5. An `svgtiler.Mappings` object containing one or more of the listed formats,
+   e.g., `new svgtiler.Mappings(mapping1, mapping2)`.  `Mappings` look up
+   the specified key in each mapping in reverse sequential order until
+   finding one that doesn't resolve to `null` or `undefined`
+   (so later mappings take priority over earlier mappings,
+   as on the command line).
+6. An `Array` of any of the above types, meaning to run the mappings
+   in parallel and stack the resulting tiles on top of each other,
+   with the first non-null tile defining the tile size.
+   (See next list for more details.)
 
 Each **tile** (property of JavaScript object, value of `Map` object,
 or return value of a function) should be specified as one of the following:
@@ -221,9 +231,9 @@ or return value of a function) should be specified as one of the following:
 6. An empty string, short for the empty symbol `<symbol viewBox="0 0 0 0"/>`.
 7. `undefined` or `null`, indicating that this mapping doesn't define a tile
    for this tile name (and the next mapping should be checked).
-8. Another mapping (JavaScript object, `Map` object, function, or
-   `svgtiler.Mapping`) that gets recursively evaluated as described above
-   (with the same tile name and context).
+8. Another mapping (JavaScript object, `Map` object, function,
+   `svgtiler.Mapping`, or `svgtiler.Mappings`) that gets recursively evaluated
+   as described above (with the same tile name and context).
    For example, a top-level JavaScript object could map some tile
    names to functions (when they need to be dynamic); or a top-level function
    could return different mappings depending on context.

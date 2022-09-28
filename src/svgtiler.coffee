@@ -1058,7 +1058,11 @@ class Mapping extends Input
           value = value[$static]
           ## Static wrapper forces static, even if there are functions.
           isStatic = true
-        else if Array.isArray value
+        else if value instanceof Mapping or value instanceof Mappings
+          return
+            value: value.lookup key, context
+            isStatic: false  # no need to cache at higher level
+        else if Array.isArray value  # must come after Mappings test
           ## Items in an array inherit parent staticness if any,
           ## with no influence between items.
           ## Overall array is static if every item is.
@@ -1069,10 +1073,6 @@ class Mapping extends Input
               allStatic = false if result.isStatic == false
               result.value
           return {value, isStatic: allStatic}
-        else if value instanceof Mapping
-          return
-            value: value.lookup key, context
-            isStatic: false  # no need to cache at higher level
         else if typeof value == 'object'
           if value.hasOwnProperty key  # avoid inherited property e.g. toString
             value = value[key]
