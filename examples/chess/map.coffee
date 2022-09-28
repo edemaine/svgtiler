@@ -20,9 +20,11 @@ read = (filename) ->
   #  {dom.props.children}
   #</symbol>
 
-svgtiler.afterRender (render) ->
-  <rect fill="white" z-index="-2"
-   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
+svgtiler.background 'white'
+## Equivalent:
+#svgtiler.afterRender (render) ->
+#  <rect fill="white" z-index="-2"
+#   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
 
 [
   background

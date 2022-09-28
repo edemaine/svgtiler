@@ -7,9 +7,13 @@ kind =
   L: 'other'
   Z: 'other'
 
+svgtiler.background 'black'
+
 (key) ->
   if key.trim() == ''
-    <rect fill="black" width="8" height="8"/>
+    # allocate space for black background instead of lots of tiny rects
+    <symbol width="8" height="8"/>
+    #<rect fill="black" width="8" height="8"/>
   else
     # could just return "./NES_level7_#{kind[key]}.png" here
     # and SVG Tiler will do the same thing;

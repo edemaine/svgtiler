@@ -172,6 +172,8 @@ defaultSettings =
   ## `href` behaves better in web browsers, but `xlink:href` is more
   ## compatible with older SVG drawing programs.
   useHref: window?
+  ## Background rectangle fill color.
+  background: null
   ## renderDOM-specific
   filename: 'drawing.asc'  # default filename when not otherwise specified
   keepParent: false
@@ -1500,6 +1502,7 @@ class Render extends HasSettings
   constructor: (@drawing, @settings) ->
     super()
     @settings ?= @drawing.settings
+    @backgroundFill = @getSetting 'background'
     @idVersions = new Map
     @mappings = new Mappings @getSetting 'mappings'
     @styles = new Styles @getSetting 'styles'
@@ -1542,6 +1545,11 @@ class Render extends HasSettings
       content.setId @id content.defaultId 'def'
       @defs.push content
       content
+  background: (fill) ->
+    ## Sets current background fill to specified value; `null` to remove.
+    ## Returns current background fill.
+    @backgroundFill = fill unless fill == undefined
+    @backgroundFill
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1688,6 +1696,14 @@ class Render extends HasSettings
         @yMax = Math.max @yMax, box[1] + box[3]
         updateSize()
       @layers[overlay.zIndex].push dom.documentElement
+
+    ## Background fill, now that size has settled
+    if (@backgroundFill ?= @getSetting 'background')?
+      @layers['-Infinity'] ?= []
+      @layers['-Infinity'].unshift (new SVGContent "background",
+        """<rect x="#{@xMin}" y="#{@yMin}" width="#{@width}" height="#{@height}" fill="#{@backgroundFill}"/>""",
+        @settings
+      ).makeDOM()
 
     ## Check for global <defs> used by the symbols so far.
     usedIds = new Set
@@ -1963,6 +1979,16 @@ globalDef = (content) ->
     globalDefs.set content.id, content
     content
 
+globalBackground = (fill) ->
+  ## Sets current/default background fill to specified value; `null` to remove.
+  ## Returns current background fill.
+  if currentRender?
+    currentRender.background fill
+  else if currentMapping?
+    beforeRender (render) -> render.background fill
+  else
+    throw new SVGTilerError "svgtiler.background called outside of render of mapping context"
+
 class Context
   constructor: (@render, i, j) ->
     @drawing = @render.drawing
@@ -2102,6 +2128,7 @@ Optional arguments:
   -m / --margin         Don't delete blank extreme rows/columns
   --uneven              Don't make all rows have same length by padding with ''
   --hidden              Process hidden sheets within spreadsheet files
+  --bg BG / --background BG  Set background fill color to BG
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT
@@ -2202,6 +2229,9 @@ main = (args = process.argv[2..]) ->
           settings.forceHeight = arg
         else
           console.warn "Invalid argument to --tile-height: #{args[i+1]}"
+      when '--bg', '--background'
+        skip = 1
+        settings.background = args[i+1]
       when '-s', '--share'
         skip = 1
         [key, ...value] = args[i+1].split '='
@@ -2282,22 +2312,21 @@ main = (args = process.argv[2..]) ->
 
 svgtiler = {
   SVGContent, SVGTopLevel, SVGSVG, SVGSymbol, unrecognizedSymbol,
-  Mapping, ASCIIMapping, JSMapping, CoffeeMapping,
+  Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
   getMapping, runWithMapping,
   Drawing, AutoDrawing, ASCIIDrawing,
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
-  Style, CSSStyle, StylusStyle,
+  Style, CSSStyle, StylusStyle, Styles,
   SVGFile,
-  extensionMap, Input, DummyInput, ArrayWrapper, Mappings,
+  extensionMap, Input, DummyInput, ArrayWrapper,
   Render, getRender, runWithRender, beforeRender, afterRender,
-  id: globalId, def: globalDef,
+  id: globalId, def: globalDef, background: globalBackground,
+  static: wrapStatic,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, convert,
+  main, renderDOM, convert, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
-  require: inputRequire
-  static: wrapStatic
   share: globalShare
   version: metadata.version
 }

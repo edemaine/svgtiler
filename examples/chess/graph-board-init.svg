@@ -127,9 +127,7 @@
       <path d="M 12.5,37 C 18,34 27,34 32.5,37" style="fill:none; stroke:#000000;"/>
     </g>
   </symbol>
-  <svg overflow="visible">
-    <rect fill="white" x="0" y="0" width="360" height="360"/>
-  </svg>
+  <rect x="0" y="0" width="360" height="360" fill="white"/>
   <use xlink:href="#n" x="45" y="0"/>
   <use xlink:href="#n" x="135" y="0"/>
   <use xlink:href="#n" x="225" y="0"/>

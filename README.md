@@ -348,6 +348,13 @@ The top-level code of your .js or .coffee mapping file can also call:
   overall size of the rendered drawing.
   During the callback, `render` has properties about the rendering's
   bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
+* `svgtiler.background(fillColor)` to set the default background color
+  for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
+  Roughly equivalent to
+  `svgtiler.afterRender((render) => <rect fill="white" z-index="-99999" x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>`.
+  You can also call `svgtiler.background` within a tile definition function or
+  a `beforeRender`/`afterRender` callback to set the background dynamically,
+  or set the global default via the `--bg`/`--background` command-line option.
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
 .js and .coffee files can access `__dirname` and `__filename`,
@@ -819,6 +826,7 @@ Optional arguments:
   -m / --margin         Don't delete blank extreme rows/columns
   --uneven              Don't make all rows have same length by padding with ''
   --hidden              Process hidden sheets within spreadsheet files
+  --bg BG / --background BG  Set background fill color to BG
   --tw TILE_WIDTH / --tile-width TILE_WIDTH
                         Force all symbol tiles to have specified width
   --th TILE_HEIGHT / --tile-height TILE_HEIGHT

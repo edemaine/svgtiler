@@ -11,10 +11,12 @@ function read(filename) {
   return dom.props.children;
 }
 
-svgtiler.afterRender((render) =>
-  <rect fill="white" z-index="-2"
-   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
-);
+svgtiler.background('white');
+// Equivalent:
+//svgtiler.afterRender((render) =>
+//  <rect fill="white" z-index="-2"
+//   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
+//);
 
 (key, context) => {
   // Map blanks to empty string
