@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-3 -3 106 106" width="106" height="106" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="red" width="50" height="50" overflow="visible">
+    <rect width="50" height="50" stroke="red" stroke-width="6" fill="gray"/>
+  </symbol>
+  <symbol id="red_v1" viewBox="-25 -25 50 50" width="50" height="50" overflow="visible">
+    <circle r="17" fill="red"/>
+  </symbol>
+  <symbol id="purple" width="50" height="50" overflow="visible">
+    <rect width="50" height="50" stroke="purple" stroke-width="6" fill="gray"/>
+  </symbol>
+  <symbol id="purple_v1" viewBox="-25 -25 50 50" width="50" height="50" overflow="visible">
+    <circle r="17" fill="purple"/>
+  </symbol>
+  <use xlink:href="#red" x="0" y="0"/>
+  <use xlink:href="#red" x="50" y="50"/>
+  <use xlink:href="#purple" x="50" y="0"/>
+  <use xlink:href="#purple" x="0" y="50"/>
+  <use xlink:href="#red_v1" x="0" y="0"/>
+  <use xlink:href="#purple_v1" x="50" y="0"/>
+  <use xlink:href="#purple_v1" x="0" y="50"/>
+  <use xlink:href="#red_v1" x="50" y="50"/>
+</svg>

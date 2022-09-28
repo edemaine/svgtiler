@@ -196,6 +196,8 @@ objects:
    This feature allows you to parse tile names how you want, and to
    vary the tile depending on the context (e.g., neighboring tile names
    or parity of the tile location).
+4. An `svgtiler.Mapping` object containing one of the listed formats, e.g.,
+   `new svgtiler.Mapping((key, context) => ...)`
 
 Each **tile** (property of JavaScript object, value of `Map` object,
 or return value of a function) should be specified as one of the following:
@@ -219,9 +221,10 @@ or return value of a function) should be specified as one of the following:
 6. An empty string, short for the empty symbol `<symbol viewBox="0 0 0 0"/>`.
 7. `undefined` or `null`, indicating that this mapping doesn't define a tile
    for this tile name (and the next mapping should be checked).
-8. Another mapping (JavaScript object, `Map` object, or function) that gets
-   recursively evaluated as described above (with the same tile name and
-   context).  For example, a top-level JavaScript object could map some tile
+8. Another mapping (JavaScript object, `Map` object, function, or
+   `svgtiler.Mapping`) that gets recursively evaluated as described above
+   (with the same tile name and context).
+   For example, a top-level JavaScript object could map some tile
    names to functions (when they need to be dynamic); or a top-level function
    could return different mappings depending on context.
 9. A tile in one of the listed formats wrapped in a call to `svgtiler.static`,
@@ -238,6 +241,8 @@ or return value of a function) should be specified as one of the following:
     to control stacking order.
     Null items in the array get ignored, and an empty array acts like `null`
     (this mapping does not define a tile for this tile name).
+    You can put functions inside arrays (which effectively disappear if they
+    return `null`/`undefined`), or return arrays from functions, or both.
 
 If you need to use a `<marker>`, `<filter>`, gradient, or other element
 intended for `<defs>`, call `svgtiler.def(tag)`, where `tag`

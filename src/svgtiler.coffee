@@ -851,7 +851,6 @@ class SVGSymbol extends SVGTopLevel
       @height = 0
     if warnings.length > 0
       console.warn "Failed to detect #{warnings.join ' and '} of SVG for #{@name}"
-      console.log @origWidth, @origHeight
 
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
@@ -1011,7 +1010,8 @@ class Mapping extends Input
   Base Mapping class.
   The passed-in data can be any supported output from a JavaScript mapping
   file: an object, a Map, or a function resolving to one of the above
-  or a String (containing SVG or a filename), Preact VDOM, or null/undefined.
+  or a String (containing SVG or a filename), Preact VDOM, or null/undefined,
+  with Arrays possibly mixed in; or another `Mapping`.
   In this class and subclasses, `@map` stores this data.
   ###
   constructor: (data, opts) ->
@@ -1077,6 +1077,10 @@ class Mapping extends Input
               allStatic = false if result.isStatic == false
               result.value
           return {value, isStatic: allStatic}
+        else if value instanceof Mapping
+          return
+            value: value.lookup key, context
+            isStatic: false  # no need to cache at higher level
         else if typeof value == 'object'
           if value.hasOwnProperty key  # avoid inherited property e.g. toString
             value = value[key]
