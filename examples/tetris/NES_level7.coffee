@@ -8,7 +8,7 @@ kind =
   Z: 'other'
 
 (key) ->
-  if key == ' '
+  if key.trim() == ''
     <rect fill="black" width="8" height="8"/>
   else
     # could just return "./NES_level7_#{kind[key]}.png" here
