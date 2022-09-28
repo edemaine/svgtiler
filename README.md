@@ -592,9 +592,17 @@ the `<symbol>`'s [`preserveAspectRatio`](https://developer.mozilla.org/en-US/doc
 
 ## Unrecognized Tiles
 
-Any undefined tile displays as a red-on-yellow diamond question mark
-(like the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
+Any undefined tile displays as a red-on-yellow diamond with a question mark
+(like the [Unicode replacement character �](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character)),
 with automatic width and height, so that it is easy to spot.
+SVG Tiler also lists any unrecognized tiles at the end of its output.
+
+If evaluating a tile raises an exception (usually from code in your
+.js/.coffee mapping files), the tile renders as a red-on-yellow triangle
+with an exclamation mark (like the Unicode warning sign ⚠️).
+SVG Tiler also Tiler outputs the error and stack trace, and
+lists any erroring tiles at the end of its output.
+
 See the [auto sizing example](examples/auto).
 
 ## `<image>` Processing

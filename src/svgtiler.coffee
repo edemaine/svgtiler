@@ -897,6 +897,19 @@ unrecognizedSymbol = new SVGSymbol 'unrecognized tile', '''
 unrecognizedSymbol.id = '_unrecognized' # cannot be output of escapeId()
 unrecognizedSymbol.isStatic = true      # need to clone on use
 
+## Tile to fall back to when encountering an error during tile evaluation.
+## Path from https://commons.wikimedia.org/wiki/File:Caution_icon_-_Noun_Project_9556_white.svg
+## by José Hernandez, SE, released under CC-BY-SA 3.0.
+## This symbol is hereby released under the same CC-BY-SA 3.0 license.
+errorSymbol = new SVGSymbol 'error tile', '''
+  <symbol viewBox="0 0 100 100" preserveAspectRatio="none" width="auto" height="auto">
+    <rect width="100" height="100" fill="yellow"/>
+    <path stroke="none" fill="red" d="M96.803,83.551L55.418,8.992C52.466,3.67,47.631,3.67,44.675,8.988L3.23,83.555   c-2.957,5.32-0.396,9.672,5.688,9.672h82.19C97.193,93.227,99.756,88.873,96.803,83.551z M55.53,82.439H44.5V71.41h11.03V82.439z    M56.064,38.449l-2.484,26.85h-7.132l-2.484-26.85v-9.894h12.101V38.449z"/>
+  </symbol>
+'''
+errorSymbol.id = '_error'   # cannot be output of escapeId()
+errorSymbol.isStatic = true # need to clone on use
+
 class Input extends HasSettings
   ###
   Abstract base class for all inputs to SVG Tiler, in particular
@@ -1570,12 +1583,19 @@ class Render extends HasSettings
     ## Render all tiles in the drawing.
     @mappings.doBeforeRender @
     missing = new Set
+    errored = new Set
     @cache = new Map
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
           currentContext.move j, i
-          symbols = @mappings.lookup key, currentContext
+          try
+            symbols = @mappings.lookup key, currentContext
+          catch error
+            console.warn "Error while evaluating mapping for key '#{key}':"
+            console.error error
+            errored.add key
+            symbols = errorSymbol
           unless symbols? and symbols.length != 0
             missing.add key
             symbols = unrecognizedSymbol
@@ -1601,8 +1621,11 @@ class Render extends HasSettings
             }
     currentContext = null
     missing = ("'#{key}'" for key from missing)
+    errored = ("'#{key}'" for key from errored)
     if missing.length
       console.warn "Failed to recognize tiles:", missing.join ', '
+    if errored.length
+      console.warn "Errors during tiles:", errored.join ', '
 
     ## Lay out the tiles in the drawing via SVG <use>.
     @xMin = @yMin = @xMax = @yMax = 0

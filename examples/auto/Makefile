@@ -1,2 +1,2 @@
 all:
-	svgtiler -f auto.txt grid.asc
+	svgtiler -f error.coffee auto.txt grid.asc

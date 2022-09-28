@@ -17,6 +17,10 @@
   <symbol id="X" viewBox="-10 -10 20 20" overflow="visible">
     <circle r="10" fill="red"/>
   </symbol>
+  <symbol id="_error" viewBox="0 0 100 100" preserveAspectRatio="none" overflow="visible">
+    <rect width="100" height="100" fill="yellow"/>
+    <path stroke="none" fill="red" d="M96.803,83.551L55.418,8.992C52.466,3.67,47.631,3.67,44.675,8.988L3.23,83.555   c-2.957,5.32-0.396,9.672,5.688,9.672h82.19C97.193,93.227,99.756,88.873,96.803,83.551z M55.53,82.439H44.5V71.41h11.03V82.439z    M56.064,38.449l-2.484,26.85h-7.132l-2.484-26.85v-9.894h12.101V38.449z"/>
+  </symbol>
   <use xlink:href="#_2B" x="0" y="0"/>
   <use xlink:href="#_2D" x="10" y="0"/>
   <use xlink:href="#_2B" x="30" y="0"/>
@@ -50,6 +54,7 @@
   <use xlink:href="#_2D" x="70" y="60"/>
   <use xlink:href="#_2B" x="90" y="60"/>
   <use xlink:href="#_7C" x="0" y="70"/>
+  <use xlink:href="#_error" x="10" y="70" width="20" height="20"/>
   <use xlink:href="#_7C" x="30" y="70"/>
   <use xlink:href="#_7C" x="60" y="70"/>
   <use xlink:href="#X" x="70" y="70" width="20" height="20"/>
