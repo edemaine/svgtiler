@@ -363,6 +363,9 @@ to import local modules or files relative to the mapping file.
   adds a `class` attribute and prepends a `<rect>` child.
   Alternatively, use `svg.svg` (the `svg` attribute of the returned object)
   to get the SVG string (with comments removed).
+  Note that the `.svg` file can even have JSX notation in it, such as
+  `<svg width={share.width} height={share.height}>`, but `svg.svg` will not
+  interpret it specially.
 * If you `import`/`require` a filename with `.png`, `.jpg`, `.jpeg`, or `.gif`
   extension, you obtain a Preact Virtual DOM object `image`
   representing an `<image>` tag for the file's inclusion,
