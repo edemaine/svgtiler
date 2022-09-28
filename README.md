@@ -197,7 +197,9 @@ objects:
    vary the tile depending on the context (e.g., neighboring tile names
    or parity of the tile location).
 4. An `svgtiler.Mapping` object containing one of the listed formats, e.g.,
-   `new svgtiler.Mapping((key, context) => ...)`
+   `new svgtiler.Mapping((key, context) => ...)`.
+   Such an object can also be obtained from a mapping file (as if it were
+   specified on the command line) via `svgtiler.require(filename)`.
 5. An `svgtiler.Mappings` object containing one or more of the listed formats,
    e.g., `new svgtiler.Mappings(mapping1, mapping2)`.  `Mappings` look up
    the specified key in each mapping in reverse sequential order until

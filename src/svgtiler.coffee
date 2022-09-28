@@ -74,9 +74,28 @@ unless window?
           last.replaceWith exportLast
         return
 
+  ## Modify `svgtiler.require` calls to add __dirname as third argument,
+  ## so that files can be located relative to the module's directory.
+  svgtilerRequire = ({types}) ->
+    visitor:
+      CallExpression: (path) ->
+        {node} = path
+        {callee} = node
+        return unless types.isMemberExpression callee
+        return unless types.isIdentifier(callee.object) and
+                      callee.object.name == 'svgtiler'
+        return unless types.isIdentifier(callee.property) and
+                      callee.property.name == 'require'
+        while node.arguments.length < 2
+          node.arguments.push types.identifier 'undefined'
+        if node.arguments.length == 2
+          node.arguments.push types.identifier '__dirname'
+        return
+
   babelConfig =
     plugins: [
       implicitFinalExportDefault
+      svgtilerRequire
       [require.resolve('babel-plugin-auto-import'),
         declarations: [
           default: 'preact'
@@ -2140,6 +2159,10 @@ convert = (filenames, formats, settings) ->
   else
     processor.convertTo filenames, formats
 
+inputRequire = (filename, settings = getSettings() ? defaultSettings, dirname) ->
+  filename = path.join dirname, filename if dirname?
+  Input.recognize filename, undefined, settings
+
 main = (args = process.argv[2..]) ->
   files = skip = 0
   formats = []
@@ -2273,7 +2296,8 @@ svgtiler = {
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, convert,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
-  static: wrapStatic,
+  require: inputRequire
+  static: wrapStatic
   share: globalShare
   version: metadata.version
 }
