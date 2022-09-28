@@ -992,7 +992,7 @@ class ArrayWrapper extends Array
       else if item instanceof @constructor.itemClass
         @push item
       else
-        @push new @itemClass item
+        @push new @constructor.itemClass item
 
 class Styles extends ArrayWrapper
   @itemClass: Style

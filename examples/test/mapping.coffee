@@ -6,7 +6,7 @@ export map1 = new svgtiler.Mapping (key) ->
     <rect width="50" height="50" stroke={key} stroke-width="6" fill="gray"/>
   </symbol>
 
-export map2 = new svgtiler.Mapping (key) ->
+export map2 = (key) ->
   <symbol viewBox="-25 -25 50 50" z-index="2">
     <circle r="17" fill={key}/>
   </symbol>
