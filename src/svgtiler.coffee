@@ -158,15 +158,15 @@ defaultSettings =
   keepParent: false
   keepClass: false
   ## Major state
-  mappings: null  # should be valid argument to Mappings.from
-  styles: null    # should be valid argument to Styles.from
+  mappings: null  # should be valid argument to new Mappings
+  styles: null    # should be valid argument to new Styles
 
 cloneSettings = (settings) ->
   settings = {...settings}
   if settings.mappings?
-    settings.mappings = Mappings.from settings.mappings, true
+    settings.mappings = new Mappings settings.mappings
   if settings.styles?
-    settings.styles = Styles.from settings.styles, true
+    settings.styles = new Styles settings.styles
   settings
 getSetting = (settings, key) ->
   settings?[key] ? defaultSettings[key]
@@ -973,11 +973,11 @@ class ArrayWrapper extends Array
   For example, `Styles` is like an array of `Style`s; and
   `Mappings` is like an array of `Mapping`s.
   ###
-  @from: (data, clone) ->
+  constructor: (...items) ->
     ###
-    Enforce `data` to be `ArrayWrapper` (sub)class.
+    Enforce `items` to be instances of `@itemClass`.
     Supported formats:
-      * `ArrayWrapper` (do nothing, unless clone requested)
+      * `ArrayWrapper` (just clone array)
       * `@itemClass` (wrap in singleton)
       * raw data to pass to `new @itemClass`
       * `Array` of `@itemClass`
@@ -985,22 +985,14 @@ class ArrayWrapper extends Array
       * `Array` of a mixture
       * `undefined`/`null` (empty)
     ###
-    if data instanceof @
-      if clone
-        new @ ...data
+    super()
+    for item in items
+      if item instanceof @constructor
+        @push ...item
+      else if item instanceof @constructor.itemClass
+        @push item
       else
-        data
-    else if data?
-      data = [data] unless Array.isArray data
-      new @ ...(
-        for item in data when item?
-          if item instanceof @itemClass
-            item
-          else
-            new @itemClass item
-      )
-    else
-      new @
+        @push new @itemClass item
 
 class Styles extends ArrayWrapper
   @itemClass: Style
@@ -1490,8 +1482,8 @@ class Render extends HasSettings
     super()
     @settings ?= @drawing.settings
     @idVersions = new Map
-    @mappings = Mappings.from @getSetting 'mappings'
-    @styles = Styles.from @getSetting 'styles'
+    @mappings = new Mappings @getSetting 'mappings'
+    @styles = new Styles @getSetting 'styles'
     @defs = []
   hrefAttr: -> hrefAttr @settings
   id: (key) -> #, noEscape) ->
