@@ -182,12 +182,16 @@ defaultSettings =
   mappings: null  # should be valid argument to new Mappings
   styles: null    # should be valid argument to new Styles
 
-cloneSettings = (settings) ->
+cloneSettings = (settings, addArrays) ->
   settings = {...settings}
   if settings.mappings?
     settings.mappings = new Mappings settings.mappings
+  else if addArrays
+    settings.mappings = new Mappings
   if settings.styles?
     settings.styles = new Styles settings.styles
+  else if addArrays
+    settings.styles = new Styles
   settings
 getSetting = (settings, key) ->
   settings?[key] ? defaultSettings[key]
@@ -2274,11 +2278,7 @@ inputRequire = (filename, settings = getSettings() ? defaultSettings, dirname) -
 main = (args = process.argv[2..]) ->
   files = skip = 0
   formats = []
-  settings = {
-    ...defaultSettings
-    mappings: new Mappings
-    styles: new Styles
-  }
+  settings = cloneSettings defaultSettings, true
   stack = []  # {settings, share} objects for implementing parens
   for arg, i in args
     if skip
@@ -2367,6 +2367,9 @@ main = (args = process.argv[2..]) ->
           delete globalShare[key] for key of globalShare
           Object.assign globalShare, share
         else
+          ## Unmatched ')': reset settings and share
+          settings = cloneSettings defaultSettings, true
+          delete globalShare[key] for key of globalShare
           console.warn "Unmatched ')'"
       else
         files++
