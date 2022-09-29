@@ -186,7 +186,7 @@
   <use xlink:href="#K" x="45" y="315"/>
   <use xlink:href="#R" x="135" y="315"/>
   <use xlink:href="#R" x="180" y="315"/>
-  <svg overflow="visible">
+  <svg>
     <line x1="22.5" y1="22.5" x2="157.5" y2="157.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
     <line x1="157.5" y1="112.5" x2="157.5" y2="157.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>
     <line x1="157.5" y1="112.5" x2="247.5" y2="202.5" stroke="hsl(286,65%,50%,70%)" stroke-width="10" stroke-linecap="round"/>

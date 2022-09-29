@@ -369,12 +369,9 @@ extractZIndex = (node) ->
   ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
   ## a z-index="..." attribute.  Check for this first.
   ## 2. Look for style="z-index:..." as in HTML.
-  z = parseFloat attributeOrStyle node, 'z-index'
+  z = parseNum attributeOrStyle node, 'z-index'
   removeAttributeOrStyle node, 'z-index'
-  if isNaN z
-    0
-  else
-    z
+  z ? 0
 
 domRecurse = (node, callback) ->
   ###
@@ -565,15 +562,29 @@ getSettings = ->
   else
     null
 
+## SVG container element tags from
+## https://developer.mozilla.org/en-US/docs/Web/SVG/Element#container_elements
+## that are useless when empty and have no `id` attribute.
+emptyContainers = new Set [
+  'defs'
+  'g'
+  'svg'
+  'switch'
+  'symbol'
+]
+
 class SVGContent extends HasSettings
   ###
   Base helper for parsing SVG as specified in SVG Tiler:
   SVG strings, Preact VDOM, or filenames, with special handling of image files.
-  Usually acquires an `id` attribute via `setId`, which can be formatted
-  via `url()` and `hash()`.
-  In some cases, acquires `isStatic` Boolean attribute to indicate
-  re-usable content, or `isForced` Boolean attribute to indicate
-  a def that should be included by force.
+  Automatically determines `width`, `height`, `viewBox`, `overflowBox`,
+  and `zIndex` properties if specified in the SVG content,
+  and sets `isEmpty` to indicate whether the SVG is a useless empty tag.
+  In many cases (symbols and defs), acquires an `id` property via `setId`,
+  which can be formatted via `url()` and `hash()`.
+  In some cases, acquires `isStatic` Boolean property to indicate
+  re-usable content, or `isForced` Boolean property to indicate
+  a def that should be included by force (even if unused).
   ###
   constructor: (@name, @value, @settings) ->
     ## `@value` can be a string (SVG or filename) or Preact VDOM.
@@ -639,6 +650,7 @@ class SVGContent extends HasSettings
   makeDOM: ->
     return @dom if @dom?
     @makeSVG()
+
     ## Force SVG namespace when parsing, so nodes have correct namespaceURI.
     ## (This is especially important on the browser, so the results can be
     ## reparented into an HTML Document.)
@@ -669,7 +681,11 @@ class SVGContent extends HasSettings
     unless @getSetting 'useHref'
       @dom.documentElement.removeAttribute 'xmlns:xlink'
 
-    ## <image> processing
+    ## Wrap in <symbol> if appropriate,
+    ## before we add width/height/etc. attributes.
+    @wrap?()
+
+    ## <image> processing (must come before width/height processing).
     domRecurse @dom.documentElement, (node) =>
       if node.nodeName == 'image'
         ###
@@ -733,68 +749,29 @@ class SVGContent extends HasSettings
         false
       else
         true
-    @dom
-  useDOM: ->
-    @makeDOM()
-    ## Clone if content is static, to enable later re-use
-    if @isStatic
-      @dom.documentElement.cloneNode true
-    else
-      @dom.documentElement
-
-class SVGTopLevel extends SVGContent
-  ###
-  Abstract base class for `SVGSymbol` and `SVGSVG` which have support for
-  `viewBox`, `overflowBox`, and `z-index`.
-  Subclass should define `wrapper` of 'symbol' or 'svg'.
-  Parser will enforce that the content is wrapped in this element.
-  ###
-  makeDOM: ->
-    return @dom if @dom?
-    super()
-    ## Wrap XML in <wrapper>.
-    symbol = @dom.createElementNS SVGNS, @wrapper
-    ## Force `id` to be first attribute.
-    symbol.setAttribute 'id', @id if @id?
-    ## Avoid a layer of indirection for <symbol>/<svg> at top level
-    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
-       not @dom.documentElement.nextSibling?
-      for attribute in @dom.documentElement.attributes
-        unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
-          symbol.setAttribute attribute.name, attribute.value
-      @dom.removeChild doc = @dom.documentElement
-    else
-      doc = @dom
-      ## Allow top-level object to specify <symbol> data.
-      for attribute in ['z-index', 'viewBox', 'overflowBox']
-        if doc.documentElement.hasAttribute attribute
-          symbol.setAttribute attribute,
-            doc.documentElement.getAttribute attribute
-          doc.documentElement.removeAttribute attribute
-    for child in (node for node in doc.childNodes)
-      symbol.appendChild child
-    @dom.appendChild symbol
-    @isEmpty = symbol.childNodes.length == 0
 
     ## Determine `viewBox`, `width`, and `height` attributes.
     @viewBox = parseBox @dom.documentElement.getAttribute 'viewBox'
     @width = parseDim @origWidth = @dom.documentElement.getAttribute 'width'
     @height = parseDim @origHeight = @dom.documentElement.getAttribute 'height'
     ## Check for default width/height specified by caller.
-    if @defaultWidth? and not @width?
+    if not @width? and @defaultWidth?
       @dom.documentElement.setAttribute 'width', @width = @defaultWidth
-    if @defaultHeight? and not @height?
+    if not @height? and @defaultHeight?
       @dom.documentElement.setAttribute 'height', @height = @defaultHeight
-    ## Absent viewBox becomes 0 0 <width> <height> if latter are present.
+    ## Absent viewBox becomes 0 0 <width> <height> if latter are present
+    ## (but only internal to SVG Tiler, DOM remains unchanged).
     if @width? and @height? and not @viewBox?
       @viewBox = [0, 0, @width, @height]
-    ## Absent viewBox set to automatic bounding box if wrapping in <symbol>.
-    if not @viewBox? and @wrapper == 'symbol'
+    ## Absent viewBox set to automatic bounding box if requested
+    ## (e.g. in `SVGSymbol`).
+    if not @viewBox? and @autoViewBox
       if (@viewBox = svgBBox @dom)?
         @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
-    ## Absent width/height inherited from viewBox if latter is present.
-    ## (This deviates from SVG spec, which would default to meaningless 100%.)
-    if @viewBox?
+    ## Absent width/height inherited from viewBox if latter is present,
+    ## in `SVGSymbol` which sets `@autoWidthHeight`.
+    ## Including the width/height in the <symbol> lets us skip it in <use>.
+    if @viewBox? and @autoWidthHeight
       unless @width?
         @dom.documentElement.setAttribute 'width', @width = @viewBox[2]
       unless @height?
@@ -802,9 +779,8 @@ class SVGTopLevel extends SVGContent
 
     ## Overflow behavior
     overflow = attributeOrStyle @dom.documentElement, 'overflow'
-    if not overflow? and (overflowDefault = @getSetting 'overflowDefault')?
-      @dom.documentElement.setAttribute 'overflow',
-        overflow = overflowDefault
+    if not overflow? and @defaultOverflow?
+      @dom.documentElement.setAttribute 'overflow', overflow = @defaultOverflow
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
 
     ###
@@ -824,29 +800,81 @@ class SVGTopLevel extends SVGContent
         @viewBox[3] = zeroSizeReplacement if @viewBox[3] == 0
         @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
 
+    ## Special SVG Tiler attributes that get extracted from DOM
     @overflowBox = extractOverflowBox @dom
     @zIndex = extractZIndex @dom.documentElement
+    @isEmpty = @dom.documentElement.childNodes.length == 0 and
+      (@emptyWithId or not @dom.documentElement.hasAttribute 'id') and
+      emptyContainers.has @dom.documentElement.tagName
+    @dom
+  useDOM: ->
+    @makeDOM()
+    ## Clone if content is static, to enable later re-use
+    if @isStatic
+      @dom.documentElement.cloneNode true
+    else
+      @dom.documentElement
+
+class SVGWrapped extends SVGContent
+  ###
+  Abstract base class for `SVGSymbol` and `SVGSVG` which automatically wrap
+  content in a containing element (`<symbol>` or `<svg>` respectively).
+  Subclass should define `wrapper` of 'symbol' or 'svg'.
+  Parser will enforce that the content is wrapped in this element.
+  ###
+  wrap: ->
+    ## Wrap XML in <wrapper>.
+    symbol = @dom.createElementNS SVGNS, @wrapper
+    ## Force `id` to be first attribute (if it's already set).
+    symbol.setAttribute 'id', @id if @id?
+    ## Avoid a layer of indirection for <symbol>/<svg> at top level
+    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
+       not @dom.documentElement.nextSibling?
+      for attribute in @dom.documentElement.attributes
+        unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
+          symbol.setAttribute attribute.name, attribute.value
+      @dom.removeChild doc = @dom.documentElement
+    else
+      doc = @dom
+      ## Allow top-level object to specify <symbol> data.
+      ## `z-index` and `overflowBox` should already be extracted.
+      ## `width` and `height` have another meaning in e.g. <rect>s,
+      ## so just transfer for tags where they are meaningless.
+      for attribute in ['viewBox', 'width', 'height', 'overflow']
+        continue if attribute in ['width', 'height'] and
+                    doc.documentElement.tagName not in ['g']
+        if doc.documentElement.hasAttribute attribute
+          symbol.setAttribute attribute,
+            doc.documentElement.getAttribute attribute
+          doc.documentElement.removeAttribute attribute
+    for child in (node for node in doc.childNodes)
+      symbol.appendChild child
+    @dom.appendChild symbol
     @dom
 
-class SVGSVG extends SVGTopLevel
-  ###
-  SVG content wrapped in <svg>, used for `afterRender` content.
-  ###
-  wrapper: 'svg'
+#class SVGSVG extends SVGWrapped
+#  ###
+#  SVG content wrapped in `<svg>`.
+#  ###
+#  wrapper: 'svg'
 
-class SVGSymbol extends SVGTopLevel
+class SVGSymbol extends SVGWrapped
   ###
-  SVG content wrapped in `<symbol>`, with special width/height handling,
-  used for tiles.  An alternative title for this class would be `Tile`,
-  but often the same symbol is re-used by many tiles.
+  SVG content wrapped in `<symbol>`, with special width/height handling
+  and text extraction, used for tiles.
+  Note though that one `SVGSymbol` may be re-used in many different `Tile`s.
   ###
   wrapper: 'symbol'
+  autoViewBox: true
+  autoWidthHeight: true
+  emptyWithId: true  # consider empty even if <symbol> has id attribute
   makeDOM: ->
     return @dom if @dom?
 
-    ## Check for overrides and missing width/height needed for symbols.
+    ## Special defaults for loading symbols in `SVGContent`'s `makeDOM`.
     @defaultWidth = @getSetting 'forceWidth'
     @defaultHeight = @getSetting 'forceHeight'
+    @defaultOverflow = @getSetting 'overflowDefault'
 
     ## `SVGTop` sets `@width` and `@height` according to
     ## `width`/`height`/`viewBox` attributes or our defaults.
@@ -1563,6 +1591,9 @@ class Render extends HasSettings
     ## Returns current background fill.
     @backgroundFill = fill unless fill == undefined
     @backgroundFill
+  updateSize: ->
+    @width = @xMax - @xMin
+    @height = @yMax - @yMin
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1701,23 +1732,20 @@ class Render extends HasSettings
       @yMax = Math.max @yMax, y
 
     ## afterRender callbacks: render as <symbol> and then strip off that wrapper
-    do updateSize = =>
-      @width = @xMax - @xMin
-      @height = @yMax - @yMin
+    @updateSize()
     @mappings.doAfterRender @, (out, mapping) =>
       return unless out
-      overlay = new SVGSVG "afterRender content from '#{mapping.filename}'",
+      overlay = new SVGContent "afterRender content from '#{mapping.filename}'",
         out, @settings
-      ## Wrap in <svg> instead of <symbol>, with default viewBox of drawing.
       dom = overlay.makeDOM()
-      @layers[overlay.zIndex] ?= []
-      box = overlay.overflowBox ? overlay.viewBox
-      if box?
+      return if overlay.isEmpty
+      if (box = overlay.overflowBox ? overlay.viewBox)?
         @xMin = Math.min @xMin, box[0]
         @yMin = Math.min @yMin, box[1]
         @xMax = Math.max @xMax, box[0] + box[2]
         @yMax = Math.max @yMax, box[1] + box[3]
         updateSize()
+      @layers[overlay.zIndex] ?= []
       @layers[overlay.zIndex].push dom.documentElement
 
     ## Background fill, now that size has settled
@@ -2336,7 +2364,7 @@ main = (args = process.argv[2..]) ->
     help()
 
 svgtiler = {
-  SVGContent, SVGTopLevel, SVGSVG, SVGSymbol, unrecognizedSymbol,
+  SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
   getMapping, runWithMapping,
   Drawing, AutoDrawing, ASCIIDrawing,

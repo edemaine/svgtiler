@@ -350,7 +350,7 @@ The top-level code of your .js or .coffee mapping file can also call:
   bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
 * `svgtiler.background(fillColor)` to set the default background color
   for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
-  Roughly equivalent to
+  Equivalent to
   `svgtiler.afterRender((render) => <rect fill="white" z-index="-99999" x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>`.
   You can also call `svgtiler.background` within a tile definition function or
   a `beforeRender`/`afterRender` callback to set the background dynamically,
