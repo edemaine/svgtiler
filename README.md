@@ -842,6 +842,8 @@ Optional arguments:
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
+  (                     Remember settings, mappings, styles, and share values
+  )                     Restore last remembered settings/mappings/styles/share
 
 Filename arguments:  (mappings and styles before relevant drawings!)
 

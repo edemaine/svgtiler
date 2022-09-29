@@ -2159,6 +2159,8 @@ Optional arguments:
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
+  (                     Remember settings, mappings, styles, and share values
+  )                     Restore last remembered settings/mappings/styles/share
 
 Filename arguments:  (mappings and styles before relevant drawings!)
 
@@ -2221,8 +2223,7 @@ main = (args = process.argv[2..]) ->
     mappings: new Mappings
     styles: new Styles
   }
-  settingsStack = []
-  shareStack = [{}]
+  stack = []  # {settings, share} objects for implementing parens
   for arg, i in args
     if skip
       skip--
@@ -2258,7 +2259,6 @@ main = (args = process.argv[2..]) ->
       when '-s', '--share'
         skip = 1
         [key, ...value] = args[i+1].split '='
-        shareStack.at(-1)[key] = globalShare[key]  # save old value
         globalShare[key] = value.join '='  # ignore later =s
       when '-o', '--output'
         skip = 1
@@ -2301,13 +2301,15 @@ main = (args = process.argv[2..]) ->
         else
           console.warn "Invalid argument to --jobs: #{args[i+1]}"
       when '('
-        shareStack.push {}
-        settingsStack.push settings
-        settings = cloneSettings settings
+        stack.push
+          settings: cloneSettings settings
+          share: {...globalShare}  # shallow copy
       when ')'
-        if settingsStack.length
-          settings = settingsStack.pop()
-          Object.assign globalShare, shareStack.pop()
+        if stack.length
+          {settings, share} = stack.pop()
+          ## Restore globalShare without changing top-level object identity
+          delete globalShare[key] for key of globalShare
+          Object.assign globalShare, share
         else
           console.warn "Unmatched ')'"
       else

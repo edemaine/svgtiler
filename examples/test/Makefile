@@ -7,5 +7,5 @@ all:
 	svgtiler -f mapping.coffee mapping.ssv
 	svgtiler -f mappings.coffee -O mappings mapping.ssv
 	svgtiler -f set.coffee set.asc
-	svgtiler -f share-provider.js share-user.js
+	svgtiler -f \( share-provider.js share-user.js \) share-undefined.js
 	svgtiler -f \( -s data=Success\! share-user.js \) share-undefined.js
