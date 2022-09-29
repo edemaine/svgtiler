@@ -4,9 +4,6 @@
   <symbol id="X" width="50" height="50" overflow="visible">
     <rect x="0" y="0" width="50" height="50" fill="#95989d" stroke="#dadada"/>
   </symbol>
-  <symbol id="_blank" width="50" height="50" overflow="visible">
-    <g/>
-  </symbol>
   <symbol id="O" width="50" height="50" overflow="visible">
     <g>
       <rect x="0" y="0" width="50" height="50" fill="#fafafa" stroke="#dadada"/>
@@ -15,7 +12,5 @@
     </g>
   </symbol>
   <use xlink:href="#X" x="0" y="0"/>
-  <use xlink:href="#_blank" x="50" y="0"/>
-  <use xlink:href="#_blank" x="100" y="0"/>
   <use xlink:href="#O" x="150" y="0"/>
 </svg>

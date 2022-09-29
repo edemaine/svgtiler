@@ -803,9 +803,16 @@ class SVGContent extends HasSettings
     ## Special SVG Tiler attributes that get extracted from DOM
     @overflowBox = extractOverflowBox @dom
     @zIndex = extractZIndex @dom.documentElement
-    @isEmpty = @dom.documentElement.childNodes.length == 0 and
-      (@emptyWithId or not @dom.documentElement.hasAttribute 'id') and
-      emptyContainers.has @dom.documentElement.tagName
+    #@isEmpty = @dom.documentElement.childNodes.length == 0 and
+    #  (@emptyWithId or not @dom.documentElement.hasAttribute 'id') and
+    #  emptyContainers.has @dom.documentElement.tagName
+    recursiveEmpty = (node, allowId) ->
+      return false unless emptyContainers.has node.tagName
+      return false unless allowId or not node.hasAttribute 'id'
+      for child in node.childNodes
+        return false unless recursiveEmpty child
+      true
+    @isEmpty = recursiveEmpty @dom.documentElement, @emptyWithId
     @dom
   useDOM: ->
     @makeDOM()
@@ -1731,7 +1738,7 @@ class Render extends HasSettings
       y += rowHeight
       @yMax = Math.max @yMax, y
 
-    ## afterRender callbacks: render as <symbol> and then strip off that wrapper
+    ## afterRender callbacks, which may use (and update) @width/@height
     @updateSize()
     @mappings.doAfterRender @, (out, mapping) =>
       return unless out
@@ -1744,7 +1751,7 @@ class Render extends HasSettings
         @yMin = Math.min @yMin, box[1]
         @xMax = Math.max @xMax, box[0] + box[2]
         @yMax = Math.max @yMax, box[1] + box[3]
-        updateSize()
+        @updateSize()
       @layers[overlay.zIndex] ?= []
       @layers[overlay.zIndex].push dom.documentElement
 
