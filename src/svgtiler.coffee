@@ -404,21 +404,22 @@ domRecurse = (node, callback) ->
 
 refRegExp = ///
   # url() without quotes
-  ^\s* url \s* \( \s* \# ([^()]*) \) \s*$
+  \b url \s* \( \s* \# ([^()]*) \)
   # url() with quotes, or src() which requires quotes
-| ^\s* (?: url | src) \s* \( \s* (['"]) \s* \# ([^'"]*) \2 \s* \) \s*$
-///
+| \b (?: url | src) \s* \( \s* (['"]) \s* \# ([^'"]*) \2 \s* \)
+///g
 findRefs = (root) =>
   ## Returns an array of id-based references to other elements in the SVG.
   refs = []
   domRecurse root, (node) =>
     return unless node.attributes?
     for attr in node.attributes
-      if (match = refRegExp.exec attr.value)?
-        refs.push {id: (match[1] or match[3]).trim(), node, attr: attr.name}
-      else if attr.name in ['href', 'xlink:href'] and
+      if attr.name in ['href', 'xlink:href'] and
               (value = attr.value.trim()).startsWith '#'
         refs.push {id: value[1..].trim(), node, attr: attr.name}
+      else
+        while (match = refRegExp.exec attr.value)?
+          refs.push {id: (match[1] or match[3]).trim(), node, attr: attr.name}
     true
   refs
 
