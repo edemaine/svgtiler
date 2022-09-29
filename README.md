@@ -337,21 +337,24 @@ The top-level code of your .js or .coffee mapping file can also call:
   which in particular has `drawing`, `mappings`, and `styles` attributes.
   You can even modify the drawing's `keys` at this stage,
   by modifying `render.drawing.keys`.
+  You can also add SVG content via `render.add` or `svgtiler.add`,
+  e.g., add metadata like `svgtiler.add(<title>My drawing</title>)`
+  (see below for more details).
 * `svgtiler.afterRender(callback)` to schedule calling `callback(render)`
-  after rendering each drawing.  In particular,
-  to render an overlay or underlay, return the content to render
-  as a string or Preact VDOM (ideally in an `<svg>` wrapper).
+  after rendering each drawing.
+  During the callback, `render` has properties about the rendering's
+  bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
+  You can add SVG content (overlay/underlay) via `render.add` or
+  `svgtiler.add`, which you can pass a string or Preact Virtual DOM.
   Specify a [`z-index`](#z-index-stacking-order-of-tiles)
   to control the stacking order relative to other symbols
   or overlays/underlays.
   Specify [`overflowBox`](#overflow-and-bounding-box) to increase the
   overall size of the rendered drawing.
-  During the callback, `render` has properties about the rendering's
-  bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
 * `svgtiler.background(fillColor)` to set the default background color
   for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
   Equivalent to
-  `svgtiler.afterRender((render) => <rect fill="white" z-index="-99999" x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>`.
+  `svgtiler.afterRender((render) => render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>))`.
   You can also call `svgtiler.background` within a tile definition function or
   a `beforeRender`/`afterRender` callback to set the background dynamically,
   or set the global default via the `--bg`/`--background` command-line option.
@@ -470,6 +473,11 @@ polygon.purple
 See the [animation example](examples/anim) for sample usage of a .css or
 .styl file.
 
+If you'd rather generate a `<style>` tag dynamically depending on the
+drawing content, you can do so in a .js or .coffee mapping file by calling
+`svgtiler.add` during an `svgtiler.beforeRender` or `svgtiler.afterRender`
+callback.
+
 ## Layout Algorithm
 
 Given one or more mapping files and a drawing file, SVG Tiler follows a fairly
@@ -508,6 +516,8 @@ will be rendered on top of (later than) all tiles without a
 `z-index="..."` specification (which default to a z-index of 0).
 You can use a `z-index="..."` property or an HTML-style
 `style="z-index: ..."` property.
+The special values `Infinity`, `+Infinity`, and `-Infinity` are allowed
+(along with variants like `Inf` or `\infty`).
 
 ## Overflow and Bounding Box
 

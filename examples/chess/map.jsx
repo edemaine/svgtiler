@@ -11,12 +11,15 @@ function read(filename) {
   return dom.props.children;
 }
 
+svgtiler.beforeRender(({drawing}) => svgtiler.add(
+  <title z-index="-Infinity">Chess diagram {drawing.filename}</title>));
+
 svgtiler.background('white');
 // Equivalent:
-//svgtiler.afterRender((render) =>
-//  <rect fill="white" z-index="-2"
+//svgtiler.afterRender((render) => render.add(
+//  <rect fill="white" z-index="-Infinity"
 //   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
-//);
+//));
 
 (key, context) => {
   // Map blanks to empty string

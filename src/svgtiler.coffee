@@ -230,6 +230,17 @@ parseNum = (x) ->
   else
     parsed
 
+## Allow Infinity, \infty, Inf with optional sign prefix
+infinityRegExp = /^\s*([+-]?)\\?infi?n?i?t?y?\s*$/i
+parseNumOrInfinity = (x) ->
+  if (match = infinityRegExp.exec x)?
+    if match[1] == '-'
+      -Infinity
+    else
+      Infinity
+  else
+    parseNum x
+
 ## Conversion from arbitrary unit to px (SVG units),
 ## from https://www.w3.org/TR/css-values-3/#absolute-lengths
 units =
@@ -364,12 +375,13 @@ getHref = (node) ->
 
 extractZIndex = (node) ->
   ## Check whether DOM node has a specified z-index, defaulting to zero.
+  ## Special values of Infinity or -Infinity are allowed.
   ## Also remove z-index attribute, so output is valid SVG.
   ## Note that z-index must be an integer.
   ## 1. https://www.w3.org/Graphics/SVG/WG/wiki/Proposals/z-index suggests
   ## a z-index="..." attribute.  Check for this first.
   ## 2. Look for style="z-index:..." as in HTML.
-  z = parseNum attributeOrStyle node, 'z-index'
+  z = parseNumOrInfinity attributeOrStyle node, 'z-index'
   removeAttributeOrStyle node, 'z-index'
   z ? 0
 
@@ -545,7 +557,7 @@ getContextString = ->
   else if currentRender?
     "render of '#{currentRender.drawing.filename}'"
   else
-    ''
+    'unknown context'
 
 getSettings = ->
   ###
@@ -1296,12 +1308,12 @@ class Mappings extends ArrayWrapper
       value = @[i].lookup key, context
       return value if value?
     undefined
-  doBeforeRender: (render, callback) ->
+  doBeforeRender: (render, onResult) ->
     for mapping in @
-      mapping.doBeforeRender render, callback
-  doAfterRender: (render, callback) ->
+      mapping.doBeforeRender render, onResult
+  doAfterRender: (render, onResult) ->
     for mapping in @
-      mapping.doAfterRender render, callback
+      mapping.doAfterRender render, onResult
 
 blankCells = new Set [
   ''
@@ -1555,6 +1567,9 @@ class Render extends HasSettings
     @mappings = new Mappings @getSetting 'mappings'
     @styles = new Styles @getSetting 'styles'
     @defs = []
+    ## Accumulated rendering, in case add() called before makeDOM():
+    @xMin = @yMin = @xMax = @yMax = 0
+    @layers = {}
   hrefAttr: -> hrefAttr @settings
   id: (key) -> #, noEscape) ->
     ## Generate unique ID starting with an escaped version of `key`.
@@ -1598,6 +1613,23 @@ class Render extends HasSettings
     ## Returns current background fill.
     @backgroundFill = fill unless fill == undefined
     @backgroundFill
+  add: (content, prepend) ->
+    unless content instanceof SVGContent
+      content = new SVGContent \
+        "svgtiler.add content from #{getContextString()}", content, @settings
+    dom = content.makeDOM()
+    return if content.isEmpty
+    if (box = content.overflowBox ? content.viewBox)?
+      @xMin = Math.min @xMin, box[0]
+      @yMin = Math.min @yMin, box[1]
+      @xMax = Math.max @xMax, box[0] + box[2]
+      @yMax = Math.max @yMax, box[1] + box[3]
+      @updateSize()
+    @layers[content.zIndex] ?= []
+    if prepend
+      @layers[content.zIndex].unshift dom.documentElement
+    else
+      @layers[content.zIndex].push dom.documentElement
   updateSize: ->
     @width = @xMax - @xMin
     @height = @yMax - @yMin
@@ -1666,11 +1698,8 @@ class Render extends HasSettings
       console.warn "Errors during tiles:", errored.join ', '
 
     ## Lay out the tiles in the drawing via SVG <use>.
-    @xMin = @yMin = @xMax = @yMax = 0
-    @layers = {}
     y = 0
     colWidths = {}
-    @coords = []
     for row, i in @tiles
       rowHeight = 0
       for tiles in row
@@ -1740,28 +1769,13 @@ class Render extends HasSettings
 
     ## afterRender callbacks, which may use (and update) @width/@height
     @updateSize()
-    @mappings.doAfterRender @, (out, mapping) =>
-      return unless out
-      overlay = new SVGContent "afterRender content from '#{mapping.filename}'",
-        out, @settings
-      dom = overlay.makeDOM()
-      return if overlay.isEmpty
-      if (box = overlay.overflowBox ? overlay.viewBox)?
-        @xMin = Math.min @xMin, box[0]
-        @yMin = Math.min @yMin, box[1]
-        @xMax = Math.max @xMax, box[0] + box[2]
-        @yMax = Math.max @yMax, box[1] + box[3]
-        @updateSize()
-      @layers[overlay.zIndex] ?= []
-      @layers[overlay.zIndex].push dom.documentElement
+    @mappings.doAfterRender @
 
     ## Background fill, now that size has settled
     if (@backgroundFill ?= @getSetting 'background')?
-      @layers['-Infinity'] ?= []
-      @layers['-Infinity'].unshift (new SVGContent "background",
-        """<rect x="#{@xMin}" y="#{@yMin}" width="#{@width}" height="#{@height}" fill="#{@backgroundFill}"/>""",
-        @settings
-      ).makeDOM()
+      @add new SVGContent("background",
+        """<rect z-index="-Infinity" x="#{@xMin}" y="#{@yMin}" width="#{@width}" height="#{@height}" fill="#{@backgroundFill}"/>""",
+        @settings), true  # prepend
 
     ## Check for global <defs> used by the symbols so far.
     usedIds = new Set
@@ -2046,6 +2060,12 @@ globalBackground = (fill) ->
     beforeRender (render) -> render.background fill
   else
     throw new SVGTilerError "svgtiler.background called outside of render of mapping context"
+
+globalAdd = (content, ...opts) ->
+  if currentRender?
+    currentRender.add content, ...opts
+  else
+    throw new SVGTilerError "svgtiler.add called outside of render context"
 
 class Context
   constructor: (@render, i, j) ->
@@ -2373,7 +2393,7 @@ main = (args = process.argv[2..]) ->
 svgtiler = {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
-  getMapping, runWithMapping,
+  getMapping, runWithMapping, static: wrapStatic,
   Drawing, AutoDrawing, ASCIIDrawing,
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
@@ -2382,7 +2402,7 @@ svgtiler = {
   extensionMap, Input, DummyInput, ArrayWrapper,
   Render, getRender, runWithRender, beforeRender, afterRender,
   id: globalId, def: globalDef, background: globalBackground,
-  static: wrapStatic,
+  add: globalAdd,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   main, renderDOM, convert, require: inputRequire,

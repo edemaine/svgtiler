@@ -71,4 +71,4 @@ svgtiler.afterRender (render) ->
                 stroke={graphColor} stroke-width="10" stroke-linecap="round"
           />
 
-  <svg>{edges}</svg>
+  render.add <g>{edges}</g>

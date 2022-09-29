@@ -128,6 +128,7 @@
     </g>
   </symbol>
   <rect x="0" y="0" width="360" height="360" fill="white"/>
+  <title>Chess diagram board-init.asc</title>
   <use xlink:href="#n" x="45" y="0"/>
   <use xlink:href="#n" x="135" y="0"/>
   <use xlink:href="#n" x="225" y="0"/>
