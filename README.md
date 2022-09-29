@@ -260,8 +260,12 @@ If you need to use a `<marker>`, `<filter>`, gradient, or other element
 intended for `<defs>`, call `svgtiler.def(tag)`, where `tag`
 is one of the above representations of the marker, filter, gradient, etc.
 This function adds the object to `<defs>` (if needed) at the top of the SVG,
-and returns the `id` for the object.  By default, the `id` starts with
-`marker`, `filter`, etc. according to the top-level tag of `tag`.
+and returns an object `def` with property `def.id` containing a unique `id`
+string, and helper methods `def.url()` and `def.hash()` generating `url(#id)`
+(as you'd use markers or gradients) and `#id` (as you'd use in `<use>`)
+respectively.
+By default, the `id` starts with `marker`, `filter`, etc.
+according to the top-level tag of `tag`.
 You can choose a better name by giving the tag an initial `id`, e.g.,
 `svgtiler.def(<marker id="arrow">...</marker>)`.
 You can call `svgtiler.def` within a tile function (where repeated calls
