@@ -1189,14 +1189,12 @@ class Mapping extends Input
     @preprocessQueue.push fn
   postprocess: (fn) ->
     @postprocessQueue.push fn
-  doPreprocess: (render, onResult) ->
+  doPreprocess: (render) ->
     for callback in @preprocessQueue
-      result = callback.call render, render
-      onResult? result, @
-  doPostprocess: (render, onResult) ->
+      callback.call render, render
+  doPostprocess: (render) ->
     for callback in @postprocessQueue
-      result = callback.call render, render
-      onResult? result, @
+      callback.call render, render
 
 preprocess = (fn) ->
   unless currentMapping?
@@ -1313,12 +1311,12 @@ class Mappings extends ArrayWrapper
       value = @[i].lookup key, context
       return value if value?
     undefined
-  doPreprocess: (render, onResult) ->
+  doPreprocess: (render) ->
     for mapping in @
-      mapping.doPreprocess render, onResult
-  doPostprocess: (render, onResult) ->
+      mapping.doPreprocess render
+  doPostprocess: (render) ->
     for mapping in @
-      mapping.doPostprocess render, onResult
+      mapping.doPostprocess render
 
 blankCells = new Set [
   ''
