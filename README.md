@@ -334,8 +334,8 @@ The `Context` object has the following properties and methods:
 
 The top-level code of your .js or .coffee mapping file can also call:
 
-* `svgtiler.beforeRender(callback)` to schedule calling `callback(render)`
-  before rendering each drawing, e.g.,
+* `svgtiler.preprocess(callback)` to schedule calling `callback(render)`
+  when preparing to rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.
   The `callback`'s argument (and `this`) is set to a `Render` instance,
   which in particular has `drawing`, `mappings`, and `styles` attributes.
@@ -344,8 +344,8 @@ The top-level code of your .js or .coffee mapping file can also call:
   You can also add SVG content via `render.add` or `svgtiler.add`,
   e.g., add metadata like `svgtiler.add(<title>My drawing</title>)`
   (see below for more details).
-* `svgtiler.afterRender(callback)` to schedule calling `callback(render)`
-  after rendering each drawing.
+* `svgtiler.postprocess(callback)` to schedule calling `callback(render)`
+  after rendering each drawing, e.g., to modify or add to the drawing.
   During the callback, `render` has properties about the rendering's
   bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
   You can add SVG content (overlay/underlay) via `render.add` or
@@ -358,9 +358,9 @@ The top-level code of your .js or .coffee mapping file can also call:
 * `svgtiler.background(fillColor)` to set the default background color
   for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
   Equivalent to
-  `svgtiler.afterRender((render) => render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>))`.
+  `svgtiler.postprocess((render) => render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>))`.
   You can also call `svgtiler.background` within a tile definition function or
-  a `beforeRender`/`afterRender` callback to set the background dynamically,
+  a `preprocess`/`postprocess` callback to set the background dynamically,
   or set the global default via the `--bg`/`--background` command-line option.
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
@@ -479,7 +479,7 @@ See the [animation example](examples/anim) for sample usage of a .css or
 
 If you'd rather generate a `<style>` tag dynamically depending on the
 drawing content, you can do so in a .js or .coffee mapping file by calling
-`svgtiler.add` during an `svgtiler.beforeRender` or `svgtiler.afterRender`
+`svgtiler.add` during an `svgtiler.preprocess` or `svgtiler.postprocess`
 callback.
 
 ## Layout Algorithm

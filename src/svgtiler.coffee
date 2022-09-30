@@ -1095,8 +1095,8 @@ class Mapping extends Input
   constructor: (data, opts) ->
     super data, {
       cache: new Map  # for static tiles
-      beforeRenderQueue: []
-      afterRenderQueue: []
+      preprocessQueue: []
+      postprocessQueue: []
       ...opts
     }
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
@@ -1185,27 +1185,27 @@ class Mapping extends Input
     ## Save in cache if overall static.
     @cache.set key, value if isStatic
     value
-  beforeRender: (fn) ->
-    @beforeRenderQueue.push fn
-  afterRender: (fn) ->
-    @afterRenderQueue.push fn
-  doBeforeRender: (render, onResult) ->
-    for callback in @beforeRenderQueue
+  preprocess: (fn) ->
+    @preprocessQueue.push fn
+  postprocess: (fn) ->
+    @postprocessQueue.push fn
+  doPreprocess: (render, onResult) ->
+    for callback in @preprocessQueue
       result = callback.call render, render
       onResult? result, @
-  doAfterRender: (render, onResult) ->
-    for callback in @afterRenderQueue
+  doPostprocess: (render, onResult) ->
+    for callback in @postprocessQueue
       result = callback.call render, render
       onResult? result, @
 
-beforeRender = (fn) ->
+preprocess = (fn) ->
   unless currentMapping?
-    throw new SVGTilerError "svgtiler.beforeRender called outside mapping file"
-  currentMapping.beforeRender fn
-afterRender = (fn) ->
+    throw new SVGTilerError "svgtiler.preprocess called outside mapping file"
+  currentMapping.preprocess fn
+postprocess = (fn) ->
   unless currentMapping?
-    throw new SVGTilerError "svgtiler.afterRender called outside mapping file"
-  currentMapping.afterRender fn
+    throw new SVGTilerError "svgtiler.postprocess called outside mapping file"
+  currentMapping.postprocess fn
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -1313,12 +1313,12 @@ class Mappings extends ArrayWrapper
       value = @[i].lookup key, context
       return value if value?
     undefined
-  doBeforeRender: (render, onResult) ->
+  doPreprocess: (render, onResult) ->
     for mapping in @
-      mapping.doBeforeRender render, onResult
-  doAfterRender: (render, onResult) ->
+      mapping.doPreprocess render, onResult
+  doPostprocess: (render, onResult) ->
     for mapping in @
-      mapping.doAfterRender render, onResult
+      mapping.doPostprocess render, onResult
 
 blankCells = new Set [
   ''
@@ -1650,13 +1650,16 @@ class Render extends HasSettings
     svg.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
     svg.setAttribute 'version', '1.1'
     #svg.appendChild defs = @dom.createElementNS SVGNS, 'defs'
+
+    ## Preprocess callbacks, which may change anything about the Render job
+    @mappings.doPreprocess @
+
     ## <style> tags for CSS
     for style in @styles
       svg.appendChild styleTag = @dom.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
 
     ## Render all tiles in the drawing.
-    @mappings.doBeforeRender @
     missing = new Set
     errored = new Set
     @cache = new Map
@@ -1772,9 +1775,9 @@ class Render extends HasSettings
       y += rowHeight
       @yMax = Math.max @yMax, y
 
-    ## afterRender callbacks, which may use (and update) @width/@height
+    ## Postprocess callbacks, which may use (and update) @width/@height
     @updateSize()
-    @mappings.doAfterRender @
+    @mappings.doPostprocess @
 
     ## Background fill, now that size has settled
     if (@backgroundFill ?= @getSetting 'background')?
@@ -2062,7 +2065,7 @@ globalBackground = (fill) ->
   if currentRender?
     currentRender.background fill
   else if currentMapping?
-    beforeRender (render) -> render.background fill
+    preprocess (render) -> render.background fill
   else
     throw new SVGTilerError "svgtiler.background called outside of render of mapping context"
 
@@ -2404,7 +2407,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle, Styles,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper,
-  Render, getRender, runWithRender, beforeRender, afterRender,
+  Render, getRender, runWithRender, preprocess, postprocess,
   id: globalId, def: globalDef, background: globalBackground,
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,

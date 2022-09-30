@@ -24,9 +24,9 @@
   * Using `require` to load and modify external SVG files
     (strip off unnecessary `<svg>` wrapper)
   * JSX notation for creating and composing symbols
-  * `svgtiler.afterRender` for rendering a background white rectangle
+  * `svgtiler.background` for rendering a background white rectangle
 * [CoffeeScript file](graph.coffee) for rendering the graph of attacks,
-  illustrating more advanced `svgtiler.afterRender` usage.
+  illustrating more advanced `svgtiler.postprocess` usage.
 
 ## Piece Shapes
 

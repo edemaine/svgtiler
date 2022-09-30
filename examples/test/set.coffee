@@ -7,10 +7,10 @@ showRow = (row) ->
         '⎵'
   ).join ''
 
-svgtiler.beforeRender ->
+svgtiler.preprocess ->
   console.assert @drawing.keys.length == 1
   console.log 'Before substitution:', showRow @drawing.keys[0]
-svgtiler.afterRender ->
+svgtiler.postprocess ->
   console.assert @drawing.keys.length == 2
   console.log 'After substitution: ', showRow @drawing.keys[0]
   console.log '                    ', showRow @drawing.keys[1]

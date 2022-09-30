@@ -1,6 +1,6 @@
 palette = background = map = null
 
-svgtiler.beforeRender ->
+svgtiler.preprocess ->
   palette = share.palette ? 'overworld'
   console.log "Using Mario #{palette} palette"
 
