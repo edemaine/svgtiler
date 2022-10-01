@@ -334,6 +334,15 @@ The `Context` object has the following properties and methods:
 
 The top-level code of your .js or .coffee mapping file can also call:
 
+* `svgtiler.onInit(callback)` to schedule calling `callback()` whenever
+  this mapping file is listed on the command line (including right after
+  the mapping file is first loaded), and when state gets reset via a `)`
+  command-line argument.  Note that each mapping file gets loaded (`require`d)
+  as a NodeJS module, which happens only once, so if your file uses any
+  side effects (in particular, reading or writing to the `share` object
+  for communication with other mapping files), it's important to wrap that code
+  in `svgtiler.onInit`, so that SVG Tiler can correctly limit and restore
+  these side effects in the presense of parentheses on the command line.
 * `svgtiler.preprocess(callback)` to schedule calling `callback(render)`
   when preparing to rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.

@@ -1095,6 +1095,7 @@ class Mapping extends Input
   constructor: (data, opts) ->
     super data, {
       cache: new Map  # for static tiles
+      initQueue: []
       preprocessQueue: []
       postprocessQueue: []
       ...opts
@@ -1185,10 +1186,15 @@ class Mapping extends Input
     ## Save in cache if overall static.
     @cache.set key, value if isStatic
     value
+  onInit: (fn) ->
+    @initQueue.push fn
   preprocess: (fn) ->
     @preprocessQueue.push fn
   postprocess: (fn) ->
     @postprocessQueue.push fn
+  doInit: ->
+    for callback in @initQueue
+      callback()
   doPreprocess: (render) ->
     for callback in @preprocessQueue
       callback.call render, render
@@ -1196,6 +1202,10 @@ class Mapping extends Input
     for callback in @postprocessQueue
       callback.call render, render
 
+onInit = (fn) ->
+  unless currentMapping?
+    throw new SVGTilerError "svgtiler.onInit called outside mapping file"
+  currentMapping.onInit fn
 preprocess = (fn) ->
   unless currentMapping?
     throw new SVGTilerError "svgtiler.preprocess called outside mapping file"
@@ -1204,6 +1214,15 @@ postprocess = (fn) ->
   unless currentMapping?
     throw new SVGTilerError "svgtiler.postprocess called outside mapping file"
   currentMapping.postprocess fn
+
+## A fake Mapping file that just sets a `share` key when initialized.
+## (Used to implement -s/--share command-line option.)
+class ShareSetter
+  constructor: (key, value) ->
+    @key = key
+    @value = value
+  doInit: ->
+    globalShare[@key] = @value
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -2278,9 +2297,11 @@ inputRequire = (filename, settings = getSettings() ? defaultSettings, dirname) -
 
 main = (args = process.argv[2..]) ->
   files = skip = 0
+  inputCache = new Map  # maps filenames to previously loaded `Input`s
   formats = []
   settings = cloneSettings defaultSettings, true
-  stack = []  # {settings, share} objects for implementing parens
+  inits = []  # array of objects to call doInit() on
+  stack = []  # {settings, inits} objects for implementing parens
   for arg, i in args
     if skip
       skip--
@@ -2316,7 +2337,9 @@ main = (args = process.argv[2..]) ->
       when '-s', '--share'
         skip = 1
         [key, ...value] = args[i+1].split '='
-        globalShare[key] = value.join '='  # ignore later =s
+        inits.push setter =
+          new ShareSetter key, value.join '='  # ignore later =s
+        setter.doInit()
       when '-o', '--output'
         skip = 1
         settings.outputDir = args[i+1]
@@ -2360,24 +2383,35 @@ main = (args = process.argv[2..]) ->
       when '('
         stack.push
           settings: cloneSettings settings
-          share: {...globalShare}  # shallow copy
+          inits: [...inits]
       when ')'
+        oldInits = inits
         if stack.length
-          {settings, share} = stack.pop()
-          ## Restore globalShare without changing top-level object identity
-          delete globalShare[key] for key of globalShare
-          Object.assign globalShare, share
+          {settings, inits} = stack.pop()
         else
-          ## Unmatched ')': reset settings and share
-          settings = cloneSettings defaultSettings, true
-          delete globalShare[key] for key of globalShare
           console.warn "Unmatched ')'"
+          settings = cloneSettings defaultSettings, true
+          inits = []
+        ## Check whether inits list changed.  If so,
+        ## reset globalShare without changing top-level object identity,
+        ## and re-initialize all still-active mappings to restore side-effects.
+        unless inits.length == oldInits.length and
+               inits.every (init, i) -> init == oldInits[i] 
+          delete globalShare[key] for key of globalShare
+          init.doInit() for init in inits
       else
         files++
         console.log '*', arg
-        input = Input.recognize arg, undefined, settings
+        if inputCache.has arg
+          input = inputCache.get arg
+          input.settings = settings
+        else
+          input = Input.recognize arg, undefined, settings
+          inputCache.set arg, input
         if input instanceof Mapping
           settings.mappings.push input
+          inits.push input
+          input.doInit()
         else if input instanceof Style
           settings.styles.push input
         else if input instanceof Drawing or input instanceof Drawings
@@ -2405,7 +2439,7 @@ svgtiler = {
   Style, CSSStyle, StylusStyle, Styles,
   SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper,
-  Render, getRender, runWithRender, preprocess, postprocess,
+  Render, getRender, runWithRender, onInit, preprocess, postprocess,
   id: globalId, def: globalDef, background: globalBackground,
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,
