@@ -366,7 +366,8 @@ The top-level code of your .js or .coffee mapping file can also call:
   overall size of the rendered drawing.
 * `svgtiler.background(fillColor)` to set the default background color
   for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
-  Equivalent to
+  When used called more than once, only the final background color gets
+  rendered.  When used only once, equivalent to
   `svgtiler.postprocess((render) => render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>))`.
   You can also call `svgtiler.background` within a tile definition function or
   a `preprocess`/`postprocess` callback to set the background dynamically,
