@@ -7,8 +7,9 @@
 ( context.coffee context.asc )
 
 ( escape.txt escape.csv )
-
 ( css-escape.css css-escape.txt css-escape.asc )
+
+( glob.coffee )
 
 ( mapping.coffee mapping.ssv )
 ( mappings.coffee -O mappings mapping.ssv )

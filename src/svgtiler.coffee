@@ -2366,6 +2366,13 @@ glob = (pattern, options) ->
     pattern = pattern.replace /\\($|[^\*\+\?\!\|\@\(\)\[\]\{\}])/g, '/$1'
   require('glob').sync pattern, options
 
+match = (filename, pattern, options) ->
+  ## 'glob' library uses 'minimatch' to match filenames against glob patterns.
+  Boolean require('minimatch').match [filename], pattern, options
+
+filter = (filenames, pattern, options) ->
+  require('minimatch').match filenames, pattern, options
+
 loadMaketile = (settings = getSettings() ? defaultSettings) ->
   filenames = glob settings.maketile, nodir: true
   return unless filenames.length
@@ -2561,7 +2568,7 @@ svgtiler = {
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, convert, glob, require: inputRequire,
+  main, renderDOM, convert, glob, match, filter, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
   version: metadata.version
