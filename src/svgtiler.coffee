@@ -2378,12 +2378,12 @@ loadMaketile = (settings = getSettings() ? defaultSettings) ->
   return unless filenames.length
   inputRequire filenames.sort().pop(), settings
 
+inputCache = new Map  # maps filenames to previously loaded `Input`s
 main = (args = process.argv[2..]) ->
   showHelp = 'No filename arguments and no Maketile to run; showing --help'
   maketile = null
   ranMaketile = false
-  files = 0
-  inputCache = new Map  # maps filenames to previously loaded `Input`s
+  numFiles = 0
   formats = []
   settings = cloneSettings defaultSettings, true
   inits = []  # array of objects to call doInit() on
@@ -2391,7 +2391,7 @@ main = (args = process.argv[2..]) ->
   # `for arg, i in args` but allowing i to advance and args to get appended to
   i = 0
   loop
-    if i >= args.length and not files and not ranMaketile and
+    if i >= args.length and not numFiles and not ranMaketile and
        (maketile ?= loadMaketile settings)?
       ranMaketile = true
       if maketile instanceof Args
@@ -2504,28 +2504,35 @@ main = (args = process.argv[2..]) ->
           init.doInit() for init in inits
       else
         showHelp = false
-        unless (exists = inputCache.has arg)
+        exists = typeof arg != 'string' or inputCache.has arg
+        unless exists
           try
             exists = fs.statSync arg
         if exists
-          filenames = [arg]
+          files = [arg]
         else
-          filenames = glob arg
+          files = glob arg
         append = i+1  # where to append Args
-        for filename in filenames
-          files++
-          cached = inputCache.has filename
-          console.log '*', filename, if cached then '(cached)' else ''
-          if cached
-            input = inputCache.get filename
-            input.settings = settings
+        for file in files
+          numFiles++
+          if typeof file == 'string'
+            cached = inputCache.has file
+            console.log '*', file, if cached then '(cached)' else ''
+            if cached
+              input = inputCache.get file
+              input.settings = settings
+            else
+              input = Input.recognize file, undefined, settings
+              ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
+              ## the first load (top-level code run only during first `require`).
+              ## Don't cache drawing files, as we might have changed options like
+              ## `keepMargins` and `keepUneven` which affect parsing.
+              inputCache.set file, input if input instanceof Mapping
+          else if file? and typeof file == 'object'
+            console.log '*', file.constructor?.name, file.filename
           else
-            input = Input.recognize filename, undefined, settings
-            ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
-            ## the first load (top-level code run only during first `require`).
-            ## Don't cache drawing files, as we might have changed options like
-            ## `keepMargins` and `keepUneven` which affect parsing.
-            inputCache.set filename, input if input instanceof Mapping
+            input = file
+            continue  # skip boolean, number, null, undefined
           if input instanceof Mapping
             settings.mappings.push input
             inits.push input
@@ -2547,13 +2554,36 @@ main = (args = process.argv[2..]) ->
             args[append...append] = input.args
             append += input.args.length
           else
-            console.log "Unrecognized file '#{filename}' of type '#{input?.constructor?.name}'"
+            console.log "Unrecognized file '#{file}' of type '#{input?.constructor?.name}'"
     i++
   if showHelp
     console.log showHelp
     help()
 
-svgtiler = {
+run = (...protoArgs) ->
+  args = []
+  for arg in protoArgs
+    if typeof arg == 'string'
+      args.push ...(parseIntoArgs arg)
+    else if Array.isArray arg
+      args.push ...(arg.flat Infinity)
+    else  # Mapping, Style, etc.
+      args.push arg
+  console.log '> svgtiler', (
+    for arg in args
+      if typeof arg == 'string'
+        arg
+      else if arg?.constructor?.name?
+        if arg.filename?
+          "[#{arg.constructor.name} #{arg.filename}]"
+        else
+          "[#{arg.constructor.name}]"
+      else
+        "[#{typeof arg} #{arg}]"
+  ).join ' '
+  main args
+
+svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
   getMapping, runWithMapping, static: wrapStatic,
@@ -2568,7 +2598,8 @@ svgtiler = {
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, convert, glob, match, filter, require: inputRequire,
+  main, run, renderDOM, inputCache, convert,
+  glob, match, filter, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
   version: metadata.version
