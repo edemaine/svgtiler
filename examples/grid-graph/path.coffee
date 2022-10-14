@@ -1,4 +1,3 @@
-parity = (share.flipParity ? 0) * 2
 size = 10
 edgeColor = 'purple'
 edgeStroke = 4
@@ -7,6 +6,10 @@ arrowStroke = 2.5
 arrowSize = 2.5
 
 viewBox = "#{-size/2} #{-size/2} #{size} #{size}"
+
+parity = null
+svgtiler.onInit ->
+  parity = (share.flipParity ? 0) * 2
 
 blank = <symbol viewBox={viewBox} overflowBox="-5.5 -5.5 11 11"/>
 

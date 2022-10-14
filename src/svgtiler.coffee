@@ -2496,41 +2496,51 @@ main = (args = process.argv[2..]) ->
           delete globalShare[key] for key of globalShare
           init.doInit() for init in inits
       else
-        files++
         showHelp = false
-        cached = inputCache.has arg
-        console.log '*', arg, if cached then '(cached)' else ''
-        if cached
-          input = inputCache.get arg
-          input.settings = settings
+        unless (exists = inputCache.has arg)
+          try
+            exists = fs.statSync arg
+        if exists
+          filenames = [arg]
         else
-          input = Input.recognize arg, undefined, settings
-          ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
-          ## the first load (top-level code run only during first `require`).
-          ## Don't cache drawing files, as we might have changed options like
-          ## `keepMargins` and `keepUneven` which affect parsing.
-          inputCache.set arg, input if input instanceof Mapping
-        if input instanceof Mapping
-          settings.mappings.push input
-          inits.push input
-          input.doInit()
-        else if input instanceof Style
-          settings.styles.push input
-        else if input instanceof Drawing or input instanceof Drawings
-          filenames = input.render settings
-          ## Convert to any additional formats.  Even if SVG files didn't
-          ## change, we may not have done these conversions before or in the
-          ## last run of SVG Tiler, so let svgink compare mod times and decide.
-          convert filenames, formats, settings
-          ## Reset -O output filename stem override unless it uses `*`.
-          if settings.outputStem? and not settings.outputStem.includes '*'
-            settings.outputStem = null
-        else if input instanceof SVGFile
-          convert input.filename, formats, settings
-        else if input instanceof Args
-          args[i+1...i+1] = input.args
-        else
-          console.log "Unrecognized file '#{arg}' of type '#{input?.constructor?.name}'"
+          filenames = glob arg
+        append = i+1  # where to append Args
+        for filename in filenames
+          files++
+          cached = inputCache.has filename
+          console.log '*', filename, if cached then '(cached)' else ''
+          if cached
+            input = inputCache.get filename
+            input.settings = settings
+          else
+            input = Input.recognize filename, undefined, settings
+            ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
+            ## the first load (top-level code run only during first `require`).
+            ## Don't cache drawing files, as we might have changed options like
+            ## `keepMargins` and `keepUneven` which affect parsing.
+            inputCache.set filename, input if input instanceof Mapping
+          if input instanceof Mapping
+            settings.mappings.push input
+            inits.push input
+            input.doInit()
+          else if input instanceof Style
+            settings.styles.push input
+          else if input instanceof Drawing or input instanceof Drawings
+            svgs = input.render settings
+            ## Convert to any additional formats.  Even if SVG files didn't
+            ## change, we may not have done these conversions before or in the
+            ## last run of SVG Tiler, so let svgink compare mod times and decide.
+            convert svgs, formats, settings
+            ## Reset -O output filename stem override unless it uses `*`.
+            if settings.outputStem? and not settings.outputStem.includes '*'
+              settings.outputStem = null
+          else if input instanceof SVGFile
+            convert input.filename, formats, settings
+          else if input instanceof Args
+            args[append...append] = input.args
+            append += input.args.length
+          else
+            console.log "Unrecognized file '#{filename}' of type '#{input?.constructor?.name}'"
     i++
   if showHelp
     console.log showHelp

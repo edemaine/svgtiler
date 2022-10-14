@@ -1,1 +1,0 @@
-share.flipParity = 1
