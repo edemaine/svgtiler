@@ -1,4 +1,6 @@
-if (share.data == null)
-  console.log('Success!!');
-else
-  console.log('FAILURE!!');
+svgtiler.onInit(() => {
+  if (share.data == null)
+    console.log('Success!!');
+  else
+    console.log('FAILURE!!');
+});

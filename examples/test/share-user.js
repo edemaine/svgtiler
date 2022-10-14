@@ -1,1 +1,3 @@
-console.log(share.data);
+svgtiler.onInit(() => {
+  console.log(share.data);
+});

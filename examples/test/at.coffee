@@ -1,5 +1,7 @@
-keepUneven = svgtiler.getSettings().keepUneven
-console.log 'Testing with --uneven =', keepUneven
+keepUneven = null
+svgtiler.onInit ->
+  keepUneven = svgtiler.getSettings().keepUneven
+  console.log 'Testing with --uneven =', keepUneven
 
 ->
   console.assert undefined == @at(0, -4).key == @at(0, -5).key, 'row -1'

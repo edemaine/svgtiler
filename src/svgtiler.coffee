@@ -174,6 +174,8 @@ defaultSettings =
   useHref: window?
   ## Background rectangle fill color.
   background: null
+  ## Glob pattern for Maketiles.
+  maketile: '[mM]aketile.{args,coffee,js}'
   ## renderDOM-specific
   filename: 'drawing.asc'  # default filename when not otherwise specified
   keepParent: false
@@ -1006,9 +1008,10 @@ class Input extends HasSettings
     Meant to be used as `Input.recognize(...)` via top-level Input class,
     without specific subclass.
     ###
-    extension = extensionOf filename
-    if extensionMap.hasOwnProperty extension
+    if extensionMap.hasOwnProperty (extension = extensionOf filename)
       extensionMap[extension].parseFile filename, filedata, settings
+    #else if filenameMap.hasOwnProperty (lower = filename.toLowerCase())
+    #  filenameMap[lower].parseFile filename, filedata, settings
     else
       throw new SVGTilerError "Unrecognized extension in filename #{filename}"
   dependsOn: (@deps) ->
@@ -1083,6 +1086,59 @@ class ArrayWrapper extends Array
 class Styles extends ArrayWrapper
   @itemClass: Style
 
+parseIntoArgs = (text) ->
+  ## Parse string into an array of arguments, similar to shells.
+  re = ///
+    " (?: [^"\\] | \\. )* "  # double-quoted string
+  | ' [^']* '?               # single-quoted string: no escape processing
+  | \\.                      # escaped character
+  | \#.*                     # comment
+  | (\s+)                    # top-level whitespace separates args
+  | [^"'\\\#\s]+             # everything else
+  | .                        # for failed matches like "foo
+  ///g
+  args = []
+  arg = ''
+  while (match = re.exec text)?
+    chunk = match[0]
+    if match[1]  # whitespace
+      args.push arg if arg
+      arg = ''
+    else
+      switch chunk[0]
+        when '"'
+          ## Double-quoted strings escape all glob patterns, and
+          ## process argument-specific escapes processed,
+          ## leaving rest (e.g. `\*`) for glob processing.
+          chunk = chunk[1...-1]
+          .replace /\\(["'\-#])/g, '$1'
+          .replace /[\*\+\?\!\|\@\(\)\[\]\{\}]/g, '\\$&'
+        when "'"
+          ## Single-quoted strings escape all backslashes and glob patterns
+          ## so they will be treated literally (as in bash).
+          chunk = chunk[1...-1]
+          .replace /[\\\*\+\?\!\|\@\(\)\[\]\{\}]/g, '\\$&'
+        when '\\'
+          ## Process escaping specific to argument parsing,
+          ## leaving rest (e.g. `\*`) for glob processing.
+          chunk = chunk[1] if chunk[1] in ['"', "'", '-', '#']
+        when '#'
+          continue
+      arg += chunk
+  args.push arg if arg
+  args
+
+class Args extends Input
+  ###
+  Args list stores in `@args` an array of strings such as "-p" and
+  "filename.asc".  It's represented in a file as an ASCII file
+  that's parsed like a shell, allowing quoted strings, backslash escapes,
+  comments via `#`, and newlines treated like regular whitespace.
+  ###
+  @title: "Additional command-line arguments parsed like a shell"
+  parse: (text) ->
+    @args = parseIntoArgs text
+
 class Mapping extends Input
   ###
   Base Mapping class.
@@ -1108,6 +1164,8 @@ class Mapping extends Input
     if isPreact @map
       console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
       @map = null
+  isFunction: ->
+    typeof @map == 'function'
   lookup: (key, context) ->
     ## `key` normally should be a String (via `AutoDrawing::parse` coercion).
     ## Don't do anything if this is an empty mapping.
@@ -1193,14 +1251,17 @@ class Mapping extends Input
   postprocess: (fn) ->
     @postprocessQueue.push fn
   doInit: ->
-    for callback in @initQueue
-      callback()
+    runWithMapping @, =>
+      for callback in @initQueue
+        callback.call @, @
   doPreprocess: (render) ->
-    for callback in @preprocessQueue
-      callback.call render, render
+    runWithMapping @, =>
+      for callback in @preprocessQueue
+        callback.call render, render
   doPostprocess: (render) ->
-    for callback in @postprocessQueue
-      callback.call render, render
+    runWithMapping @, =>
+      for callback in @postprocessQueue
+        callback.call render, render
 
 onInit = (fn) ->
   unless currentMapping?
@@ -1920,7 +1981,7 @@ class Render extends HasSettings
     if relativeDir
       relativeDir += '/'
       ## TeX uses forward slashes for path separators
-      if require('process').platform == 'win32'
+      if process.platform == 'win32'
         relativeDir = relativeDir.replace /\\/g, '/'
     ## LaTeX based loosely on Inkscape's PDF/EPS/PS + LaTeX output extension.
     ## See http://tug.ctan.org/tex-archive/info/svg-inkscape/
@@ -2158,6 +2219,9 @@ extensionMap =
   '.styl': StylusStyle
   # Other
   '.svg': SVGFile
+  '.args': Args
+#filenameMap =
+#  'maketile': Args
 
 renderDOM = (elts, settings) ->
   if typeof elts == 'string'
@@ -2295,20 +2359,52 @@ inputRequire = (filename, settings = getSettings() ? defaultSettings, dirname) -
   filename = path.join dirname, filename if dirname?
   Input.recognize filename, undefined, settings
 
+glob = (pattern, options) ->
+  ## Support backslash in Windows path as long as not meaningful escape.
+  ## [code from svgink]
+  if process.platform == 'win32'
+    pattern = pattern.replace /\\($|[^\*\+\?\!\|\@\(\)\[\]\{\}])/g, '/$1'
+  require('glob').sync pattern, options
+
+loadMaketile = (settings = getSettings() ? defaultSettings) ->
+  filenames = glob settings.maketile, nodir: true
+  return unless filenames.length
+  inputRequire filenames.sort().pop(), settings
+
 main = (args = process.argv[2..]) ->
-  files = skip = 0
+  showHelp = 'No filename arguments and no Maketile to run; showing --help'
+  maketile = null
+  ranMaketile = false
+  files = 0
   inputCache = new Map  # maps filenames to previously loaded `Input`s
   formats = []
   settings = cloneSettings defaultSettings, true
   inits = []  # array of objects to call doInit() on
   stack = []  # {settings, inits} objects for implementing parens
-  for arg, i in args
-    if skip
-      skip--
-      continue
-    switch arg
+  # `for arg, i in args` but allowing i to advance and args to get appended to
+  i = 0
+  loop
+    if i >= args.length and not files and not ranMaketile and
+       (maketile ?= loadMaketile settings)?
+      ranMaketile = true
+      if maketile instanceof Args
+        showHelp = "No filename arguments on command line or in '#{maketile.filename}'"
+        args.push ...maketile.args
+      else if maketile instanceof Mapping
+        showHelp = false
+        maketile.doInit()
+        if maketile.isFunction()
+          maketile.map()
+        else
+          console.log "Maketile '#{maketile.filename}' did not `export default` a function"
+      else
+        showHelp = false
+        console.log "Unrecognized Maketile '#{maketile.filename}' of type '#{maketile?.constructor?.name}'"
+    break if i >= args.length
+    switch (arg = args[i])
       when '-h', '--help'
         help()
+        return
       when '-f', '--force'
         settings.force = true
       when '-m', '--margin'
@@ -2318,49 +2414,49 @@ main = (args = process.argv[2..]) ->
       when '--hidden'
         settings.keepHidden = true
       when '--tw', '--tile-width'
-        skip = 1
-        arg = parseFloat args[i+1]
-        if arg
+        i++
+        arg = parseFloat args[i]
+        if arg?
           settings.forceWidth = arg
         else
-          console.warn "Invalid argument to --tile-width: #{args[i+1]}"
+          console.warn "Invalid argument to --tile-width: #{args[i]}"
       when '--th', '--tile-height'
-        skip = 1
-        arg = parseFloat args[i+1]
-        if arg
+        i++
+        arg = parseFloat args[i]
+        if arg?
           settings.forceHeight = arg
         else
-          console.warn "Invalid argument to --tile-height: #{args[i+1]}"
+          console.warn "Invalid argument to --tile-height: #{args[i]}"
       when '--bg', '--background'
-        skip = 1
-        settings.background = args[i+1]
+        i++
+        settings.background = args[i]
       when '-s', '--share'
-        skip = 1
-        [key, ...value] = args[i+1].split '='
+        i++
+        [key, ...value] = args[i].split '='
         inits.push setter =
           new ShareSetter key, value.join '='  # ignore later =s
         setter.doInit()
       when '-o', '--output'
-        skip = 1
-        settings.outputDir = args[i+1]
+        i++
+        settings.outputDir = args[i]
       when '-O', '--output-stem'
-        skip = 1
-        settings.outputStem = args[i+1]
+        i++
+        settings.outputStem = args[i]
       when '--os', '--output-svg'
-        skip = 1
-        settings.outputDirExt['.svg'] = args[i+1]
+        i++
+        settings.outputDirExt['.svg'] = args[i]
       when '--op', '--output-pdf'
-        skip = 1
-        settings.outputDirExt['.pdf'] = args[i+1]
+        i++
+        settings.outputDirExt['.pdf'] = args[i]
       when '--oP', '--output-png'
-        skip = 1
-        settings.outputDirExt['.png'] = args[i+1]
+        i++
+        settings.outputDirExt['.png'] = args[i]
       when '--ot', '--output-tex'
-        skip = 1
-        settings.outputDirExt['.svg_tex'] = args[i+1]
+        i++
+        settings.outputDirExt['.svg_tex'] = args[i]
       when '-i', '--inkscape'
-        skip = 1
-        settings.inkscape = args[i+1]
+        i++
+        settings.inkscape = args[i]
       when '-p', '--pdf'
         formats.push 'pdf'
       when '-P', '--png'
@@ -2374,12 +2470,12 @@ main = (args = process.argv[2..]) ->
       when '--no-inline'
         settings.inlineImages = false
       when '-j', '--jobs'
-        skip = 1
-        arg = parseInt args[i+1], 10
+        i++
+        arg = parseInt args[i], 10
         if arg
           settings.jobs = arg
         else
-          console.warn "Invalid argument to --jobs: #{args[i+1]}"
+          console.warn "Invalid argument to --jobs: #{args[i]}"
       when '('
         stack.push
           settings: cloneSettings settings
@@ -2401,13 +2497,19 @@ main = (args = process.argv[2..]) ->
           init.doInit() for init in inits
       else
         files++
-        console.log '*', arg
-        if inputCache.has arg
+        showHelp = false
+        cached = inputCache.has arg
+        console.log '*', arg, if cached then '(cached)' else ''
+        if cached
           input = inputCache.get arg
           input.settings = settings
         else
           input = Input.recognize arg, undefined, settings
-          inputCache.set arg, input
+          ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
+          ## the first load (top-level code run only during first `require`).
+          ## Don't cache drawing files, as we might have changed options like
+          ## `keepMargins` and `keepUneven` which affect parsing.
+          inputCache.set arg, input if input instanceof Mapping
         if input instanceof Mapping
           settings.mappings.push input
           inits.push input
@@ -2425,8 +2527,13 @@ main = (args = process.argv[2..]) ->
             settings.outputStem = null
         else if input instanceof SVGFile
           convert input.filename, formats, settings
-  unless files
-    console.log 'Not enough filename arguments'
+        else if input instanceof Args
+          args[i+1...i+1] = input.args
+        else
+          console.log "Unrecognized file '#{arg}' of type '#{input?.constructor?.name}'"
+    i++
+  if showHelp
+    console.log showHelp
     help()
 
 svgtiler = {
@@ -2437,14 +2544,14 @@ svgtiler = {
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle, Styles,
-  SVGFile,
+  Args, SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper,
   Render, getRender, runWithRender, onInit, preprocess, postprocess,
   id: globalId, def: globalDef, background: globalBackground,
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, renderDOM, convert, require: inputRequire,
+  main, renderDOM, convert, glob, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
   version: metadata.version
@@ -2463,7 +2570,7 @@ if module? and require?.main == module and not window?
   ]
   paths.push process.env.NODE_PATH if process.env.NODE_PATH
   process.env.NODE_PATH = paths.join (
-    if require('process').platform == 'win32'
+    if process.platform == 'win32'
       ';'
     else
       ':'

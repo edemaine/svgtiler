@@ -1,0 +1,20 @@
+-f  # force rebuild
+
+## Run 'at' example with and without --uneven option
+( at.coffee at.asc )
+( '--uneven' at.coffee at.asc )  # ''s just to test that ''s work
+
+( context.coffee context.asc )
+
+( escape.txt escape.csv )
+
+( css-escape.css css-escape.txt css-escape.asc )
+
+( mapping.coffee mapping.ssv )
+( mappings.coffee -O mappings mapping.ssv )
+
+( set.coffee set.asc )
+
+## Test )'s ability to reset share object
+( ( share-provider.js share-user.js ) share-undefined.js )
+( ( -s data=Success! share-user.js ) share-undefined.js )
