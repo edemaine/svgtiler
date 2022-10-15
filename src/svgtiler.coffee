@@ -2385,7 +2385,7 @@ main = (args = process.argv[2..]) ->
   showHelp = 'No filename arguments and no Maketile to run; showing --help'
   maketile = null
   ranMaketile = false
-  numFiles = 0
+  numFileArgs = 0
   formats = []
   settings = cloneSettings defaultSettings, true
   inits = []  # array of objects to call doInit() on
@@ -2395,7 +2395,7 @@ main = (args = process.argv[2..]) ->
   loop
     ## Automatically run Maketile if we're out of arguments
     ## and haven't processed any files yet.
-    if i >= args.length and not numFiles and not ranMaketile and
+    if i >= args.length and not numFileArgs and not ranMaketile and
        (maketile ?= loadMaketile settings)?
       ranMaketile = true
       if maketile instanceof Args
@@ -2516,17 +2516,27 @@ main = (args = process.argv[2..]) ->
           init.doInit() for init in inits
       else
         showHelp = false
+        numFileArgs++
+        ## If argument is not a string (e.g. Mapping or Style),
+        ## or is a string that corresponds to an existing filename.
+        ## process it directly.
         exists = typeof arg != 'string' or inputCache.has arg
         unless exists
           try
             exists = fs.statSync arg
         if exists
           files = [arg]
+        ## Otherwise, try matching as a glob pattern.
+        else if (files = glob arg).length
+        ## Otherwise, check for a matching rule in the Maketile.
         else
-          files = glob arg
+          maketile ?= loadMaketile settings
+          if maketile?.module.hasOwnProperty arg
+            maketile.module[arg]()
+          else
+            console.warn "No files or Maketile rules match '#{arg}'"
         append = i+1  # where to append Args
         for file in files
-          numFiles++
           if typeof file == 'string'
             cached = inputCache.has file
             console.log '*', file, if cached then '(cached)' else ''
