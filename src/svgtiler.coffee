@@ -2378,6 +2378,8 @@ loadMaketile = (settings = getSettings() ? defaultSettings) ->
   return unless filenames.length
   inputRequire filenames.sort().pop(), settings
 
+dashArgRegExp = /^-([a-zA-Z]{2,})$/
+
 inputCache = new Map  # maps filenames to previously loaded `Input`s
 main = (args = process.argv[2..]) ->
   showHelp = 'No filename arguments and no Maketile to run; showing --help'
@@ -2391,6 +2393,8 @@ main = (args = process.argv[2..]) ->
   # `for arg, i in args` but allowing i to advance and args to get appended to
   i = 0
   loop
+    ## Automatically run Maketile if we're out of arguments
+    ## and haven't processed any files yet.
     if i >= args.length and not numFiles and not ranMaketile and
        (maketile ?= loadMaketile settings)?
       ranMaketile = true
@@ -2408,6 +2412,14 @@ main = (args = process.argv[2..]) ->
         showHelp = false
         console.log "Unrecognized Maketile '#{maketile.filename}' of type '#{maketile?.constructor?.name}'"
     break if i >= args.length
+
+    ## Split up single-dash arguments with multiple options like -pP
+    if (match = args[i].match dashArgRegExp)?
+      args[i..i] =
+        for char in match[1]
+          "-#{char}"
+
+    ## Main argument handling
     switch (arg = args[i])
       when '-h', '--help'
         help()
