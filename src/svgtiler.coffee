@@ -147,6 +147,8 @@ defaultSettings =
   ## Don't make all rows have the same number of columns by padding with
   ## empty strings.
   keepUneven: false
+  ## Array of conversion formats such as 'pdf' or 'pdf'.
+  formats: null
   ## Override for output file's stem (basename without extension).
   ## Can use `*` to refer to input file's stem, to add prefix or suffix.
   outputStem: null
@@ -186,6 +188,10 @@ defaultSettings =
 
 cloneSettings = (settings, addArrays) ->
   settings = {...settings}
+  if settings.formats?
+    settings.formats = [...settings.formats]
+  else if addArrays
+    settings.formats = []
   if settings.mappings?
     settings.mappings = new Mappings settings.mappings
   else if addArrays
@@ -512,6 +518,7 @@ removeSVGComments = (svg) ->
 
 currentMapping = null
 currentRender = null
+currentDriver = null
 currentContext = null
 
 getMapping = ->
@@ -529,8 +536,7 @@ runWithMapping = (mapping, fn) ->
     currentMapping = oldMapping
 
 getRender = ->
-  ## Returns current `Mapping` object,
-  ## when used at top level of a JS/CS mapping file.
+  ## Returns current `Render` object, when used within its execution.
   currentRender
 runWithRender = (render, fn) ->
   ## Runs the specified function `fn` as if it were called
@@ -541,6 +547,19 @@ runWithRender = (render, fn) ->
     fn()
   finally
     currentRender = oldRender
+
+getDriver = ->
+  ## Returns current `Driver` object, when used within its execution.
+  currentDriver
+runWithDriver = (driver, fn) ->
+  ## Runs the specified function `fn` as if it were called
+  ## from the specified `driver`.
+  oldDriver = currentDriver
+  currentDriver = driver
+  try
+    fn()
+  finally
+    currentDriver = oldDriver
 
 getContext = ->
   ## Returns current `Context` object, when used within a mapping function.
@@ -568,9 +587,11 @@ getContextString = ->
 
 getSettings = ->
   ###
-  Returns currently active `Settings` object, if any, from the current Render
-  process (which includes the case of an active Context) or the current Mapping.
-  Returns `null` if neither is currently active.
+  Returns currently active `Settings` object, if any, from
+  * the current Render process (which includes the case of an active Context),
+  * the current Mapping file,
+  * the current Driver process, or
+  * `defaultSettings` if none of the above are currently active.
   ###
   #if currentContext?
   #  currentContext.render.settings
@@ -578,8 +599,10 @@ getSettings = ->
     currentRender.settings
   else if currentMapping?
     currentMapping.settings
+  else if currentDriver?
+    currentDriver.settings
   else
-    null
+    defaultSettings
 
 ## SVG container element tags from
 ## https://developer.mozilla.org/en-US/docs/Web/SVG/Element#container_elements
@@ -1683,8 +1706,7 @@ class Render extends HasSettings
       @cache.set def.value, def
     found
   def: (content) ->
-    content = new SVGContent getContextString(), content,
-      getSettings() ? @settings
+    content = new SVGContent getContextString(), content, @settings
     if (found = @cacheLookup content)?
       found
     else
@@ -2332,8 +2354,8 @@ TILE specifiers:  (omit the quotes in anything except .js and .coffee files)
   process.exit()
 
 processor = null
-convert = (filenames, formats, settings) ->
-  return unless formats.length
+convert = (filenames, settings) ->
+  return unless settings.formats.length
   unless processor?
     svgink = require 'svgink'
     settings = {...svgink.defaultSettings, ...settings}
@@ -2351,11 +2373,11 @@ convert = (filenames, formats, settings) ->
       console.log error
   if Array.isArray filenames
     for filename in filenames
-      processor.convertTo filename, formats
+      processor.convertTo filename, settings.formats
   else
-    processor.convertTo filenames, formats
+    processor.convertTo filenames, settings.formats
 
-inputRequire = (filename, settings = getSettings() ? defaultSettings, dirname) ->
+inputRequire = (filename, settings = getSettings(), dirname) ->
   filename = path.join dirname, filename if dirname?
   Input.recognize filename, undefined, settings
 
@@ -2373,237 +2395,247 @@ match = (filename, pattern, options) ->
 filter = (filenames, pattern, options) ->
   require('minimatch').match filenames, pattern, options
 
-loadMaketile = (settings = getSettings() ? defaultSettings) ->
-  filenames = glob settings.maketile, nodir: true
-  return unless filenames.length
-  inputRequire filenames.sort().pop(), settings
-
 dashArgRegExp = /^-([a-zA-Z]{2,})$/
 
 inputCache = new Map  # maps filenames to previously loaded `Input`s
-main = (args = process.argv[2..]) ->
-  showHelp = 'No filename arguments and no Maketile to run; showing --help'
-  maketile = null
-  ranMaketile = false
-  numFileArgs = 0
-  formats = []
-  settings = cloneSettings defaultSettings, true
-  inits = []  # array of objects to call doInit() on
-  stack = []  # {settings, inits} objects for implementing parens
-  # `for arg, i in args` but allowing i to advance and args to get appended to
-  i = 0
-  loop
-    ## Automatically run Maketile if we're out of arguments
-    ## and haven't processed any files yet.
-    if i >= args.length and not numFileArgs and not ranMaketile and
-       (maketile ?= loadMaketile settings)?
-      ranMaketile = true
-      if maketile instanceof Args
-        showHelp = "No filename arguments on command line or in '#{maketile.filename}'"
-        args.push ...maketile.args
-      else if maketile instanceof Mapping
-        showHelp = false
-        maketile.doInit()
-        if maketile.isFunction()
-          maketile.map()
-        else
-          console.log "Maketile '#{maketile.filename}' did not `export default` a function"
-      else
-        showHelp = false
-        console.log "Unrecognized Maketile '#{maketile.filename}' of type '#{maketile?.constructor?.name}'"
-    break if i >= args.length
 
-    ## Split up single-dash arguments with multiple options like -pP
-    if (match = args[i].match dashArgRegExp)?
-      args[i..i] =
-        for char in match[1]
-          "-#{char}"
-
-    ## Main argument handling
-    switch (arg = args[i])
-      when '-h', '--help'
-        help()
-        return
-      when '-f', '--force'
-        settings.force = true
-      when '-m', '--margin'
-        settings.keepMargins = true
-      when '--uneven'
-        settings.keepUneven = true
-      when '--hidden'
-        settings.keepHidden = true
-      when '--tw', '--tile-width'
-        i++
-        arg = parseFloat args[i]
-        if arg?
-          settings.forceWidth = arg
-        else
-          console.warn "Invalid argument to --tile-width: #{args[i]}"
-      when '--th', '--tile-height'
-        i++
-        arg = parseFloat args[i]
-        if arg?
-          settings.forceHeight = arg
-        else
-          console.warn "Invalid argument to --tile-height: #{args[i]}"
-      when '--bg', '--background'
-        i++
-        settings.background = args[i]
-      when '-s', '--share'
-        i++
-        [key, ...value] = args[i].split '='
-        inits.push setter =
-          new ShareSetter key, value.join '='  # ignore later =s
-        setter.doInit()
-      when '-o', '--output'
-        i++
-        settings.outputDir = args[i]
-      when '-O', '--output-stem'
-        i++
-        settings.outputStem = args[i]
-      when '--os', '--output-svg'
-        i++
-        settings.outputDirExt['.svg'] = args[i]
-      when '--op', '--output-pdf'
-        i++
-        settings.outputDirExt['.pdf'] = args[i]
-      when '--oP', '--output-png'
-        i++
-        settings.outputDirExt['.png'] = args[i]
-      when '--ot', '--output-tex'
-        i++
-        settings.outputDirExt['.svg_tex'] = args[i]
-      when '-i', '--inkscape'
-        i++
-        settings.inkscape = args[i]
-      when '-p', '--pdf'
-        formats.push 'pdf'
-      when '-P', '--png'
-        formats.push 'png'
-      when '-t', '--tex'
-        settings.texText = true
-      when '--no-sanitize'
-        settings.sanitize = false
-      when '--no-overflow'
-        settings.overflowDefault = null  # no default
-      when '--no-inline'
-        settings.inlineImages = false
-      when '-j', '--jobs'
-        i++
-        arg = parseInt args[i], 10
-        if arg
-          settings.jobs = arg
-        else
-          console.warn "Invalid argument to --jobs: #{args[i]}"
-      when '('
-        stack.push
-          settings: cloneSettings settings
-          inits: [...inits]
-      when ')'
-        oldInits = inits
-        if stack.length
-          {settings, inits} = stack.pop()
-        else
-          console.warn "Unmatched ')'"
-          settings = cloneSettings defaultSettings, true
-          inits = []
-        ## Check whether inits list changed.  If so,
-        ## reset globalShare without changing top-level object identity,
-        ## and re-initialize all still-active mappings to restore side-effects.
-        unless inits.length == oldInits.length and
-               inits.every (init, i) -> init == oldInits[i] 
-          delete globalShare[key] for key of globalShare
-          init.doInit() for init in inits
+class Driver extends HasSettings
+  constructor: (@parent = getDriver()) ->
+    super()
+    @resetSettings()
+  resetSettings: ->
+    @settings = cloneSettings @parent?.settings ? defaultSettings, true
+  loadMaketile: ->
+    return @maketile unless @maketile == undefined
+    filenames = glob @settings.maketile, nodir: true
+    @maketile =
+      if filenames.length
+        inputRequire filenames.sort().pop(), @settings
       else
-        showHelp = false
-        numFileArgs++
-        ## If argument is not a string (e.g. Mapping or Style),
-        ## or is a string that corresponds to an existing filename.
-        ## process it directly.
-        exists = typeof arg != 'string' or inputCache.has arg
-        unless exists
-          try
-            exists = fs.statSync arg
-        if exists
-          files = [arg]
-        ## Otherwise, try matching as a glob pattern.
-        else if (files = glob arg).length
-        ## Otherwise, check for a matching rule in the Maketile.
-        else
-          maketile ?= loadMaketile settings
-          if maketile?.module.hasOwnProperty arg
-            maketile.module[arg]()
+        null
+  main: (args = process.argv[2..]) -> runWithDriver @, =>
+    showHelp = 'No filename arguments and no Maketile to run; showing --help'
+    ranMaketile = false
+    numFileArgs = 0
+    inits = []  # array of objects to call doInit() on
+    stack = []  # {settings, inits} objects for implementing parens
+    # `for arg, i in args` but allowing i to advance and args to get appended to
+    i = 0
+    loop
+      ## Automatically run Maketile if we're out of arguments
+      ## and haven't processed any files yet.
+      if i >= args.length and not numFileArgs and not ranMaketile and
+         @loadMaketile()?
+        ranMaketile = true
+        if @maketile instanceof Args
+          showHelp = "No filename arguments on command line or in '#{@maketile.filename}'"
+          args.push ...@maketile.args
+        else if @maketile instanceof Mapping
+          showHelp = false
+          @maketile.doInit()
+          if @maketile.isFunction()
+            @maketile.map()
           else
-            console.warn "No files or Maketile rules match '#{arg}'"
-        append = i+1  # where to append Args
-        for file in files
-          if typeof file == 'string'
-            cached = inputCache.has file
-            console.log '*', file, if cached then '(cached)' else ''
-            if cached
-              input = inputCache.get file
-              input.settings = settings
+            console.log "Maketile '#{@maketile.filename}' did not `export default` a function"
+        else
+          showHelp = false
+          console.log "Unrecognized Maketile '#{@maketile.filename}' of type '#{@maketile.constructor?.name}'"
+      break if i >= args.length
+
+      ## Split up single-dash arguments with multiple options like -pP
+      if (match = args[i].match dashArgRegExp)?
+        args[i..i] =
+          for char in match[1]
+            "-#{char}"
+
+      ## Main argument handling
+      switch (arg = args[i])
+        when '-h', '--help'
+          help()
+          return
+        when '-f', '--force'
+          @settings.force = true
+        when '-m', '--margin'
+          @settings.keepMargins = true
+        when '--uneven'
+          @settings.keepUneven = true
+        when '--hidden'
+          @settings.keepHidden = true
+        when '--tw', '--tile-width'
+          i++
+          arg = parseFloat args[i]
+          if arg?
+            @settings.forceWidth = arg
+          else
+            console.warn "Invalid argument to --tile-width: #{args[i]}"
+        when '--th', '--tile-height'
+          i++
+          arg = parseFloat args[i]
+          if arg?
+            @settings.forceHeight = arg
+          else
+            console.warn "Invalid argument to --tile-height: #{args[i]}"
+        when '--bg', '--background'
+          i++
+          @settings.background = args[i]
+        when '-s', '--share'
+          i++
+          [key, ...value] = args[i].split '='
+          inits.push setter =
+            new ShareSetter key, value.join '='  # ignore later =s
+          setter.doInit()
+        when '-o', '--output'
+          i++
+          @settings.outputDir = args[i]
+        when '-O', '--output-stem'
+          i++
+          @settings.outputStem = args[i]
+        when '--os', '--output-svg'
+          i++
+          @settings.outputDirExt['.svg'] = args[i]
+        when '--op', '--output-pdf'
+          i++
+          @settings.outputDirExt['.pdf'] = args[i]
+        when '--oP', '--output-png'
+          i++
+          @settings.outputDirExt['.png'] = args[i]
+        when '--ot', '--output-tex'
+          i++
+          @settings.outputDirExt['.svg_tex'] = args[i]
+        when '-i', '--inkscape'
+          i++
+          @settings.inkscape = args[i]
+        when '-p', '--pdf'
+          @settings.formats.push 'pdf'
+        when '-P', '--png'
+          @settings.formats.push 'png'
+        when '-t', '--tex'
+          @settings.texText = true
+        when '--no-sanitize'
+          @settings.sanitize = false
+        when '--no-overflow'
+          @settings.overflowDefault = null  # no default
+        when '--no-inline'
+          @settings.inlineImages = false
+        when '-j', '--jobs'
+          i++
+          arg = parseInt args[i], 10
+          if arg
+            @settings.jobs = arg
+          else
+            console.warn "Invalid argument to --jobs: #{args[i]}"
+        when '('
+          stack.push
+            settings: cloneSettings @settings
+            inits: [...inits]
+        when ')'
+          oldInits = inits
+          if stack.length
+            {settings: @settings, inits} = stack.pop()
+          else
+            console.warn "Unmatched ')'"
+            @resetSettings()
+            inits = []
+          ## Check whether inits list changed.  If so,
+          ## reset globalShare without changing top-level object identity,
+          ## and re-initialize all still-active mappings to restore side-effects.
+          unless inits.length == oldInits.length and
+                inits.every (init, i) -> init == oldInits[i] 
+            delete globalShare[key] for key of globalShare
+            init.doInit() for init in inits
+        else
+          showHelp = false
+          numFileArgs++
+          ## If argument is not a string (e.g. Mapping or Style),
+          ## or is a string that corresponds to an existing filename.
+          ## process it directly.
+          exists = typeof arg != 'string' or inputCache.has arg
+          unless exists
+            try
+              exists = fs.statSync arg
+          if exists
+            files = [arg]
+          ## Otherwise, try matching as a glob pattern.
+          else if (files = glob arg).length
+          ## Otherwise, check for a matching rule in the Maketile.
+          else
+            if @loadMaketile()?.module?.hasOwnProperty arg
+              @maketile.doInit()
+              @maketile.module[arg]()
             else
-              input = Input.recognize file, undefined, settings
-              ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
-              ## the first load (top-level code run only during first `require`).
-              ## Don't cache drawing files, as we might have changed options like
-              ## `keepMargins` and `keepUneven` which affect parsing.
-              inputCache.set file, input if input instanceof Mapping
-          else if file? and typeof file == 'object'
-            console.log '*', file.constructor?.name, file.filename
-          else
-            input = file
-            continue  # skip boolean, number, null, undefined
-          if input instanceof Mapping
-            settings.mappings.push input
-            inits.push input
-            input.doInit()
-          else if input instanceof Style
-            settings.styles.push input
-          else if input instanceof Drawing or input instanceof Drawings
-            svgs = input.render settings
-            ## Convert to any additional formats.  Even if SVG files didn't
-            ## change, we may not have done these conversions before or in the
-            ## last run of SVG Tiler, so let svgink compare mod times and decide.
-            convert svgs, formats, settings
-            ## Reset -O output filename stem override unless it uses `*`.
-            if settings.outputStem? and not settings.outputStem.includes '*'
-              settings.outputStem = null
-          else if input instanceof SVGFile
-            convert input.filename, formats, settings
-          else if input instanceof Args
-            args[append...append] = input.args
-            append += input.args.length
-          else
-            console.log "Unrecognized file '#{file}' of type '#{input?.constructor?.name}'"
-    i++
-  if showHelp
-    console.log showHelp
-    help()
+              console.warn "No files or Maketile rules match '#{arg}'"
+          append = i+1  # where to append Args
+          for file in files
+            if typeof file == 'string'
+              cached = inputCache.has file
+              console.log '*', file, if cached then '(cached)' else ''
+              if cached
+                input = inputCache.get file
+                input.settings = @settings
+              else
+                input = Input.recognize file, undefined, @settings
+                ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
+                ## the first load (top-level code run only during first `require`).
+                ## Don't cache drawing files, as we might have changed options like
+                ## `keepMargins` and `keepUneven` which affect parsing.
+                inputCache.set file, input if input instanceof Mapping
+            else if file? and typeof file == 'object'
+              console.log '*', file.constructor?.name, file.filename
+            else
+              input = file
+              continue  # skip boolean, number, null, undefined
+            if input instanceof Mapping
+              @settings.mappings.push input
+              inits.push input
+              input.doInit()
+            else if input instanceof Style
+              @settings.styles.push input
+            else if input instanceof Drawing or input instanceof Drawings
+              svgs = input.render @settings
+              ## Convert to any additional formats.  Even if SVG files didn't
+              ## change, we may not have done these conversions before or in the
+              ## last run of SVG Tiler, so let svgink compare mod times and decide.
+              convert svgs, @settings
+              ## Reset -O output filename stem override unless it uses `*`.
+              if @settings.outputStem? and not @settings.outputStem.includes '*'
+                @settings.outputStem = null
+            else if input instanceof SVGFile
+              convert input.filename, @settings
+            else if input instanceof Args
+              args[append...append] = input.args
+              append += input.args.length
+            else
+              console.log "Unrecognized file '#{file}' of type '#{input?.constructor?.name}'"
+      i++
+    if showHelp
+      console.log showHelp
+      help()
 
-run = (...protoArgs) ->
-  args = []
-  for arg in protoArgs
-    if typeof arg == 'string'
-      args.push ...(parseIntoArgs arg)
-    else if Array.isArray arg
-      args.push ...(arg.flat Infinity)
-    else  # Mapping, Style, etc.
-      args.push arg
-  console.log '> svgtiler', (
-    for arg in args
+  run: (...protoArgs) ->
+    args = []
+    for arg in protoArgs
       if typeof arg == 'string'
-        arg
-      else if arg?.constructor?.name?
-        if arg.filename?
-          "[#{arg.constructor.name} #{arg.filename}]"
+        args.push ...(parseIntoArgs arg)
+      else if Array.isArray arg
+        args.push ...(arg.flat Infinity)
+      else  # Mapping, Style, etc.
+        args.push arg
+    console.log '> svgtiler', (
+      for arg in args
+        if typeof arg == 'string'
+          arg
+        else if arg?.constructor?.name?
+          if arg.filename?
+            "[#{arg.constructor.name} #{arg.filename}]"
+          else
+            "[#{arg.constructor.name}]"
         else
-          "[#{arg.constructor.name}]"
-      else
-        "[#{typeof arg} #{arg}]"
-  ).join ' '
-  main args
+          "[#{typeof arg} #{arg}]"
+    ).join ' '
+    @main args
+
+main = (args...) -> new Driver().main args...
+run = (args...) -> new Driver().run args...
 
 svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
@@ -2620,7 +2652,8 @@ svgtiler = Object.assign run, {
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,
   SVGTilerError, SVGNS, XLINKNS, escapeId,
-  main, run, renderDOM, inputCache, convert,
+  Driver, main, run, convert, inputCache,
+  renderDOM,
   glob, match, filter, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
