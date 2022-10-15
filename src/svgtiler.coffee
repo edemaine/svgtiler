@@ -2414,7 +2414,7 @@ class Driver extends HasSettings
       else
         null
   main: (args = process.argv[2..]) -> runWithDriver @, =>
-    showHelp = 'No filename arguments and no Maketile to run; showing --help'
+    showHelp = 'No filename arguments and no Maketile to run. Try `svgtiler --help`'
     ranMaketile = false
     numFileArgs = 0
     inits = []  # array of objects to call doInit() on
@@ -2567,18 +2567,38 @@ class Driver extends HasSettings
           append = i+1  # where to append Args
           for file in files
             if typeof file == 'string'
-              cached = inputCache.has file
-              console.log '*', file, if cached then '(cached)' else ''
-              if cached
+              ## Check for input already in cache (e.g. already loaded Mapping)
+              if inputCache.has file
+                console.log '*', file, '(cached)'
                 input = inputCache.get file
                 input.settings = @settings
               else
-                input = Input.recognize file, undefined, @settings
-                ## Cache Mapping files, as we only capture `onInit` etc. callbacks on
-                ## the first load (top-level code run only during first `require`).
-                ## Don't cache drawing files, as we might have changed options like
-                ## `keepMargins` and `keepUneven` which affect parsing.
-                inputCache.set file, input if input instanceof Mapping
+                ## Check for directory
+                if exists instanceof fs.Stats
+                  stat = exists
+                else
+                  try
+                    stat = fs.statSync file
+                if stat?.isDirectory()
+                  ## Recursively run svgtiler within directory
+                  console.log '**', file, '(directory)'
+                  oldDir = process.cwd()
+                  process.chdir file
+                  (new Driver @).main []
+                  process.chdir oldDir
+                  console.log '..', file, '(end of directory)'
+                  continue
+                else
+                  ## Regular file
+                  input = inputRequire file, @settings
+                  ###
+                  Cache Mapping files, as we only capture `onInit` etc.
+                  callbacks on the first load (top-level code run only
+                  during first `require`).  Don't cache drawing files,
+                  as we might have changed options like `keepMargins` and
+                  `keepUneven` which affect parsing.
+                  ###
+                  inputCache.set file, input if input instanceof Mapping
             else if file? and typeof file == 'object'
               console.log '*', file.constructor?.name, file.filename
             else
@@ -2609,7 +2629,7 @@ class Driver extends HasSettings
       i++
     if showHelp
       console.log showHelp
-      help()
+      #help()
 
   run: (...protoArgs) ->
     args = []

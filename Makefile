@@ -7,9 +7,7 @@ build:
 	#npm run prepare
 
 examples:
-	for example in examples/*; do \
-	  make -C $$example ; \
-	done
+	svgtiler examples
 
 test:
 	java -Xss1024k -jar node_modules/vnu-jar/build/dist/vnu.jar \
