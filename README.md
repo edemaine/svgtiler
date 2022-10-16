@@ -342,7 +342,7 @@ The top-level code of your .js or .coffee mapping file can also call:
   side effects (in particular, reading or writing to the `share` object
   for communication with other mapping files), it's important to wrap that code
   in `svgtiler.onInit`, so that SVG Tiler can correctly limit and restore
-  these side effects in the presense of parentheses on the command line.
+  these side effects in the presence of parentheses on the command line.
 * `svgtiler.preprocess(callback)` to schedule calling `callback(render)`
   when preparing to rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.
@@ -854,6 +854,7 @@ Optional arguments:
   --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
   -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
+  --maketile GLOB       Custom Maketile file or glob pattern
   -s KEY=VALUE / --share KEY=VALUE  Set share.KEY to VALUE (undefined if no =)
   -m / --margin         Don't delete blank extreme rows/columns
   --uneven              Don't make all rows have same length by padding with ''

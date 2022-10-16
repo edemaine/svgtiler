@@ -2313,6 +2313,7 @@ Optional arguments:
   --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
   -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
+  --maketile GLOB       Custom Maketile file or glob pattern
   -s KEY=VALUE / --share KEY=VALUE  Set share.KEY to VALUE (undefined if no =)
   -m / --margin         Don't delete blank extreme rows/columns
   --uneven              Don't make all rows have same length by padding with ''
@@ -2419,7 +2420,7 @@ class Driver extends HasSettings
     filenames = glob @settings.maketile, nodir: true
     @maketile =
       if filenames.length
-        inputRequire filenames.sort().pop(), @settings
+        inputRequire filenames.sort()[0], @settings
       else
         null
   addInit: (input) ->
@@ -2546,6 +2547,9 @@ class Driver extends HasSettings
         when '-i', '--inkscape'
           i++
           @settings.inkscape = args[i]
+        when '--maketile'
+          i++
+          @settings.maketile = args[i]
         when '-p', '--pdf'
           @settings.formats.push 'pdf'
         when '-P', '--png'
