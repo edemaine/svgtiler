@@ -14,7 +14,7 @@ export simple = ->
   for palette in palettes
     svgtiler "-f -s palette=#{palette} -O *_#{palette} mario.coffee door.tsv"
 
-## Example definition using just s single call to svgtiler()
+## Example definition using just a single call to svgtiler()
 export singleCall = ->
   svgtiler '''
     -f

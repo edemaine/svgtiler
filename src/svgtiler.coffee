@@ -2398,13 +2398,21 @@ filter = (filenames, pattern, options) ->
 dashArgRegExp = /^-([a-zA-Z]{2,})$/
 
 inputCache = new Map  # maps filenames to previously loaded `Input`s
+currentInits = []     # array of currently initialized `Input`s
 
 class Driver extends HasSettings
   constructor: (@parent = getDriver()) ->
     super()
-    @resetSettings()
-  resetSettings: ->
+    #@reset()  # called in main() instead
+  reset: ->
+    ###
+    Reset settings to a clone of the parent's, empty initialized modules,
+    and empty global `share` object (while preserving object identity),
+    as if we were running `svgtiler` from scratch.
+    ###
     @settings = cloneSettings @parent?.settings ? defaultSettings, true
+    @inits = currentInits = []
+    delete globalShare[key] for key of globalShare
   loadMaketile: ->
     return @maketile unless @maketile == undefined
     filenames = glob @settings.maketile, nodir: true
@@ -2413,12 +2421,26 @@ class Driver extends HasSettings
         inputRequire filenames.sort().pop(), @settings
       else
         null
+  addInit: (input) ->
+    input.doInit()
+    currentInits.push input
+    @inits.push input
+  maybeInit: ->
+    ## Check whether inits list changed.  If so,
+    ## reset globalShare without changing top-level object identity,
+    ## and re-initialize all still-active mappings to restore side-effects.
+    return if @inits.length == currentInits.length and
+              @inits.every (init, i) -> init == currentInits[i]
+    delete globalShare[key] for key of globalShare
+    init.doInit() for init in @inits
+    currentInits = [...@inits]
   main: (args = process.argv[2..]) -> runWithDriver @, =>
+    @reset()
     showHelp = 'No filename arguments and no Maketile to run. Try `svgtiler --help`'
     ranMaketile = false
     numFileArgs = 0
-    inits = []  # array of objects to call doInit() on
-    stack = []  # {settings, inits} objects for implementing parens
+    @inits = []  # array of objects to call doInit() on
+    stack = []   # {settings, inits} objects for implementing parens
     # `for arg, i in args` but allowing i to advance and args to get appended to
     i = 0
     loop
@@ -2481,9 +2503,7 @@ class Driver extends HasSettings
         when '-s', '--share'
           i++
           [key, ...value] = args[i].split '='
-          inits.push setter =
-            new ShareSetter key, value.join '='  # ignore later =s
-          setter.doInit()
+          @addInit new ShareSetter key, value.join '='  # ignore later =s
         when '-o', '--output'
           i++
           @settings.outputDir = args[i]
@@ -2527,22 +2547,14 @@ class Driver extends HasSettings
         when '('
           stack.push
             settings: cloneSettings @settings
-            inits: [...inits]
+            inits: [...@inits]
         when ')'
-          oldInits = inits
           if stack.length
-            {settings: @settings, inits} = stack.pop()
+            {settings: @settings, inits: @inits} = stack.pop()
           else
             console.warn "Unmatched ')'"
-            @resetSettings()
-            inits = []
-          ## Check whether inits list changed.  If so,
-          ## reset globalShare without changing top-level object identity,
-          ## and re-initialize all still-active mappings to restore side-effects.
-          unless inits.length == oldInits.length and
-                inits.every (init, i) -> init == oldInits[i] 
-            delete globalShare[key] for key of globalShare
-            init.doInit() for init in inits
+            @reset()
+          @maybeInit()
         else
           showHelp = false
           numFileArgs++
@@ -2587,6 +2599,7 @@ class Driver extends HasSettings
                   (new Driver @).main []
                   process.chdir oldDir
                   console.log '..', file, '(end of directory)'
+                  @maybeInit()
                   continue
                 else
                   ## Regular file
@@ -2606,8 +2619,7 @@ class Driver extends HasSettings
               continue  # skip boolean, number, null, undefined
             if input instanceof Mapping
               @settings.mappings.push input
-              inits.push input
-              input.doInit()
+              @addInit input
             else if input instanceof Style
               @settings.styles.push input
             else if input instanceof Drawing or input instanceof Drawings
