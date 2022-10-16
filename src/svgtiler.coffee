@@ -2398,7 +2398,7 @@ filter = (filenames, pattern, options) ->
 dashArgRegExp = /^-([a-zA-Z]{2,})$/
 
 inputCache = new Map  # maps filenames to previously loaded `Input`s
-currentInits = []     # array of currently initialized `Input`s
+currentInits = null   # array of currently initialized `Input`s
 
 class Driver extends HasSettings
   constructor: (@parent = getDriver()) ->
@@ -2412,6 +2412,7 @@ class Driver extends HasSettings
     ###
     @settings = cloneSettings @parent?.settings ? defaultSettings, true
     @inits = currentInits = []
+    @initsLength = 0
     delete globalShare[key] for key of globalShare
   loadMaketile: ->
     return @maketile unless @maketile == undefined
@@ -2422,18 +2423,38 @@ class Driver extends HasSettings
       else
         null
   addInit: (input) ->
-    input.doInit()
-    currentInits.push input
+    @maybeInit()
+    ## Now @inits == currentInits and @initsLength == currentInits.length
     @inits.push input
+    @initsLength++
+    input.doInit()
   maybeInit: ->
-    ## Check whether inits list changed.  If so,
-    ## reset globalShare without changing top-level object identity,
-    ## and re-initialize all still-active mappings to restore side-effects.
-    return if @inits.length == currentInits.length and
-              @inits.every (init, i) -> init == currentInits[i]
-    delete globalShare[key] for key of globalShare
-    init.doInit() for init in @inits
-    currentInits = [...@inits]
+    ###
+    Check whether @inits list changed and (re)initialize if so.
+    If the list changed by appending items, just initialize new items.
+    Otherwise, reset global `share` object (without changing object identity)
+    and re-initialize all items from scratch to restore side effects.
+    ###
+    ## If @inits has grown without our knowledge, de-alias init lists.
+    unless @initsLength == @inits.length
+      @inits = @inits[...@initsLength]
+    ## Cheap case: init lists are (still) identical.  Nothing to do.
+    return if @inits == currentInits
+    reset = (currentInits.length > @initsLength)
+    unless reset
+      ## currentInits is shorter or equal; check for prefix match
+      for init, i in currentInits
+        unless init == @inits[i]
+          reset = true
+          break
+    if reset
+      delete globalShare[key] for key of globalShare
+      start = 0
+    else
+      start = currentInits.length
+    for init in @inits[start..]
+      init.doInit()
+    currentInits = @inits
   main: (args = process.argv[2..]) -> runWithDriver @, =>
     @reset()
     showHelp = 'No filename arguments and no Maketile to run. Try `svgtiler --help`'
@@ -2554,7 +2575,6 @@ class Driver extends HasSettings
           else
             console.warn "Unmatched ')'"
             @reset()
-          @maybeInit()
         else
           showHelp = false
           numFileArgs++
@@ -2599,10 +2619,10 @@ class Driver extends HasSettings
                   (new Driver @).main []
                   process.chdir oldDir
                   console.log '..', file, '(end of directory)'
-                  @maybeInit()
                   continue
                 else
                   ## Regular file
+                  @maybeInit()
                   input = inputRequire file, @settings
                   ###
                   Cache Mapping files, as we only capture `onInit` etc.
@@ -2623,6 +2643,7 @@ class Driver extends HasSettings
             else if input instanceof Style
               @settings.styles.push input
             else if input instanceof Drawing or input instanceof Drawings
+              @maybeInit()
               svgs = input.render @settings
               ## Convert to any additional formats.  Even if SVG files didn't
               ## change, we may not have done these conversions before or in the
