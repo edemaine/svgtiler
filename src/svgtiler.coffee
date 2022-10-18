@@ -2626,6 +2626,7 @@ class Driver extends HasSettings
                   continue
                 else
                   ## Regular file
+                  console.log '*', file
                   @maybeInit()
                   input = inputRequire file, @settings
                   ###
