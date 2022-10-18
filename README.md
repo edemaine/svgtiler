@@ -252,7 +252,7 @@ or return value of a function) should be specified as one of the following:
 10. An `Array` of tiles of any of the listed formats (including more `Array`s,
     which get flattened), meaning to stack multiple tiles on top of each other,
     where the first non-null tile defines the `viewBox` and size
-    (but all can influence the [`overflowBox`](#overflow-and-bounding-box)).
+    (but all can influence the [`boundingBox`](#overflow-and-bounding-box)).
     Use [`z-index`](#z-index-stacking-order-of-tiles)
     to control stacking order.
     Null items in the array get ignored, and an empty array acts like `null`
@@ -366,7 +366,7 @@ The top-level code of your .js or .coffee mapping file can also call:
   Specify a [`z-index`](#z-index-stacking-order-of-tiles)
   to control the stacking order relative to other symbols
   or overlays/underlays.
-  Specify [`overflowBox`](#overflow-and-bounding-box) to increase the
+  Specify [`boundingBox`](#overflow-and-bounding-box) to increase the
   overall size of the rendered drawing.
 * `svgtiler.background(fillColor)` to set the default background color
   for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
@@ -552,18 +552,30 @@ When `overflow` is `visible`, `viewBox` still represents the size of the
 element in the [grid layout](#layout-algorithm),
 but allows the element's actual bounding box to be something else.
 To correctly set the bounding box of the overall SVG drawing, SVG Tiler
-defines an additional `<symbol>` attribute called `overflowBox`, which is like
+defines an additional `<symbol>` attribute called `boundingBox`, which is like
 `viewBox` but for specifying the actual bounding box of the content
-(when they differ &mdash; `overflowBox` defaults to the value of `viewBox`).
+(when they differ &mdash; `boundingBox` defaults to the value of `viewBox`).
 The `viewBox` of the overall SVG is set to the minimum rectangle
-containing all tiles' `overflowBox`s.
+containing all tiles' `boundingBox`s.
 
 For example,
-`<symbol viewBox="0 0 10 10" overflowBox="-5 -5 20 20" overflow="visible">...</symbol>`
+`<symbol viewBox="0 0 10 10" boundingBox="-5 -5 20 20">...</symbol>`
 defines a tile that gets laid out as if it occupies the [0, 10] &times;
 [0, 10] square, but the tile can draw outside that square, and the overall
 drawing bounding box will be set as if the tile occupies the
 [&minus;5, 15] &times; [&minus;5, 15] square.
+
+The `boundingBox` can also be *smaller* than the `viewBox`, in case the
+`viewBox` needs to be larger for proper grid alignment but the particular
+symbol doesn't actually use the whole space.
+For example, `<symbol viewBox="0 0 10 10" boundingBox="5 5 10 10"/>`
+allocates 10×10 of space but may shrink down to 10×5 when used on the
+top edge of the diagram (if no other symbols' bounding box extend above)
+or 5×10 when used on the left edge of the diagram,
+or 5×5 in the top-left corner.
+You can also use the special value `boundingBox="none"` to specify that
+the symbol should not influence the drawing's `viewBox` at all,
+or `boundingBox="null -5 null 10"` to just affect the vertical extent (say).
 
 Even zero-width and zero-height `<symbol>`s will get rendered (unless
 `overflow="hidden"`).  This can be useful for drawing grid
@@ -572,6 +584,10 @@ outlines without affecting the overall grid layout, for example.
 height](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox),
 so SVG Tiler automatically works around this by using slightly positive
 widths and heights in the output `viewBox`.)
+
+The `boundingBox` attribute used to be called `overflowBox` (prior to v3).
+For backward compatibility, the old name is still supported, but in either
+case it can cause both overflow and underflow relative to `viewBox`.
 
 ## Autosizing Tiles
 

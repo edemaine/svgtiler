@@ -11,11 +11,11 @@ parity = null
 svgtiler.onInit ->
   parity = (share.flipParity ? 0) * 2
 
-blank = <symbol viewBox={viewBox} overflowBox="-5.5 -5.5 11 11"/>
+blank = <symbol viewBox={viewBox} boundingBox="0 0 0 0"/>
 
 vertex = ->
   <symbol viewBox={viewBox} z-index="1"
-   overflowBox="#{-(size+vertexStroke)/2} #{-(size+vertexStroke)/2} #{size+vertexStroke} #{size+vertexStroke}">
+   boundingBox="#{-(size+vertexStroke)/2} #{-(size+vertexStroke)/2} #{size+vertexStroke} #{size+vertexStroke}">
     <circle r="5" stroke="black" stroke-width={vertexStroke}
      fill={if (@i + @j) % 4 == parity then 'white' else 'black'}/>
   </symbol>
@@ -32,13 +32,13 @@ arrow = svgtiler.def(
 
 horizontal = (start, end) ->
   <symbol viewBox={viewBox}
-   overflowBox="#{-(size+edgeStroke)/2} #{-edgeStroke/2} #{size+edgeStroke} #{edgeStroke}">
+   boundingBox="#{-(size+edgeStroke)/2} #{-edgeStroke/2} #{size+edgeStroke} #{edgeStroke}">
     <line x1={-size/2} x2={size/2} stroke={edgeColor} stroke-width={edgeStroke}
      marker-start={start} marker-end={end}/>
   </symbol>
 vertical = (start, end) ->
   <symbol viewBox={viewBox}
-   overflowBox="#{-edgeStroke/2} #{-(size+edgeStroke)/2} #{edgeStroke} #{size+edgeStroke}">
+   boundingBox="#{-edgeStroke/2} #{-(size+edgeStroke)/2} #{edgeStroke} #{size+edgeStroke}">
     <line y1={-size/2} y2={size/2} stroke={edgeColor} stroke-width={edgeStroke}
      marker-start={start} marker-end={end}/>
   </symbol>
@@ -53,3 +53,19 @@ o: vertex
 '>': horizontal null, arrow
 '^': vertical arrow, null
 'v': vertical null, arrow
+'.': ->  # connecting turn between -s and |s
+  <symbol viewBox={viewBox} boundingBox="#{-edgeStroke/2} #{-edgeStroke/2} #{edgeStroke} #{edgeStroke}">
+    <circle r={edgeStroke/2} fill={edgeColor}/>
+    {if @neighbor(-1, 0).includes '-'
+      <line x1={-size/2} stroke={edgeColor} stroke-width={edgeStroke}/>
+    }
+    {if @neighbor(+1, 0).includes '-'
+      <line x2={+size/2} stroke={edgeColor} stroke-width={edgeStroke}/>
+    }
+    {if @neighbor(0, -1).includes '|'
+      <line y1={-size/2} stroke={edgeColor} stroke-width={edgeStroke}/>
+    }
+    {if @neighbor(0, +1).includes '|'
+      <line y2={+size/2} stroke={edgeColor} stroke-width={edgeStroke}/>
+    }
+  </symbol>

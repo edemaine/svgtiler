@@ -274,19 +274,27 @@ parseDim = (x) ->
     console.warn "Unrecognized unit #{match[2]}"
     parseNum match[1]
 
-parseBox = (box) ->
+parseBox = (box, allowNull) ->
   return null unless box
   box = box.split /\s*[\s,]\s*/
   .map parseNum
-  return null if null in box
+  return null if null in box unless allowNull
   box
 
-extractOverflowBox = (xml) ->
-  ## Parse and return root overflowBox attribute.
-  ## Also remove it if present, so output is valid SVG.
-  box = xml.documentElement.getAttribute 'overflowBox'
+extractBoundingBox = (xml) ->
+  ###
+  Parse and return root `boundingBox` attribute,
+  possibly under the old name of `overflowBox`.
+  Also remove them if present, so output is valid SVG.
+  ###
+  box = xml.documentElement.getAttribute('boundingBox') or
+        xml.documentElement.getAttribute('overflowBox')
+  xml.documentElement.removeAttribute 'boundingBox'
   xml.documentElement.removeAttribute 'overflowBox'
-  parseBox box
+  if box.toLowerCase().trim() == 'none'
+    [null, null, null, null]
+  else
+    parseBox box, true
 
 svgBBox = (dom) ->
   ## xxx Many unsupported features!
@@ -306,9 +314,9 @@ svgBBox = (dom) ->
       when 'rect', 'image'
         ## For <image>, should autodetect image size (#42)
         [parseNum(node.getAttribute 'x') ? 0
-          parseNum(node.getAttribute 'y') ? 0
-          parseNum(node.getAttribute 'width') ? 0
-          parseNum(node.getAttribute 'height') ? 0]
+         parseNum(node.getAttribute 'y') ? 0
+         parseNum(node.getAttribute 'width') ? 0
+         parseNum(node.getAttribute 'height') ? 0]
       when 'circle'
         cx = parseNum(node.getAttribute 'cx') ? 0
         cy = parseNum(node.getAttribute 'cy') ? 0
@@ -619,7 +627,7 @@ class SVGContent extends HasSettings
   ###
   Base helper for parsing SVG as specified in SVG Tiler:
   SVG strings, Preact VDOM, or filenames, with special handling of image files.
-  Automatically determines `width`, `height`, `viewBox`, `overflowBox`,
+  Automatically determines `width`, `height`, `viewBox`, `boundingBox`,
   and `zIndex` properties if specified in the SVG content,
   and sets `isEmpty` to indicate whether the SVG is a useless empty tag.
   In many cases (symbols and defs), acquires an `id` property via `setId`,
@@ -843,7 +851,7 @@ class SVGContent extends HasSettings
         @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
 
     ## Special SVG Tiler attributes that get extracted from DOM
-    @overflowBox = extractOverflowBox @dom
+    @boundingBox = extractBoundingBox @dom
     @zIndex = extractZIndex @dom.documentElement
     #@isEmpty = @dom.documentElement.childNodes.length == 0 and
     #  (@emptyWithId or not @dom.documentElement.hasAttribute 'id') and
@@ -886,7 +894,7 @@ class SVGWrapped extends SVGContent
     else
       doc = @dom
       ## Allow top-level object to specify <symbol> data.
-      ## `z-index` and `overflowBox` should already be extracted.
+      ## `z-index` and `boundingBox` should already be extracted.
       ## `width` and `height` have another meaning in e.g. <rect>s,
       ## so just transfer for tags where they are meaningless.
       for attribute in ['viewBox', 'width', 'height', 'overflow']
@@ -1674,7 +1682,7 @@ class Render extends HasSettings
     @styles = new Styles @getSetting 'styles'
     @defs = []
     ## Accumulated rendering, in case add() called before makeDOM():
-    @xMin = @yMin = @xMax = @yMax = 0
+    @xMin = @yMin = @xMax = @yMax = null
     @layers = {}
   hrefAttr: -> hrefAttr @settings
   id: (key) -> #, noEscape) ->
@@ -1724,20 +1732,34 @@ class Render extends HasSettings
         "svgtiler.add content from #{getContextString()}", content, @settings
     dom = content.makeDOM()
     return if content.isEmpty
-    if (box = content.overflowBox ? content.viewBox)?
-      @xMin = Math.min @xMin, box[0]
-      @yMin = Math.min @yMin, box[1]
-      @xMax = Math.max @xMax, box[0] + box[2]
-      @yMax = Math.max @yMax, box[1] + box[3]
+    if (box = content.boundingBox ? content.viewBox)?
+      @expandBox box
       @updateSize()
     @layers[content.zIndex] ?= []
     if prepend
       @layers[content.zIndex].unshift dom.documentElement
     else
       @layers[content.zIndex].push dom.documentElement
+  expandBox: (box) ->
+    if box[0]?
+      @xMin = box[0] if not @xMin? or box[0] < @xMin
+      if box[2]?
+        x = box[0] + box[2]
+        @xMax = x if not @xMax? or x > @xMax
+    if box[1]?
+      @yMin = box[1] if not @yMin? or box[1] < @yMin
+      if box[3]?
+        y = box[1] + box[3]
+        @yMax = y if not @yMax? or y > @yMax
   updateSize: ->
-    @width = @xMax - @xMin
-    @height = @yMax - @yMin
+    if @xMin? and @xMax?
+      @width = @xMax - @xMin
+    else
+      @width = 0
+    if @yMin? and @yMax?
+      @height = @yMax - @yMin
+    else
+      @height = 0
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
@@ -1863,19 +1885,25 @@ class Render extends HasSettings
             if symbol.autoHeight
               use.setAttribute 'height',
                 (symbol.viewBox?[3] ? symbol.height) * scaleY
-          if symbol.overflowBox?
-            dx = (symbol.overflowBox[0] - symbol.viewBox[0]) * scaleX
-            dy = (symbol.overflowBox[1] - symbol.viewBox[1]) * scaleY
-            @xMin = Math.min @xMin, x + dx
-            @yMin = Math.min @yMin, y + dy
-            @xMax = Math.max @xMax, x + dx + symbol.overflowBox[2] * scaleX
-            @yMax = Math.max @yMax, y + dy + symbol.overflowBox[3] * scaleY
+          if symbol.boundingBox?
+            dx = (symbol.boundingBox[0] - symbol.viewBox[0]) * scaleX
+            dy = (symbol.boundingBox[1] - symbol.viewBox[1]) * scaleY
+            @expandBox [
+              x + dx
+              y + dy
+              symbol.boundingBox[2] * scaleX
+              symbol.boundingBox[3] * scaleY
+            ]
+          else
+            @expandBox [tile.xMin, tile.yMin, tile.width, tile.height]
         x = tiles[0].xMax
-        @xMax = Math.max @xMax, x
       y += rowHeight
-      @yMax = Math.max @yMax, y
 
     ## Postprocess callbacks, which may use (and update) @width/@height
+    @xMin ?= 0
+    @yMin ?= 0
+    @xMax ?= 0
+    @yMax ?= 0
     @updateSize()
     @mappings.doPostprocess @
 

@@ -1,7 +1,7 @@
 # Test svgtiler.Mappings being provided as mapping values
 
 export map1 = new svgtiler.Mapping (key) ->
-  <symbol width="50" height="50" overflowBox="-3 -3 56 56"
+  <symbol width="50" height="50" boundingBox="-3 -3 56 56"
    z-index={if key == 'purple' then 1}>
     <rect width="50" height="50" stroke={key} stroke-width="6" fill="gray"/>
   </symbol>

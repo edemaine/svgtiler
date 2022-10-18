@@ -39,3 +39,9 @@ the vertex coloring, to match the figure in the paper.
 ![Underlying graph figure](ips_example_graph.svg)
 
 [ASCII input](ips_example_graph.asc), [SVG output](ips_example_graph.svg)
+
+## Orthogonal graph layout
+
+![Orthogonal graph layout figure](ortho_test.svg)
+
+[ASCII input](ortho_test.asc), [SVG output](ortho_test.svg)
