@@ -28,6 +28,10 @@ see [more examples below](#examples).
 - [`<image>` Processing](#image-processing)
 - [Converting SVG to PDF/PNG](#converting-svg-to-pdfpng)
 - [LaTeX Text](#latex-text)
+- [Maketiles](#maketiles)
+  - [Maketile.args](#maketileargs)
+  - [Maketile.coffee/js](#maketilecoffeejs)
+  - [Directories](#directories)
 - [API](#api)
 - [Examples](#examples)
   - [Video/board games](#videoboard-games)
@@ -736,6 +740,89 @@ via one of the following options (any one will do):
 * `\usepackage{import}` and `\import{path/to/file/}{filename.svg_tex}`
   instead of `\import{filename.svg_tex}`.
 * `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
+
+## Maketiles
+
+SVG Tiler has a simple `Makefile`-like build system for keeping track of the
+`svgtiler` command-line arguments needed to build your tiled figures.
+These `Maketile`s generally get run whenever you run `svgtiler` without
+any filename arguments (e.g. just running `svgtiler` without any arguments).
+(If you ever want to skip the `Maketile` behavior, just provide mapping
+and drawing filename arguments like you normally would.)
+Several examples of `Maketile`s are in the [examples](examples) directory.
+
+### Maketile.args
+
+At the simplest level, you can put the command-line arguments to `svgtiler`
+into a file called `Maketile.args` (or `maketile.args`), and running
+`svgtiler` without any filename arguments will automatically append those
+arguments to the command line.  Thus the `.args` file could specify the
+mappings and drawings to render, and you can still add extra options like
+`--pdf` or `--force` to the actual command line as needed.
+The `.args` file gets parsed similar to the `bash` shell,
+so you can write one-line comments with `#`,
+you can use glob expressions like `**/*.asc`,
+and you put quotes around filenames with spaces or other special characters.
+You can also write the arguments over multiple lines
+(with no need to end lines with `\`).
+
+### Maketile.coffee/.js
+
+The more sophisticated system is to write a `Maketile.coffee` or
+`Maketile.js` file.  This system offers the entire CoffeeScript or
+JavaScript programming language to express complex build rules.
+In particular, you can write multiple different build rules by
+`export`ing different named functions.  The `default` export is the rule
+that gets run when `svgtiler` has no filename arguments; you can run
+another exported rule `foo` by running `svgtiler foo` from the command line
+(provided `foo` is not an actual filename).
+
+Build rules can run the equivalent of an `svgtiler` command line by calling
+the `svgtiler` function, e.g., `svgtiler('mapping.coffee *.asc')`.
+String arguments are parsed just like `.args` files: whitespace separates
+arguments, `#` indicates comments, glob patterns get expanded, and quotes
+get processed.
+Array arguments are treated as already parsed argument lists, so
+the previous example is equivalent to `svgtiler(['mapping.coffee', '*.asc'])`
+(where the glob pattern still gets processed, but whitespace in filenames
+would not).
+Instead of strings, you can also directly pass in `Mapping` or `Drawing` or
+`Style` objects (as arguments or as part of an array argument).
+An easy way to create such objects is to call `svgtiler.require()`,
+which processes any given filename (without any processing of its filename).
+For example, `svgtiler.require('filename with spaces and *s.asc')` transforms
+an ASCII file into a `Drawing` object.
+
+There are also tools for manually working with glob patterns:
+`svgtiler.glob(pattern)` returns an array of filenames that match a pattern,
+and `svgtiler.match(filename, pattern)` checks whether a filename
+matches a pattern.
+These helpers use [node-glob](https://github.com/isaacs/node-glob) and
+[minimatch](https://github.com/isaacs/minimatch) respectively, so follow their
+[glob notation](https://github.com/isaacs/node-glob#glob-primer).
+Thus you can write your own `for` loops and e.g.
+`switch` depending on what additional pattern(s) the filenames match.
+For example, `svgtiler('mapping.coffee *.asc')` can be rewritten as
+`svgtiler.glob('*.asc').forEach((asc) =>
+svgtiler('mapping.coffee', svgtiler.require(asc))`.
+
+No calls to `svgtiler()` or other side effects should be at the top level
+of the `Maketile`.  Instead, put these build steps inside an `export default`
+function or a named `export`ed function.
+
+### Directories
+
+It usually makes sense to put `Maketile`s in the directory where your
+figures are getting built, but sometimes that's not the directory you're
+working in.  For example, SVG Tiler figures may be in a `figures`
+subdirectory or your paper's main directory.  In this case, you can trigger
+the `Maketile` within the `figures` directory by running `svgtiler figures`.
+You can use this shorthand also when defining `Maketile`s,
+to recurse into subdirectories.
+For example, [examples/Maketile.coffee](examples/Maketile.coffee)
+loops over all the subdirectories within `examples` and runs their `Maketile`s.
+You can thus trigger building all examples in this repository by typing
+`svgtiler examples` at the root directory of a checkout.
 
 ## API
 
