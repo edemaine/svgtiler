@@ -475,9 +475,6 @@ unless window?
 
 isPreact = (data) ->
   typeof data == 'object' and data?.type? and data.props?
-renderPreact = (data) ->
-  (window?.preactRenderToString?.default ? require('preact-render-to-string')) \
-    data
 
 $static = Symbol 'svgtiler.static'
 wrapStatic = (x) -> [$static]: x  # exported as `static` but that's reserved
@@ -653,7 +650,20 @@ class SVGContent extends HasSettings
       ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
       ## Serialization + parsing shouldn't be necessary, but this lets us
       ## deal with one parsed format (xmldom).
-      @svg = renderPreact @value
+      @svg =
+        (window?.preactRenderToString?.default ?
+         require('preact-render-to-string')) @value
+      if (preactRenderToDom = window?.preactRenderToDom?.default ?
+                              require 'preact-render-to-dom')?
+        if xmldom?
+          @dom = new preactRenderToDom.RenderToXMLDom xmldom,
+            svg: true
+            skipNS: true
+          .render @value
+        else
+          @dom = new preactRenderToDom.RenderToDom document, svg: true
+          .render @value
+        @postprocessDOM()
     else if typeof @value == 'string'
       if @value.trim() == ''  ## Blank SVG treated as 0x0 symbol
         @svg = '<symbol viewBox="0 0 0 0"/>'
