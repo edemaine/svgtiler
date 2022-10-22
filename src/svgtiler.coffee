@@ -287,10 +287,9 @@ extractBoundingBox = (xml) ->
   possibly under the old name of `overflowBox`.
   Also remove them if present, so output is valid SVG.
   ###
-  box = xml.documentElement.getAttribute('boundingBox') or
-        xml.documentElement.getAttribute('overflowBox')
-  xml.documentElement.removeAttribute 'boundingBox'
-  xml.documentElement.removeAttribute 'overflowBox'
+  box = xml.getAttribute('boundingBox') or xml.getAttribute('overflowBox')
+  xml.removeAttribute 'boundingBox'
+  xml.removeAttribute 'overflowBox'
   if box.toLowerCase().trim() == 'none'
     [null, null, null, null]
   else
@@ -305,10 +304,10 @@ svgBBox = (dom) ->
   ##   - line widths which extend bounding box
   recurse = (node) ->
     if node.nodeType != node.ELEMENT_NODE or
-        node.nodeName in ['defs', 'use']
+       node.nodeName in ['defs', 'use']
       return null
     # Ignore <symbol>s except the root <symbol> that we're bounding
-    if node.nodeName == 'symbol' and node != dom.documentElement
+    if node.nodeName == 'symbol' and node != dom
       return null
     switch node.tagName
       when 'rect', 'image'
@@ -356,7 +355,7 @@ svgBBox = (dom) ->
         xMax = Math.max ...(viewBox[0]+viewBox[2] for viewBox in viewBoxes)
         yMax = Math.max ...(viewBox[1]+viewBox[3] for viewBox in viewBoxes)
         [xMin, yMin, xMax - xMin, yMax - yMin]
-  viewBox = recurse dom.documentElement
+  viewBox = recurse dom
   if not viewBox? or Infinity in viewBox or -Infinity in viewBox
     null
   else
@@ -686,7 +685,7 @@ class SVGContent extends HasSettings
 
   setId: (@id) ->
     ## Can be called before or after makeDOM, updating DOM in latter case.
-    @dom.documentElement.setAttribute 'id', @id if @dom?
+    @dom.setAttribute 'id', @id if @dom?
   defaultId: (base = 'id') ->
     ###
     Generate a "default" id (typically for use in def) using these rules:
@@ -695,7 +694,7 @@ class SVGContent extends HasSettings
     3. Fallback to use first argument `base`, which defaults to `"id"`.
     The returned id is not yet escaped; you should pass it to `escapeId`.
     ###
-    doc = @makeDOM().documentElement
+    doc = @makeDOM()
     doc.getAttribute('id') or doc.tagName or base
   makeDOM: ->
     return @dom if @dom?
@@ -724,19 +723,23 @@ class SVGContent extends HasSettings
           (if line < lines.length then '\n' + indent + lines[line] else '')
         console.error "SVG parse #{level} in #{@name}: #{msg}"
     .parseFromString svg, 'image/svg+xml'
+    .documentElement
     ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
+    @postprocessDOM()
+    @dom
+  postprocessDOM: ->
     ## in the original parsed content or possibly added above,
     ## to avoid conflict with these attributes in the top-level <svg>.
-    @dom.documentElement.removeAttribute 'xmlns'
+    @dom.removeAttribute 'xmlns'
     unless @getSetting 'useHref'
-      @dom.documentElement.removeAttribute 'xmlns:xlink'
+      @dom.removeAttribute 'xmlns:xlink'
 
     ## Wrap in <symbol> if appropriate,
     ## before we add width/height/etc. attributes.
     @wrap?()
 
     ## <image> processing (must come before width/height processing).
-    domRecurse @dom.documentElement, (node) =>
+    domRecurse @dom, (node) =>
       if node.nodeName == 'image'
         ###
         Fix image-rendering: if unspecified, or if specified as "optimizeSpeed"
@@ -801,14 +804,14 @@ class SVGContent extends HasSettings
         true
 
     ## Determine `viewBox`, `width`, and `height` attributes.
-    @viewBox = parseBox @dom.documentElement.getAttribute 'viewBox'
-    @width = parseDim @origWidth = @dom.documentElement.getAttribute 'width'
-    @height = parseDim @origHeight = @dom.documentElement.getAttribute 'height'
+    @viewBox = parseBox @dom.getAttribute 'viewBox'
+    @width = parseDim @origWidth = @dom.getAttribute 'width'
+    @height = parseDim @origHeight = @dom.getAttribute 'height'
     ## Check for default width/height specified by caller.
     if not @width? and @defaultWidth?
-      @dom.documentElement.setAttribute 'width', @width = @defaultWidth
+      @dom.setAttribute 'width', @width = @defaultWidth
     if not @height? and @defaultHeight?
-      @dom.documentElement.setAttribute 'height', @height = @defaultHeight
+      @dom.setAttribute 'height', @height = @defaultHeight
     ## Absent viewBox becomes 0 0 <width> <height> if latter are present
     ## (but only internal to SVG Tiler, DOM remains unchanged).
     if @width? and @height? and not @viewBox?
@@ -817,20 +820,20 @@ class SVGContent extends HasSettings
     ## (e.g. in `SVGSymbol`).
     if not @viewBox? and @autoViewBox
       if (@viewBox = svgBBox @dom)?
-        @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+        @dom.setAttribute 'viewBox', @viewBox.join ' '
     ## Absent width/height inherited from viewBox if latter is present,
     ## in `SVGSymbol` which sets `@autoWidthHeight`.
     ## Including the width/height in the <symbol> lets us skip it in <use>.
     if @viewBox? and @autoWidthHeight
       unless @width?
-        @dom.documentElement.setAttribute 'width', @width = @viewBox[2]
+        @dom.setAttribute 'width', @width = @viewBox[2]
       unless @height?
-        @dom.documentElement.setAttribute 'height', @height = @viewBox[3]
+        @dom.setAttribute 'height', @height = @viewBox[3]
 
     ## Overflow behavior
-    overflow = attributeOrStyle @dom.documentElement, 'overflow'
+    overflow = attributeOrStyle @dom, 'overflow'
     if not overflow? and @defaultOverflow?
-      @dom.documentElement.setAttribute 'overflow', overflow = @defaultOverflow
+      @dom.setAttribute 'overflow', overflow = @defaultOverflow
     @overflowVisible = (overflow? and /^\s*(visible|scroll)\b/.test overflow)
 
     ###
@@ -842,35 +845,34 @@ class SVGContent extends HasSettings
     ###
     if @overflowVisible
       if @width == 0
-        @dom.documentElement.setAttribute 'width', zeroSizeReplacement
+        @dom.setAttribute 'width', zeroSizeReplacement
       if @height == 0
-        @dom.documentElement.setAttribute 'height', zeroSizeReplacement
+        @dom.setAttribute 'height', zeroSizeReplacement
       if @viewBox? and (@viewBox[2] == 0 or @viewBox[3] == 0)
         @viewBox[2] = zeroSizeReplacement if @viewBox[2] == 0
         @viewBox[3] = zeroSizeReplacement if @viewBox[3] == 0
-        @dom.documentElement.setAttribute 'viewBox', @viewBox.join ' '
+        @dom.setAttribute 'viewBox', @viewBox.join ' '
 
     ## Special SVG Tiler attributes that get extracted from DOM
     @boundingBox = extractBoundingBox @dom
-    @zIndex = extractZIndex @dom.documentElement
-    #@isEmpty = @dom.documentElement.childNodes.length == 0 and
-    #  (@emptyWithId or not @dom.documentElement.hasAttribute 'id') and
-    #  emptyContainers.has @dom.documentElement.tagName
+    @zIndex = extractZIndex @dom
+    #@isEmpty = @dom.childNodes.length == 0 and
+    #  (@emptyWithId or not @dom.hasAttribute 'id') and
+    #  emptyContainers.has @dom.tagName
     recursiveEmpty = (node, allowId) ->
       return false unless emptyContainers.has node.tagName
       return false unless allowId or not node.hasAttribute 'id'
       for child in node.childNodes
         return false unless recursiveEmpty child
       true
-    @isEmpty = recursiveEmpty @dom.documentElement, @emptyWithId
-    @dom
+    @isEmpty = recursiveEmpty @dom, @emptyWithId
   useDOM: ->
     @makeDOM()
     ## Clone if content is static, to enable later re-use
     if @isStatic
-      @dom.documentElement.cloneNode true
+      @dom.cloneNode true
     else
-      @dom.documentElement
+      @dom
 
 class SVGWrapped extends SVGContent
   ###
@@ -881,33 +883,32 @@ class SVGWrapped extends SVGContent
   ###
   wrap: ->
     ## Wrap XML in <wrapper>.
-    symbol = @dom.createElementNS SVGNS, @wrapper
-    ## Force `id` to be first attribute (if it's already set).
-    symbol.setAttribute 'id', @id if @id?
+    symbol = @dom.ownerDocument.createElementNS SVGNS, @wrapper
+    ## Force `id` to be first attribute.
+    symbol.setAttribute 'id', @id or ''
     ## Avoid a layer of indirection for <symbol>/<svg> at top level
-    if @dom.documentElement.nodeName in ['symbol', 'svg'] and
-       not @dom.documentElement.nextSibling?
-      for attribute in @dom.documentElement.attributes
+    if @dom.nodeName in ['symbol', 'svg']
+      for attribute in @dom.attributes
         unless attribute.name in ['version', 'id'] or attribute.name.startsWith 'xmlns'
           symbol.setAttribute attribute.name, attribute.value
-      @dom.removeChild doc = @dom.documentElement
+      for child in (node for node in @dom.childNodes)
+        symbol.appendChild child
+      @dom.parentNode?.replaceChild @dom, symbol
     else
-      doc = @dom
       ## Allow top-level object to specify <symbol> data.
       ## `z-index` and `boundingBox` should already be extracted.
       ## `width` and `height` have another meaning in e.g. <rect>s,
       ## so just transfer for tags where they are meaningless.
       for attribute in ['viewBox', 'width', 'height', 'overflow']
         continue if attribute in ['width', 'height'] and
-                    doc.documentElement.tagName not in ['g']
-        if doc.documentElement.hasAttribute attribute
-          symbol.setAttribute attribute,
-            doc.documentElement.getAttribute attribute
-          doc.documentElement.removeAttribute attribute
-    for child in (node for node in doc.childNodes)
-      symbol.appendChild child
-    @dom.appendChild symbol
-    @dom
+                    @dom.tagName not in ['g']
+        if @dom.hasAttribute attribute
+          symbol.setAttribute attribute, @dom.getAttribute attribute
+          @dom.removeAttribute attribute
+      parent = @dom.parentNode
+      symbol.appendChild @dom
+      parent?.appendChild symbol
+    @dom = symbol
 
 #class SVGSVG extends SVGWrapped
 #  ###
@@ -925,15 +926,13 @@ class SVGSymbol extends SVGWrapped
   autoViewBox: true
   autoWidthHeight: true
   emptyWithId: true  # consider empty even if <symbol> has id attribute
-  makeDOM: ->
-    return @dom if @dom?
-
+  postprocessDOM: ->
     ## Special defaults for loading symbols in `SVGContent`'s `makeDOM`.
     @defaultWidth = @getSetting 'forceWidth'
     @defaultHeight = @getSetting 'forceHeight'
     @defaultOverflow = @getSetting 'overflowDefault'
 
-    ## `SVGTop` sets `@width` and `@height` according to
+    ## `SVGContent` sets `@width` and `@height` according to
     ## `width`/`height`/`viewBox` attributes or our defaults.
     super()
 
@@ -944,8 +943,8 @@ class SVGSymbol extends SVGWrapped
 
     ## Remove `width="auto"` and `height="auto"` attributes
     ## (or whatever `SVGTop` set them to).
-    @dom.documentElement.removeAttribute 'width' if @autoWidth
-    @dom.documentElement.removeAttribute 'height' if @autoHeight
+    @dom.removeAttribute 'width' if @autoWidth
+    @dom.removeAttribute 'height' if @autoHeight
 
     ## Warning for missing width/height.
     warnings = []
@@ -961,7 +960,7 @@ class SVGSymbol extends SVGWrapped
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
       @text = []
-      domRecurse @dom.documentElement, (node, parent) =>
+      domRecurse @dom, (node, parent) =>
         if node.nodeName == 'text'
           @text.push node
           node.parentNode.removeChild node
@@ -1737,9 +1736,9 @@ class Render extends HasSettings
       @updateSize()
     @layers[content.zIndex] ?= []
     if prepend
-      @layers[content.zIndex].unshift dom.documentElement
+      @layers[content.zIndex].unshift dom
     else
-      @layers[content.zIndex].push dom.documentElement
+      @layers[content.zIndex].push dom
   expandBox: (box) ->
     if box[0]?
       @xMin = box[0] if not @xMin? or box[0] < @xMin
@@ -1767,18 +1766,18 @@ class Render extends HasSettings
     and bounding box in `@xMin`, `@xMax`, `@yMin`, `@yMax`,
     `@width`, and `@height`.
     ###
-    @dom = domImplementation.createDocument SVGNS, 'svg'
-    svg = @dom.documentElement
-    svg.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
-    svg.setAttribute 'version', '1.1'
-    #svg.appendChild defs = @dom.createElementNS SVGNS, 'defs'
+    doc = domImplementation.createDocument SVGNS, 'svg'
+    @dom = doc.documentElement
+    @dom.setAttribute 'xmlns:xlink', XLINKNS unless @getSetting 'useHref'
+    @dom.setAttribute 'version', '1.1'
+    #@dom.appendChild defs = doc.createElementNS SVGNS, 'defs'
 
     ## Preprocess callbacks, which may change anything about the Render job
     @mappings.doPreprocess @
 
     ## <style> tags for CSS
     for style in @styles
-      svg.appendChild styleTag = @dom.createElementNS SVGNS, 'style'
+      @dom.appendChild styleTag = doc.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
 
     ## Render all tiles in the drawing.
@@ -1814,7 +1813,7 @@ class Render extends HasSettings
                 symbol.setId '_empty'
               else
                 ## Include new non-empty <symbol> in SVG
-                svg.appendChild symbol.useDOM()
+                @dom.appendChild symbol.useDOM()
             new Tile {i, j, k, key, symbol,
               isEmpty: symbol.isEmpty
               zIndex: symbol.zIndex
@@ -1870,7 +1869,7 @@ class Render extends HasSettings
           tile.yMax = y + tile.height
           unless tile.isEmpty
             @layers[tile.zIndex] ?= []
-            @layers[tile.zIndex].push use = @dom.createElementNS SVGNS, 'use'
+            @layers[tile.zIndex].push use = doc.createElementNS SVGNS, 'use'
             use.setAttribute @hrefAttr(), '#' + symbol.id
             use.setAttribute 'x', x
             use.setAttribute 'y', y
@@ -1934,7 +1933,7 @@ class Render extends HasSettings
               @defs.push def
           node.setAttribute attr, node.getAttribute(attr).replace "##{id}",
             "##{newId}"
-    findGlobalDefs svg
+    findGlobalDefs @dom
 
     ## Render all <defs> so far and check for additional <defs> used by them.
     ## `for def in @defs` but allowing @defs to change in length
@@ -1948,22 +1947,22 @@ class Render extends HasSettings
         findGlobalDefs dom
         {def, dom}
     ## Add <defs> to DOM if they're used or forced.
-    firstSymbol = svg.firstChild
+    firstSymbol = @dom.firstChild
     defsWrapper = null
     for {def, dom} in defDoms
       ## Omit unused <defs> unless forced.
       continue unless def.isForced or usedIds.has def.id
       ## Wrap in <defs> if needed.
       if skipDef.has dom.tagName
-        svg.insertBefore dom, firstSymbol
+        @dom.insertBefore dom, firstSymbol
       else
-        defsWrapper ?= @dom.createElementNS SVGNS, 'defs'
+        defsWrapper ?= doc.createElementNS SVGNS, 'defs'
         defsWrapper.appendChild dom
-    svg.insertBefore defsWrapper, svg.firstChild if defsWrapper?
+    @dom.insertBefore defsWrapper, @dom.firstChild if defsWrapper?
 
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = new Map
-    domRecurse svg, (node) =>
+    domRecurse @dom, (node) =>
       return true unless node.nodeName == 'image'
       {href} = getHref node
       return true unless href?.startsWith 'data:'
@@ -1977,7 +1976,7 @@ class Render extends HasSettings
       height = node.getAttribute 'data-height'
       node.removeAttribute 'data-height'
       # Transfer x/y/width/height to <use> element, for more re-usability.
-      node.parentNode.replaceChild (use = @dom.createElementNS SVGNS, 'use'),
+      node.parentNode.replaceChild (use = doc.createElementNS SVGNS, 'use'),
         node
       for attr in ['x', 'y', 'width', 'height']
         use.setAttribute attr, node.getAttribute attr if node.hasAttribute attr
@@ -1990,7 +1989,7 @@ class Render extends HasSettings
       attributes = attributes.join ' '
       unless (id = inlineImages.get attributes)?
         inlineImages.set attributes, id = @id filename
-        svg.appendChild symbol = @dom.createElementNS SVGNS, 'symbol'
+        @dom.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
         symbol.setAttribute 'id', id
         # If we don't have width/height set from data-width/height fields,
         # we take the first used width/height as the defining height.
@@ -2005,11 +2004,11 @@ class Render extends HasSettings
     layerOrder = (layer for layer of @layers).sort (x, y) -> x-y
     for layer in layerOrder
       for node in @layers[layer]
-        svg.appendChild node
-    svg.setAttribute 'viewBox', "#{@xMin} #{@yMin} #{@width} #{@height}"
-    svg.setAttribute 'width', @width
-    svg.setAttribute 'height', @height
-    #svg.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
+        @dom.appendChild node
+    @dom.setAttribute 'viewBox', "#{@xMin} #{@yMin} #{@width} #{@height}"
+    @dom.setAttribute 'width', @width
+    @dom.setAttribute 'height', @height
+    #@dom.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
     @dom
   makeSVG: ->
     out = new XMLSerializer().serializeToString @makeDOM()
@@ -2301,7 +2300,7 @@ renderDOM = (elts, settings) ->
       filename = eltSettings.filename
       drawing = Input.recognize filename, elt.innerText, eltSettings
       if drawing instanceof Drawing
-        dom = drawing.renderDOM().documentElement
+        dom = drawing.renderDOM()
         if eltSettings.keepParent
           elt.innerHTML = ''
           elt.appendChild dom
