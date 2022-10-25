@@ -2101,6 +2101,7 @@ class Render extends HasSettings
       for tiles, j in row
         for tile, k in tiles
           {xMin, yMin} = tile
+          continue unless tile.symbol.text?  # e.g. unrecognizedSymbol
           for text in tile.symbol.text
             tx = parseNum(text.getAttribute('x')) ? 0
             ty = parseNum(text.getAttribute('y')) ? 0
