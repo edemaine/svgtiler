@@ -8,7 +8,7 @@ arrowSize = 2.5
 viewBox = "#{-size/2} #{-size/2} #{size} #{size}"
 
 parity = null
-svgtiler.onInit ->
+export init = ->
   parity = (share.flipParity ? 0) * 2
 
 blank = <symbol viewBox={viewBox} boundingBox="0 0 0 0"/>

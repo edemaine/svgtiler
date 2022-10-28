@@ -1,5 +1,5 @@
 keepUneven = null
-svgtiler.onInit ->
+export init = ->
   keepUneven = svgtiler.getSettings().keepUneven
   console.log 'Testing with --uneven =', keepUneven
 

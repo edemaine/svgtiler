@@ -1,2 +1,2 @@
-svgtiler.onInit ->
+export init = ->
   share.flipParity = 1

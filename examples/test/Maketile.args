@@ -14,6 +14,8 @@
 ( mapping.coffee mapping.ssv )
 ( mappings.coffee -O mappings mapping.ssv )
 
+( inline.coffee )
+
 ( set.coffee set.asc )
 
 ## Test )'s ability to reset share object

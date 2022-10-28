@@ -542,24 +542,24 @@ removeSVGComments = (svg) ->
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
 
-currentMapping = null
+#currentMapping = null
 currentRender = null
 currentDriver = null
 currentContext = null
 
-getMapping = ->
-  ## Returns current `Mapping` object,
-  ## when used at top level of a JS/CS mapping file.
-  currentMapping
-runWithMapping = (mapping, fn) ->
-  ## Runs the specified function `fn` as if it were called
-  ## at the top level of the specified mapping.
-  oldMapping = currentMapping
-  currentMapping = mapping
-  try
-    fn()
-  finally
-    currentMapping = oldMapping
+#getMapping = ->
+#  ## Returns current `Mapping` object,
+#  ## when used at top level of a JS/CS mapping file.
+#  currentMapping
+#runWithMapping = (mapping, fn) ->
+#  ## Runs the specified function `fn` as if it were called
+#  ## at the top level of the specified mapping.
+#  oldMapping = currentMapping
+#  currentMapping = mapping
+#  try
+#    fn()
+#  finally
+#    currentMapping = oldMapping
 
 getRender = ->
   ## Returns current `Render` object, when used within its execution.
@@ -604,8 +604,8 @@ getContextString = ->
   ## Returns string describing the current context
   if currentContext?
     "tile '#{currentContext.tile}' in row #{currentContext.i+1}, column #{currentContext.j+1} of drawing '#{currentContext.drawing.filename}'"
-  else if currentMapping?
-    "mapping '#{currentMapping.filename}'"
+  #else if currentMapping?
+  #  "mapping '#{currentMapping.filename}'"
   else if currentRender?
     "render of '#{currentRender.drawing.filename}'"
   else
@@ -623,8 +623,8 @@ getSettings = ->
   #  currentContext.render.settings
   if currentRender?
     currentRender.settings
-  else if currentMapping?
-    currentMapping.settings
+  #else if currentMapping?
+  #  currentMapping.settings
   else if currentDriver?
     currentDriver.settings
   else
@@ -1196,6 +1196,7 @@ class Args extends Input
   such as "-p" and "filename.asc".
   ###
   parse: (@args) ->
+  doInit: ->
   makeRule: (key) ->
     ## Only default rule '' defined by Args.
     return if key
@@ -1213,6 +1214,16 @@ class ParsedArgs extends Args
   parse: (text) ->
     super parseIntoArgs text
 
+multiCall = (func, arg) ->
+  ## Call function with this and first argument set to `arg`.
+  ## Allow arrays as shorthand for multiple functions to call.
+  return unless func?
+  if Array.isArray arg
+    for item in arg.flat Infinity
+      func.call arg, arg
+  else
+    func.call arg, arg
+
 class Mapping extends Input
   ###
   Base Mapping class.
@@ -1222,22 +1233,28 @@ class Mapping extends Input
   with Arrays possibly mixed in; or another `Mapping`.
   In this class and subclasses, `@map` stores this data.
   ###
+  @properties = ['init', 'preprocess', 'postprocess']
   constructor: (data, opts) ->
-    super data, {
-      cache: new Map  # for static tiles
-      initQueue: []
-      preprocessQueue: []
-      postprocessQueue: []
-      ...opts
-    }
+    super data, opts
+    @cache ?= new Map  # for static tiles
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
-  parse: (@map) ->
+  @from: (obj, opts) ->
+    ## Build Mapping object from {map, init, preprocess, postprocess} object.
+    new @ obj.map ? obj.default, {...opts, ...@optsFrom obj}
+  @optsFrom: (obj) ->
+    opts = {}
+    for key in @properties
+      opts[key] = obj[key] if obj.hasOwnProperty key
+    opts
+  parse: (@map, opts) ->
     unless typeof @map in ['function', 'object', 'undefined']
       console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @map}): should be function or object"
       @map = null
     if isPreact @map
       console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
       @map = null
+    if opts?
+      @[key] = value for key, value of opts
   isFunction: ->
     typeof @map == 'function'
   lookup: (key, context) ->
@@ -1353,40 +1370,18 @@ class Mapping extends Input
       value
     recurse @module?.make ? @module?.default
     executed
-  onInit: (fn) ->
-    @initQueue.push fn
-  preprocess: (fn) ->
-    @preprocessQueue.push fn
-  postprocess: (fn) ->
-    @postprocessQueue.push fn
   doInit: ->
-    runWithMapping @, =>
-      for callback in @initQueue
-        callback.call @, @
+    if @settings.verbose and @init?
+      console.log "# Calling init() in #{@filename}"
+    multiCall @init, @
   doPreprocess: (render) ->
-    ## Run preprocess queue in forward order
-    runWithMapping @, =>
-      for callback in @preprocessQueue
-        callback.call render, render
+    if @settings.verbose and @preprocess?
+      console.log "# Calling preprocess() in #{@filename}"
+    multiCall @preprocess, render
   doPostprocess: (render) ->
-    ## Run postprocess queue in reverse order
-    return unless @postprocessQueue.length
-    runWithMapping @, =>
-      for i in [@postprocessQueue.length-1..0]
-        @postprocessQueue[i].call render, render
-
-onInit = (fn) ->
-  unless currentMapping?
-    throw new SVGTilerError "svgtiler.onInit called outside mapping file"
-  currentMapping.onInit fn
-preprocess = (fn) ->
-  unless currentMapping?
-    throw new SVGTilerError "svgtiler.preprocess called outside mapping file"
-  currentMapping.preprocess fn
-postprocess = (fn) ->
-  unless currentMapping?
-    throw new SVGTilerError "svgtiler.postprocess called outside mapping file"
-  currentMapping.postprocess fn
+    if @settings.verbose and @postprocess?
+      console.log "# Calling postprocess() in #{@filename}"
+    multiCall @postprocess, render
 
 ## A fake Mapping file that just sets a `share` key when initialized.
 ## (Used to implement -s/--share command-line option.)
@@ -1433,10 +1428,10 @@ class JSMapping extends Mapping
       #  }
       #  console.log code
       pirates?.settings = @settings
-      @module = runWithMapping @, -> require filename
-      #console.log filename, @module
-      super @module.default
+      #@module = runWithMapping @, -> require filename
+      @module = require filename
       @walkDeps filename
+      #console.log filename, @module
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually and simulate module.
@@ -1455,10 +1450,12 @@ class JSMapping extends Mapping
       #super eval code
       func = new Function \
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
-      runWithMapping @, ->
-        func @module, _filename, _dirname, svgtiler,
-          (if code.includes 'preact' then require 'preact')
-      super @module.default
+      #runWithMapping @, ->
+      func @module, _filename, _dirname, svgtiler,
+        (if code.includes 'preact' then require 'preact')
+    if @settings.verbose
+      console.log "# Module #{@filename} exported {#{Object.keys(@module).join ', '}}"
+    super (@module.map ? @module.default), @constructor.optsFrom @module
   walkDeps: (filename) ->
     deps = new Set
     recurse = (modname) =>
@@ -2277,10 +2274,10 @@ globalBackground = (fill) ->
   ## Returns current background fill.
   if currentRender?
     currentRender.background fill
-  else if currentMapping?
-    preprocess (render) -> render.background fill
+  #else if currentMapping?
+  #  preprocess (render) -> render.background fill
   else
-    throw new SVGTilerError "svgtiler.background called outside of render of mapping context"
+    throw new SVGTilerError "svgtiler.background called outside of render context"
 
 globalAdd = (content, ...opts) ->
   if currentRender?
@@ -2590,7 +2587,7 @@ class Driver extends HasSettings
         ranMaketile = true
         showHelp = false
         if @maketile.makeRule?  # Args or Mapping
-          @maketile.doInit?()
+          @maketile.doInit()
           console.log "** #{@maketile.filename} (default)"
           unless @maketile.makeRule ''
             console.log "Maketile '#{@maketile.filename}' does not define a default rule"
@@ -2599,13 +2596,15 @@ class Driver extends HasSettings
       break if i >= args.length
 
       ## Split up single-dash arguments with multiple options like -pP
-      if (match = args[i].match dashArgRegExp)?
+      arg = args[i]
+      if typeof arg == 'string' and (match = arg.match dashArgRegExp)?
         args[i..i] =
           for char in match[1]
             "-#{char}"
+        arg = args[i]
 
       ## Main argument handling
-      switch (arg = args[i])
+      switch arg
         when '-h', '--help'
           help()
           return
@@ -2751,15 +2750,13 @@ class Driver extends HasSettings
                   @maybeInit()
                   input = inputRequire file, @settings
                   ###
-                  Cache Mapping files, as we only capture `onInit` etc.
-                  callbacks on the first load (top-level code run only
-                  during first `require`).  Don't cache drawing files,
-                  as we might have changed options like `keepMargins` and
-                  `keepUneven` which affect parsing.
+                  Cache Mapping files, to avoid rebuilding Mapping objects.
+                  Don't cache drawing files, as we might have changed options
+                  like `keepMargins` and `keepUneven` which affect parsing.
                   ###
                   inputCache.set file, input if input instanceof Mapping
             else if file? and typeof file == 'object'
-              console.log '*', file.constructor?.name, file.filename
+              console.log '*', file.constructor?.name, file.filename ? file
             else
               input = file
               continue  # skip boolean, number, null, undefined
@@ -2783,8 +2780,17 @@ class Driver extends HasSettings
             else if input instanceof Args
               args[append...append] = input.args
               append += input.args.length
-            else
+            else if input?
               console.log "Unrecognized file '#{file}' of type '#{input?.constructor?.name}'"
+            else if file? and typeof file == 'object' and (
+              file.hasOwnProperty('map') or
+              Mapping.properties.some (prop) -> file.hasOwnProperty prop
+            )
+              input = Mapping.from file, settings: @settings
+              @settings.mappings.push input
+              @addInit input
+            else
+              console.log "Unrecognized file '#{file}' of type '#{file?.constructor?.name}'"
       i++
     if showHelp
       console.log showHelp
@@ -2820,14 +2826,14 @@ run = (args...) -> new Driver().run args...
 svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
-  getMapping, runWithMapping, static: wrapStatic,
+  static: wrapStatic,
   Drawing, AutoDrawing, ASCIIDrawing,
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle, Styles,
   Args, ParsedArgs, SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper,
-  Render, getRender, runWithRender, onInit, preprocess, postprocess,
+  Render, getRender, runWithRender,
   id: globalId, def: globalDef, background: globalBackground,
   add: globalAdd,
   Context, getContext, getContextString, runWithContext,

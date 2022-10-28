@@ -7,7 +7,7 @@ kind =
   L: 'other'
   Z: 'other'
 
-svgtiler.background 'black'
+export preprocess = -> svgtiler.background 'black'
 
 (key) ->
   if key.trim() == ''

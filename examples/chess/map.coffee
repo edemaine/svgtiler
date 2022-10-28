@@ -20,12 +20,11 @@ read = (filename) ->
   #  {dom.props.children}
   #</symbol>
 
-svgtiler.preprocess ({drawing}) ->
+export preprocess = ({drawing}) ->
   svgtiler.add <title z-index="-Infinity">Chess diagram {drawing.filename}</title>
-
-svgtiler.background 'white'
+  svgtiler.background 'white'
 ## Equivalent:
-#svgtiler.postprocess (render) -> render.add \
+#export postprocess = (render) -> render.add \
 #  <rect fill="white" z-index="-Infinity"
 #   x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>
 

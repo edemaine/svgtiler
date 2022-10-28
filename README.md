@@ -180,13 +180,15 @@ O O.svg
 
 In the **.js / .coffee / .jsx / .cjsx formats**, the file consists of
 JavaScript / CoffeeScript code that gets loaded as a NodeJS module.
-The code specifies a `mapping` in one of three ways:
+The code specifies a `mapping` in one of a few ways:
 
-1. `export default mapping` (ECMAScript modules style)
-2. `exports.default = mapping` (CommonJS modules style)
-3. Writing a `mapping` expression at the end of the file (implicit export),
-   which must be a top-level object, array, or function expression
-   (without e.g. being assigned to a variable).
+1. `export map = mapping` or `export default mapping`
+   (ECMAScript modules style)
+2. `exports.map = mapping` or `exports.default = mapping`
+   (CommonJS modules style)
+3. Writing a top-level object, array, or function expression
+   at the end of the file (without e.g. being assigned to a variable),
+   which triggers an implicit `export default`.
 
 In any case, `mapping` should be one of the following types of **mapping**
 objects:
@@ -336,28 +338,32 @@ The `Context` object has the following properties and methods:
   functions within the same drawing (but not between separate drawings).
   This can be useful for drawing-specific state.
 
-The top-level code of your .js or .coffee mapping file can also call:
+The top-level code of your .js or .coffee mapping file can also export
+the following functions:
 
-* `svgtiler.onInit(callback)` to schedule calling `callback()` whenever
-  this mapping file is listed on the command line (including right after
-  the mapping file is first loaded), and when state gets reset via a `)`
-  command-line argument.  Note that each mapping file gets loaded (`require`d)
+* `export init` to schedule calling `init(mapping)` whenever
+  this mapping file is listed on the command line
+  (including right after the mapping file is first loaded), and
+  when state gets reset (e.g. via a `)` command-line argument).
+  Note that each mapping file gets loaded (`require`d)
   as a NodeJS module, which happens only once, so if your file uses any
   side effects (in particular, reading or writing to the `share` object
-  for communication with other mapping files), it's important to wrap that code
-  in `svgtiler.onInit`, so that SVG Tiler can correctly limit and restore
-  these side effects in the presence of parentheses on the command line.
-* `svgtiler.preprocess(callback)` to schedule calling `callback(render)`
+  for communication with other mapping files), it's important to put that code
+  in an `init` function instead of at the top level, so that SVG Tiler
+  can correctly limit and restore these side effects in the presence of
+  parentheses on the command line or when running multiple build rules.
+* `export preprocess` to schedule calling `preprocess(render)`
   when preparing to rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.
-  The `callback`'s argument (and `this`) is set to a `Render` instance,
+  The `render` argument (and `this`) is set to a `Render` instance,
   which in particular has `drawing`, `mappings`, and `styles` attributes.
   You can even modify the drawing's `keys` at this stage,
   by modifying `render.drawing.keys`.
   You can also add SVG content via `render.add` or `svgtiler.add`,
-  e.g., add metadata like `svgtiler.add(<title>My drawing</title>)`
-  (see below for more details).
-* `svgtiler.postprocess(callback)` to schedule calling `callback(render)`
+  e.g., add metadata like `svgtiler.add(<title>My drawing</title>)`;
+  or set a default background color via `render.background(color)` or
+  `svgtiler.background(color)`.
+* `export postprocess` to schedule calling `postprocess(render)`
   after rendering each drawing, e.g., to modify or add to the drawing.
   During the callback, `render` has properties about the rendering's
   bounding box: `xMin`, `xMax`, `yMin`, `yMax`, `width`, `height`.
@@ -368,14 +374,16 @@ The top-level code of your .js or .coffee mapping file can also call:
   or overlays/underlays.
   Specify [`boundingBox`](#overflow-and-bounding-box) to increase the
   overall size of the rendered drawing.
-* `svgtiler.background(fillColor)` to set the default background color
-  for the SVG drawing (implemented via a `<rect>` underneath the bounding box).
-  When used called more than once, only the final background color gets
-  rendered.  When used only once, equivalent to
-  `svgtiler.postprocess((render) => render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>))`.
-  You can also call `svgtiler.background` within a tile definition function or
-  a `preprocess`/`postprocess` callback to set the background dynamically,
-  or set the global default via the `--bg`/`--background` command-line option.
+  You can also set the final background color via
+  `render.background(color)` or `svgtiler.background(color)`.
+  When used only once, this is equivalent to the postprocess step of
+  `render.add(<rect z-index="-Infinity" fill={fillColor} x={render.xMin} y={render.yMin} width={render.width} height={render.height}/>)`.
+
+You can call `svgtiler.background(color)` in `preprocess`, `postprocess`,
+or tile definition functions.  Only the final color will end up being
+rendered, as a single background `<rect>` beneath the whole drawing's
+bounding box.  You can also set a global default background color via the
+`--bg`/`--background` command-line option.
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
 .js and .coffee files can access `__dirname` and `__filename`,
@@ -493,8 +501,7 @@ See the [animation example](examples/anim) for sample usage of a .css or
 
 If you'd rather generate a `<style>` tag dynamically depending on the
 drawing content, you can do so in a .js or .coffee mapping file by calling
-`svgtiler.add` during an `svgtiler.preprocess` or `svgtiler.postprocess`
-callback.
+`svgtiler.add` during a `preprocess` or `postprocess` export.
 
 ## Layout Algorithm
 
@@ -797,7 +804,7 @@ The file can provide build rules in one of a few ways:
 1. `export make = ...` (ESM) or `exports.make = ...` (CommonJS)
 2. `export default ...` (ESM) or `exports.default = ...` (CommonJS)
 3. Writing a top-level object, array, or function expression
-   (without e.g. being assigned to a variable),
+   at the end of the file (without e.g. being assigned to a variable),
    which triggers an implicit `export default`.
 
 The exported rules can be one of the following types:

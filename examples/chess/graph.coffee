@@ -11,7 +11,7 @@ pieces.add lc.toUpperCase() for lc in (x for x from pieces)
 player = (key) ->
   key == key.toLowerCase()
 
-svgtiler.postprocess (render) ->
+export postprocess = (render) ->
   {drawing} = render
   edges = []
   for row, y in drawing.keys

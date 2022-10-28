@@ -26,7 +26,7 @@
   * JSX notation for creating and composing symbols
   * `svgtiler.background` for rendering a background white rectangle
 * [CoffeeScript file](graph.coffee) for rendering the graph of attacks,
-  illustrating more advanced `svgtiler.postprocess` usage.
+  illustrating more advanced `export postprocess` usage.
 
 ## Piece Shapes
 

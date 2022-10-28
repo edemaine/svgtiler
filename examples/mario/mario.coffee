@@ -1,6 +1,6 @@
 palette = background = map = null
 
-svgtiler.onInit ->
+export init = ->
   palette = share.palette ? 'overworld'
   console.log "Using Mario #{palette} palette"
 
