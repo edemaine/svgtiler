@@ -1317,13 +1317,16 @@ class Mapping extends Input
       for callback in @initQueue
         callback.call @, @
   doPreprocess: (render) ->
+    ## Run preprocess queue in forward order
     runWithMapping @, =>
       for callback in @preprocessQueue
         callback.call render, render
   doPostprocess: (render) ->
+    ## Run postprocess queue in reverse order
+    return unless @postprocessQueue.length
     runWithMapping @, =>
-      for callback in @postprocessQueue
-        callback.call render, render
+      for i in [@postprocessQueue.length-1..0]
+        @postprocessQueue[i].call render, render
 
 onInit = (fn) ->
   unless currentMapping?
@@ -1454,11 +1457,14 @@ class Mappings extends ArrayWrapper
       return value if value?
     undefined
   doPreprocess: (render) ->
+    ## Run mappings' preprocessing in forward order.
     for mapping in @
       mapping.doPreprocess render
   doPostprocess: (render) ->
-    for mapping in @
-      mapping.doPostprocess render
+    ## Run mappings' postprocessing in reverse order.
+    return unless @length
+    for i in [@length-1..0]
+      @[i].doPostprocess render
 
 blankCells = new Set [
   ''
