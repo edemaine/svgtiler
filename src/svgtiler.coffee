@@ -1192,14 +1192,26 @@ parseIntoArgs = (text) ->
 
 class Args extends Input
   ###
-  Args list stores in `@args` an array of strings such as "-p" and
-  "filename.asc".  It's represented in a file as an ASCII file
-  that's parsed like a shell, allowing quoted strings, backslash escapes,
-  comments via `#`, and newlines treated like regular whitespace.
+  Base args list stores in `@args` an array of strings
+  such as "-p" and "filename.asc".
+  ###
+  parse: (@args) ->
+  makeRule: (key) ->
+    ## Only default rule '' defined by Args.
+    return if key
+    ## Run child driver with arguments.
+    svgtiler @args
+    return true
+
+class ParsedArgs extends Args
+  ###
+  `.args` files are represented as an ASCII file that's parsed like a shell,
+  allowing quoted strings, backslash escapes, comments via `#`, and
+  newlines treated like regular whitespace.
   ###
   @title: "Additional command-line arguments parsed like a shell"
   parse: (text) ->
-    @args = parseIntoArgs text
+    super parseIntoArgs text
 
 class Mapping extends Input
   ###
@@ -1306,6 +1318,41 @@ class Mapping extends Input
     ## Save in cache if overall static.
     @cache.set key, value if isStatic
     value
+  makeRule: (key) ->
+    executed = false
+    recurse = (value, usedKey) =>
+      while value?
+        #if typeof value == 'string'
+        #  run value
+        #  executed = true
+        #  return
+        if value instanceof Map or value instanceof WeakMap
+          value = value.get key
+          usedKey = true
+        else if typeof value == 'function'
+          ## Functions without arguments only match default rule '',
+          ## unless we've already used the rule through object or Map lookup.
+          return if key and not usedKey and not value.length
+          value = value.call @, key, @
+          ## Function can return `null` (not `undefined`) to say 'no rule'.
+          executed = true unless value == null
+          return
+        else if Array.isArray value
+          for item in value
+            recurse item, usedKey
+          return
+        else if typeof value == 'object'
+          if value.hasOwnProperty key  # avoid inherited property e.g. toString
+            value = value[key]
+            usedKey = true
+          else
+            value = undefined
+        else
+          console.warn "Unsupported data type #{typeof value} in looking up Maketile rule '#{key}'"
+          value = undefined
+      value
+    recurse @module?.make ? @module?.default
+    executed
   onInit: (fn) ->
     @initQueue.push fn
   preprocess: (fn) ->
@@ -2307,9 +2354,9 @@ extensionMap =
   '.styl': StylusStyle
   # Other
   '.svg': SVGFile
-  '.args': Args
+  '.args': ParsedArgs
 #filenameMap =
-#  'maketile': Args
+#  'maketile': ParsedArgs
 
 renderDOM = (elts, settings) ->
   if typeof elts == 'string'
@@ -2541,20 +2588,14 @@ class Driver extends HasSettings
       if i >= args.length and not numFileArgs and not ranMaketile and
          @loadMaketile()?
         ranMaketile = true
-        if @maketile instanceof Args
-          showHelp = "No filename arguments on command line or in '#{@maketile.filename}'"
-          args.push ...@maketile.args
-        else if @maketile instanceof Mapping
-          showHelp = false
-          @maketile.doInit()
-          if @maketile.isFunction()
-            console.log "** #{@maketile.filename} - default"
-            @maketile.map()
-          else
-            console.log "Maketile '#{@maketile.filename}' did not `export default` a function"
+        showHelp = false
+        if @maketile.makeRule?  # Args or Mapping
+          @maketile.doInit?()
+          console.log "** #{@maketile.filename} (default)"
+          unless @maketile.makeRule ''
+            console.log "Maketile '#{@maketile.filename}' does not define a default rule"
         else
-          showHelp = false
-          console.log "Unrecognized Maketile '#{@maketile.filename}' of type '#{@maketile.constructor?.name}'"
+          console.warn "Unrecognized Maketile '#{@maketile.filename}' of type '#{@maketile.constructor?.name}'"
       break if i >= args.length
 
       ## Split up single-dash arguments with multiple options like -pP
@@ -2671,12 +2712,15 @@ class Driver extends HasSettings
           ## Otherwise, check for a matching rule in the Maketile.
           else
             files = []
-            if @loadMaketile()?.module?.hasOwnProperty arg
+            if arg.includes '.'
+              console.warn "No such file or directory '#{arg}', and not a valid Maketile rule name"
+            else if @loadMaketile()?
               console.log "** #{@maketile.filename} - #{arg}"
-              @maketile.doInit()
-              @maketile.module[arg]()
+              @maketile.doInit?()
+              unless @maketile.makeRule arg
+                console.warn "Maketile '#{@maketile.filename}' does not define rule '#{arg}'"
             else
-              console.warn "No files or Maketile rules match '#{arg}'"
+              console.warn "No such file or directory '#{arg}', and no Maketile to define rules"
           append = i+1  # where to append Args
           for file in files
             if typeof file == 'string'
@@ -2745,6 +2789,7 @@ class Driver extends HasSettings
     if showHelp
       console.log showHelp
       #help()
+    return
 
   run: (...protoArgs) ->
     args = []
@@ -2780,7 +2825,7 @@ svgtiler = Object.assign run, {
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle, Styles,
-  Args, SVGFile,
+  Args, ParsedArgs, SVGFile,
   extensionMap, Input, DummyInput, ArrayWrapper,
   Render, getRender, runWithRender, onInit, preprocess, postprocess,
   id: globalId, def: globalDef, background: globalBackground,

@@ -196,7 +196,7 @@ objects:
 2. A [**`Map` object**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
    mapping tile names to tiles.
 3. A **function** taking two arguments &mdash; a tile name (string)
-   and a `Context` object &mdash; and returning a tile.
+   and a `Context` object (also passed as `this`) &mdash; and returning a tile.
    This feature allows you to parse tile names how you want, and to
    vary the tile depending on the context (e.g., neighboring tile names
    or parity of the tile location).
@@ -762,7 +762,9 @@ via one of the following options (any one will do):
 SVG Tiler has a simple `Makefile`-like build system for keeping track of the
 `svgtiler` command-line arguments needed to build your tiled figures.
 These `Maketile`s generally get run whenever you run `svgtiler` without
-any filename arguments (e.g. just running `svgtiler` without any arguments).
+any filename arguments (including directories or glob patterns), for example,
+when just running `svgtiler` without any arguments,
+or when providing just flags like `svgtiler -f`.
 (If you ever want to skip the `Maketile` behavior, just provide mapping
 and drawing filename arguments like you normally would.)
 Several examples of `Maketile`s are in the [examples](examples) directory.
@@ -770,14 +772,17 @@ Several examples of `Maketile`s are in the [examples](examples) directory.
 ### Maketile.args
 
 At the simplest level, you can put the command-line arguments to `svgtiler`
-into a file called `Maketile.args` (or `maketile.args`), and running
-`svgtiler` without any filename arguments will automatically append those
-arguments to the command line.  Thus the `.args` file could specify the
+into a file called `Maketile.args` (or `maketile.args`), and then running
+`svgtiler` without any filename arguments will automatically
+append those arguments to the command line.
+Thus the `.args` file could specify the
 mappings and drawings to render, and you can still add extra options like
 `--pdf` or `--force` to the actual command line as needed.
 The `.args` file gets parsed similar to the `bash` shell,
 so you can write one-line comments with `#`,
-you can use glob expressions like `**/*.asc`,
+you can use
+[glob expressions](https://github.com/isaacs/node-glob#glob-primer)
+like `**/*.asc`,
 and you put quotes around filenames with spaces or other special characters.
 You can also write the arguments over multiple lines
 (with no need to end lines with `\`).
@@ -787,16 +792,40 @@ You can also write the arguments over multiple lines
 The more sophisticated system is to write a `Maketile.coffee` or
 `Maketile.js` file.  This system offers the entire CoffeeScript or
 JavaScript programming language to express complex build rules.
-In particular, you can write multiple different build rules by
-`export`ing different named functions.  The `default` export is the rule
-that gets run when `svgtiler` has no filename arguments; you can run
-another exported rule `foo` by running `svgtiler foo` from the command line.
-However, directory names, filenames with extensions, and glob patterns
-take priority over Maketile rule names, so avoid using rule names containing
-`.`, `*`, `?`, `{`, `[`, `!(`, `+(`, `@(`, or whole directory names
-to prevent such conflicts.
+The file can provide build rules in one of a few ways:
 
-Build rules can run the equivalent of an `svgtiler` command line by calling
+1. `export make = ...` (ESM) or `exports.make = ...` (CommonJS)
+2. `export default ...` (ESM) or `exports.default = ...` (CommonJS)
+3. Writing a top-level object, array, or function expression
+   (without e.g. being assigned to a variable),
+   which triggers an implicit `export default`.
+
+The exported rules can be one of the following types:
+
+1. A **function** taking two arguments &mdash; a rule name (string)
+   and a `Mapping` object representing the Maketile (also passed as `this`).
+   The function should directly run build steps by calling `svgtiler()`;
+   see below.  The function's return value is mostly ignored, except that
+   a return value of `null` is interpreted as "no rule with that name".
+   If the function takes no arguments, it is treated as just defining
+   the default build rule `""` (empty string).
+2. A plain **JavaScript object** whose properties rule names to rules
+   (e.g., `{foo: rule1, bar: rule2, '': defaultRule}`).
+3. A [**`Map` object**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
+   mapping rule names to rules.
+4. An `Array` of any of the above types, meaning to run the rules in sequence.
+
+If you run `svgtiler` with no filename arguments,
+the default rule name of `""` (empty string) gets run.
+If you run `svgtiler` with one or more arguments that are valid rule names
+(containing no `.`s or glob magic patterns like `*` or `?`),
+then instead these rules get run in sequence.
+(Note that directory names, filenames with extensions, and glob patterns
+take priority over Maketile rule names.  So avoid naming rule names that match
+directory names; other conflicts are prevented by forbidding `.`/`*`/`?`/etc.
+in rule names.)
+
+Rule functions can run the equivalent of an `svgtiler` command line by calling
 the `svgtiler` function, e.g., `svgtiler('mapping.coffee *.asc')`.
 String arguments are parsed just like `.args` files: whitespace separates
 arguments, `#` indicates comments, glob patterns get expanded, and quotes
@@ -808,7 +837,8 @@ would not).
 Instead of strings, you can also directly pass in `Mapping` or `Drawing` or
 `Style` objects (as arguments or as part of an array argument).
 An easy way to create such objects is to call `svgtiler.require()`,
-which processes any given filename (without any processing of its filename).
+which loads any given filename as if it was given on the command line
+(without any processing of its filename).
 For example, `svgtiler.require('filename with spaces and *s.asc')` transforms
 an ASCII file into a `Drawing` object.
 
@@ -823,11 +853,12 @@ Thus you can write your own `for` loops and e.g.
 `switch` depending on what additional pattern(s) the filenames match.
 For example, `svgtiler('mapping.coffee *.asc')` can be rewritten as
 `svgtiler.glob('*.asc').forEach((asc) =>
+svgtiler(['mapping.coffee', asc])` or
+`svgtiler.glob('*.asc').forEach((asc) =>
 svgtiler('mapping.coffee', svgtiler.require(asc))`.
 
 No calls to `svgtiler()` or other side effects should be at the top level
-of the `Maketile`.  Instead, put these build steps inside an `export default`
-function or a named `export`ed function.
+of the `Maketile`.  Instead, put these build steps inside a rule function.
 
 ### Directories
 

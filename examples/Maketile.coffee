@@ -1,3 +1,3 @@
-export default ->
+->
   for example in svgtiler.glob '*/'  # match directories only
-    svgtiler [example]
+    svgtiler [example]  # array argument isn't processed for globs etc.

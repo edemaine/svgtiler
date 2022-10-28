@@ -1,11 +1,8 @@
-export coffee = ->
+coffee: ->
   svgtiler '-f map.coffee *.asc'
-export js = ->
+js: ->
   svgtiler '-f map.jsx *.asc'
-export graph = ->
+graph: ->
   svgtiler '-f -O graph-* map.coffee graph.coffee *.asc'
-
-export default ->
-  coffee()
-  js()
-  graph()
+'': ->
+  svgtiler 'coffee js graph'

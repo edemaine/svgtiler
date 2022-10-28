@@ -1,9 +1,10 @@
+# Supported rules: coffee, txt
+# Default `svgtiler` behavior runs all rules.
+
 langs = ['coffee', 'txt']
 
-for lang in langs
-  exports[lang] = do (lang) -> ->
+export make = (lang) ->
+  if lang
     svgtiler "-f --tw 50 --th 50 tilt.#{lang} *.asc *.csv"
-
-export default ->
-  for lang in langs
-    exports[lang]()
+  else
+    svgtiler langs

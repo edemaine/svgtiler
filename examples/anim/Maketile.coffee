@@ -1,9 +1,9 @@
-for lang in ['css', 'styl']
-  exports[lang] = do (lang) -> ->
-    svgtiler """
-      -f css-anim.#{lang}
-      ( shapes.coffee css-anim.csv )
-      ( ascii.coffee ascii.asc )
-    """
+# Supported rules: css (default), styl
 
-export default exports.css
+(lang) ->
+  lang = 'css' unless lang
+  svgtiler """
+    -f css-anim.#{lang}
+    ( shapes.coffee css-anim.csv )
+    ( ascii.coffee ascii.asc )
+  """

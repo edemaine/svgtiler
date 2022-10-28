@@ -1,9 +1,10 @@
+# Supported rules: cjsx, jsx, coffee
+# Default `svgtiler` behavior runs all rules.
+
 langs = ['cjsx', 'jsx', 'coffee']
 
-for lang in langs
-  exports[lang] = do (lang) -> ->
+(lang) ->
+  if lang
     svgtiler "-f outlines.#{lang} *.asc"
-
-export default ->
-  for lang in langs
-    exports[lang]()
+  else
+    svgtiler langs
