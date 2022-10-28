@@ -2539,6 +2539,7 @@ class Driver extends HasSettings
           showHelp = false
           @maketile.doInit()
           if @maketile.isFunction()
+            console.log "** #{@maketile.filename} - default"
             @maketile.map()
           else
             console.log "Maketile '#{@maketile.filename}' did not `export default` a function"
@@ -2659,6 +2660,7 @@ class Driver extends HasSettings
           ## Otherwise, check for a matching rule in the Maketile.
           else
             if @loadMaketile()?.module?.hasOwnProperty arg
+              console.log "** #{@maketile.filename} - #{arg}"
               @maketile.doInit()
               @maketile.module[arg]()
             else
