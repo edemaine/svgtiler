@@ -2450,6 +2450,9 @@ glob = (pattern, options) ->
     pattern = pattern.replace /\\($|[^\*\+\?\!\|\@\(\)\[\]\{\}])/g, '/$1'
   require('glob').sync pattern, options
 
+isGlob = (pattern, options) ->
+  require('glob').hasMagic pattern, options
+
 match = (filename, pattern, options) ->
   ## 'glob' library uses 'minimatch' to match filenames against glob patterns.
   Boolean require('minimatch').match [filename], pattern, options
@@ -2647,18 +2650,21 @@ class Driver extends HasSettings
           showHelp = false
           numFileArgs++
           ## If argument is not a string (e.g. Mapping or Style),
-          ## or is a string that corresponds to an existing filename.
-          ## process it directly.
+          ## or is a string that corresponds to an existing filename
+          ## with an extension (containing '.'), process it directly.
           exists = typeof arg != 'string' or inputCache.has arg
           unless exists
             try
               exists = fs.statSync arg
+              exists = false unless exists.isDirectory() or arg.includes '.'
           if exists
             files = [arg]
           ## Otherwise, try matching as a glob pattern.
-          else if (files = glob arg).length
+          else if isGlob arg
+            files = glob arg
           ## Otherwise, check for a matching rule in the Maketile.
           else
+            files = []
             if @loadMaketile()?.module?.hasOwnProperty arg
               console.log "** #{@maketile.filename} - #{arg}"
               @maketile.doInit()
@@ -2777,7 +2783,7 @@ svgtiler = Object.assign run, {
   SVGTilerError, SVGNS, XLINKNS, escapeId,
   Driver, main, run, convert, inputCache,
   renderDOM,
-  glob, match, filter, require: inputRequire,
+  glob, isGlob, match, filter, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
   version: metadata.version

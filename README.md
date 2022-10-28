@@ -790,8 +790,11 @@ JavaScript programming language to express complex build rules.
 In particular, you can write multiple different build rules by
 `export`ing different named functions.  The `default` export is the rule
 that gets run when `svgtiler` has no filename arguments; you can run
-another exported rule `foo` by running `svgtiler foo` from the command line
-(provided `foo` is not an actual filename).
+another exported rule `foo` by running `svgtiler foo` from the command line.
+However, directory names, filenames with extensions, and glob patterns
+take priority over Maketile rule names, so avoid using rule names containing
+`.`, `*`, `?`, `{`, `[`, `!(`, `+(`, `@(`, or whole directory names
+to prevent such conflicts.
 
 Build rules can run the equivalent of an `svgtiler` command line by calling
 the `svgtiler` function, e.g., `svgtiler('mapping.coffee *.asc')`.
