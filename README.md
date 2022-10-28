@@ -948,6 +948,7 @@ Optional arguments:
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
+  -v / --verbose        Log behind-the-scenes action to aid debugging
   -o DIR / --output DIR Write all output files to directory DIR
   -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
                                 (STEM can use * to refer to input stem)

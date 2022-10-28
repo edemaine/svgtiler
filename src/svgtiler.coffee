@@ -92,6 +92,24 @@ unless window?
           node.arguments.push types.identifier '__dirname'
         return
 
+  verboseBabel = ({types}) ->
+    post: (state) ->
+      return unless getSettings()?.verbose
+      if state.opts?.filename?
+        filename = "[#{state.opts.filename}]"
+      else if state.inputMap?.sourcemap?.sources?.length
+        filename =
+          "[converted from #{state.inputMap.sourcemap.sources.join ' & '}]"
+      else
+        filename = ''
+      console.log '# Babel conversion input:', filename
+      console.log state.code
+      console.log '# Babel conversion output:', filename
+      console.log \
+        require('@babel/generator').default(state.ast, babelConfig).code
+      console.log '# End of Babel conversion', filename
+      return
+
   babelConfig =
     plugins: [
       implicitFinalExportDefault
@@ -116,6 +134,7 @@ unless window?
         throwIfNamespace: false
       ]
       require.resolve 'babel-plugin-module-deps'
+      verboseBabel
     ]
     #inputSourceMap: true  # CoffeeScript sets this to its own source map
     sourceMaps: 'inline'
@@ -135,6 +154,9 @@ unless window?
   CoffeeScript.register()
 
 defaultSettings =
+  ## Log otherwise invisible actions to aid with debugging.
+  ## Currently, 0 = none, nonzero = all, but there may be levels in future.
+  verbose: 0
   ## Force all tiles to have specified width or height.
   forceWidth: null   ## default: no size forcing
   forceHeight: null  ## default: no size forcing
@@ -2342,6 +2364,7 @@ Optional arguments:
   -P / --png            Convert output SVG files to PNG via Inkscape
   -t / --tex            Move <text> from SVG to accompanying LaTeX file.svg_tex
   -f / --force          Force SVG/TeX/PDF/PNG creation even if deps older
+  -v / --verbose        Log behind-the-scenes action to aid debugging
   -o DIR / --output DIR Write all output files to directory DIR
   -O STEM / --output-stem STEM  Write next output to STEM.{svg,svg_tex,pdf,png}
                                 (STEM can use * to refer to input stem)
@@ -2535,6 +2558,8 @@ class Driver extends HasSettings
         when '-h', '--help'
           help()
           return
+        when '-v', '--verbose'
+          @settings.verbose++
         when '-f', '--force'
           @settings.force = true
         when '-m', '--margin'

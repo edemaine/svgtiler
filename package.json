@@ -29,10 +29,11 @@
     "test": "make test"
   },
   "dependencies": {
-    "@babel/core": "7.17.10",
-    "@babel/plugin-transform-modules-commonjs": "7.17.9",
-    "@babel/plugin-transform-react-jsx": "7.17.3",
-    "@babel/register": "7.17.7",
+    "@babel/core": "7.19.10",
+    "@babel/generator": "7.20.0",
+    "@babel/plugin-transform-modules-commonjs": "7.19.6",
+    "@babel/plugin-transform-react-jsx": "7.19.0",
+    "@babel/register": "7.18.9",
     "@xmldom/xmldom": "0.8.3",
     "babel-plugin-auto-import": "1.1.0",
     "babel-plugin-module-deps": "0.1.1",
