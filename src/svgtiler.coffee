@@ -198,6 +198,9 @@ defaultSettings =
   ## `href` behaves better in web browsers, but `xlink:href` is more
   ## compatible with older SVG drawing programs.
   useHref: window?
+  ## Add `data-key`/`data-i`/`data-j`/`data-k` attributes to <use> elements,
+  ## which specify the drawing key and location (row i, column j, layer k).
+  useData: window?
   ## Background rectangle fill color.
   background: null
   ## Glob pattern for Maketiles.
@@ -1981,6 +1984,11 @@ class Render extends HasSettings
             if symbol.autoHeight
               use.setAttribute 'height',
                 (symbol.viewBox?[3] ? symbol.height) * scaleY
+            if @settings.useData
+              use.setAttribute 'data-key', tile.key
+              use.setAttribute 'data-i', i
+              use.setAttribute 'data-j', j
+              use.setAttribute 'data-k', k if tiles.length > 1
           if symbol.boundingBox?
             dx = (symbol.boundingBox[0] - symbol.viewBox[0]) * scaleX
             dy = (symbol.boundingBox[1] - symbol.viewBox[1]) * scaleY
@@ -2459,6 +2467,8 @@ Optional arguments:
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
+  --use-href            Use href attribute instead of xlink:href attribute
+  --use-data            Add data-{key,i,j,k} attributes to <use> elements
   (                     Remember settings, mappings, styles, and share values
   )                     Restore last remembered settings/mappings/styles/share
 
@@ -2703,6 +2713,10 @@ class Driver extends HasSettings
           @settings.overflowDefault = null  # no default
         when '--no-inline'
           @settings.inlineImages = false
+        when '--use-href'
+          @settings.useHref = true
+        when '--use-data'
+          @settings.useData = true
         when '-j', '--jobs'
           i++
           arg = parseInt args[i], 10

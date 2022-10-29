@@ -1031,6 +1031,8 @@ Optional arguments:
   --no-inline           Don't inline <image>s into output SVG
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
+  --use-href            Use href attribute instead of xlink:href attribute
+  --use-data            Add data-{key,i,j,k} attributes to <use> elements
   (                     Remember settings, mappings, styles, and share values
   )                     Restore last remembered settings/mappings/styles/share
 
