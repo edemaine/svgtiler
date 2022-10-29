@@ -1,20 +1,11 @@
-palette = background = map = null
+palette = tiles = null
 
 export init = ->
   palette = share.palette ? 'overworld'
   console.log "Using Mario #{palette} palette"
 
-  background =
-    switch palette
-      when 'castle'      then 'black'
-      when 'overworld'   then '#6b8cff'
-      when 'underground' then 'black'
-      when 'underwater'  then '#0059ff'
-
-  map =
-    '': <symbol viewBox="0 0 16 16">
-          <rect width="16" height="16" fill={background}/>
-        </symbol>
+  tiles =
+    '': <symbol viewBox="0 0 16 16"/>
 
     # Environment
     # These are <symbol>s instead of filename strings to enable building below.
@@ -44,39 +35,39 @@ export init = ->
     spiny_left: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_left.png"/></symbol>
     spiny_right: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_right.png"/></symbol>
 
-export default build = (key) ->
+export preprocess = ->
+  svgtiler.background(
+    switch palette
+      when 'castle'      then 'black'
+      when 'overworld'   then '#6b8cff'
+      when 'underground' then 'black'
+      when 'underwater'  then '#0059ff'
+  )
+
+export map = (key) ->
   ### Keys:
   "a,b" expands to the equivalent of a beneath b
   "a+x+y" expands to a shifted by (x, y)
   For negative offsets, use "-" in place of "+"
   ###
-  key = key.trim()
-  if ',' in key
-    tiles =
-      for subkey in key.split ','
-        build subkey
-    zIndex = Math.max ...(
-      for tile in tiles
-        tile.props['z-index'] ? 0
-    )
-    <symbol viewBox="0 0 16 16" z-index={zIndex or null}>
-      {for subkey in key.split ','
-        tile = build subkey
-        if tile?
-          tile.props?.children
-        else
-          console.warn "Unrecognized subtitle '#{subkey}'"
-      }
-    </symbol>
-  else if match = /^(.*?)([+-]\d+)([+-]\d+)?$/.exec key
-    tile = map[match[1]]
-    offsetX = parseInt match[2]
-    offsetY = parseInt (match[3] ? '0')
-    return unless tile?
-    <symbol {...tile.props}>
-      <g transform={"translate(#{offsetX},#{offsetY})"}>
-        {tile.props.children}
-      </g>
-    </symbol>
-  else
-    map[key]
+  for subkey in key.split ','
+    subkey = subkey.trim()
+    if match = /^(.*?)([+-]\d+)([+-]\d+)?$/.exec subkey
+      subkey = match[1]
+      offsetX = parseInt match[2]
+      offsetY = parseInt (match[3] ? '0')
+    else
+      offsetX = offsetY = 0
+    tile = tiles[subkey]
+    unless tile?
+      console.warn "Unrecognized tile key: #{subkey}"
+      continue
+    if offsetX or offsetY
+      ## Translate tile's children by wrapping in a <g transform>
+      <symbol {...tile.props}>
+        <g transform={"translate(#{offsetX},#{offsetY})"}>
+          {tile.props.children}
+        </g>
+      </symbol>
+    else
+      tile
