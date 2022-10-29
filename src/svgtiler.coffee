@@ -1227,36 +1227,41 @@ multiCall = (func, arg) ->
 class Mapping extends Input
   ###
   Base Mapping class.
-  The passed-in data can be any supported output from a JavaScript mapping
-  file: an object, a Map, or a function resolving to one of the above
-  or a String (containing SVG or a filename), Preact VDOM, or null/undefined,
-  with Arrays possibly mixed in; or another `Mapping`.
-  In this class and subclasses, `@map` stores this data.
+  The passed-in data should be an object (or another `Mapping`)
+  representing the exports from a JavaScript mapping file.
+  The following object properties are optional:
+
+  * `map`: an object, a Map, or a function resolving to one of the above
+    or a String (containing SVG or a filename), Preact VDOM, or null/undefined,
+    with Arrays possibly mixed in; or another `Mapping`.
+  * `init`: function called when this mapping file gets instantiated.
+  * `preprocess`: function called with a `Render` instance at the beginning.
+  * `postprocess`: function called with a `Render` instance at the end.
+
+  As shorthand, you can pass in just a Map, Array, or function and
+  it will be treated as a `map`.
+
+  In this class and subclasses, `@map`, `@init`, `@preprocess`, and
+  `@postprocess` store this data.
   ###
-  @properties = ['init', 'preprocess', 'postprocess']
+  @properties = ['map', 'init', 'preprocess', 'postprocess']
   constructor: (data, opts) ->
     super data, opts
     @cache ?= new Map  # for static tiles
     @settings = {...@settings, dirname: path.dirname @filename} if @filename?
-  @from: (obj, opts) ->
-    ## Build Mapping object from {map, init, preprocess, postprocess} object.
-    new @ obj.map ? obj.default, {...opts, ...@optsFrom obj}
-  @optsFrom: (obj) ->
-    opts = {}
-    for key in @properties
-      opts[key] = obj[key] if obj.hasOwnProperty key
-    opts
-  parse: (@map, opts) ->
+  parse: (data) ->
+    if typeof data == 'function' or data instanceof Map or
+       data instanceof WeakMap or Array.isArray data
+      data = map: data
+    if data?
+      {@map, @init, @preprocess, @postprocess, default: defaultMap} = data
+      @map ?= defaultMap  # use `default` if no `map` property
     unless typeof @map in ['function', 'object', 'undefined']
       console.warn "Mapping file #{@filename} returned invalid mapping data of type (#{typeof @map}): should be function or object"
       @map = null
     if isPreact @map
       console.warn "Mapping file #{@filename} returned invalid mapping data (Preact DOM): should be function or object"
       @map = null
-    if opts?
-      @[key] = value for key, value of opts
-  isFunction: ->
-    typeof @map == 'function'
   lookup: (key, context) ->
     ## `key` normally should be a String (via `AutoDrawing::parse` coercion).
     ## Don't do anything if this is an empty mapping.
@@ -1371,26 +1376,24 @@ class Mapping extends Input
     recurse @exports?.make ? @exports?.default
     executed
   doInit: ->
-    if @settings.verbose and @init?
+    if @getSetting('verbose') and @init?
       console.log "# Calling init() in #{@filename}"
     multiCall @init, @
   doPreprocess: (render) ->
-    if @settings.verbose and @preprocess?
+    if @getSetting('verbose') and @preprocess?
       console.log "# Calling preprocess() in #{@filename}"
     multiCall @preprocess, render
   doPostprocess: (render) ->
-    if @settings.verbose and @postprocess?
+    if @getSetting('verbose') and @postprocess?
       console.log "# Calling postprocess() in #{@filename}"
     multiCall @postprocess, render
 
 ## A fake Mapping file that just sets a `share` key when initialized.
 ## (Used to implement -s/--share command-line option.)
-class ShareSetter
-  constructor: (key, value) ->
-    @key = key
-    @value = value
-  doInit: ->
-    globalShare[@key] = @value
+class ShareSetter extends Mapping
+  constructor: (key, value, settings) ->
+    super {init: -> globalShare[key] = value},
+          {settings, filename: "--share #{key}=#{value}"}
 
 class ASCIIMapping extends Mapping
   @title: "ASCII mapping file"
@@ -1410,7 +1413,7 @@ class ASCIIMapping extends Mapping
       else
         key = line[...separator.index]
       map[key] = line[separator.index + separator[0].length..]
-    super map
+    super {map}
 
 class JSMapping extends Mapping
   @title: "JavaScript mapping file (including JSX notation)"
@@ -1453,9 +1456,9 @@ class JSMapping extends Mapping
       #runWithMapping @, ->
       func @exports, _filename, _dirname, svgtiler,
         (if code.includes 'preact' then require 'preact')
-    if @settings.verbose
+    if @getSetting 'verbose'
       console.log "# Module #{@filename} exported {#{Object.keys(@exports).join ', '}}"
-    super (@exports.map ? @exports.default), @constructor.optsFrom @exports
+    super @exports
   walkDeps: (filename) ->
     deps = new Set
     recurse = (modname) =>
@@ -2638,7 +2641,8 @@ class Driver extends HasSettings
         when '-s', '--share'
           i++
           [key, ...value] = args[i].split '='
-          @addInit new ShareSetter key, value.join '='  # ignore later =s
+          @addInit new ShareSetter key, value.join('='), # ignore later =s
+                                   @settings
         when '-o', '--output'
           i++
           @settings.outputDir = args[i]
@@ -2786,7 +2790,7 @@ class Driver extends HasSettings
               file.hasOwnProperty('map') or
               Mapping.properties.some (prop) -> file.hasOwnProperty prop
             )
-              input = Mapping.from file, settings: @settings
+              input = new Mapping file, settings: @settings
               @settings.mappings.push input
               @addInit input
             else

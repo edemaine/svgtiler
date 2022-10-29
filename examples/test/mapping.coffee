@@ -11,7 +11,7 @@ export map2 = (key) ->
     <circle r="17" fill={key}/>
   </symbol>
 
-export map = new svgtiler.Mapping -> [
+export map = new svgtiler.Mapping [
   map1
   map2
 ]
