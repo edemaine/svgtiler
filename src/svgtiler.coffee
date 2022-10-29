@@ -182,6 +182,8 @@ defaultSettings =
     '.pdf': null
     '.png': null
     '.svg_tex': null
+  ## Delete output files instead of creating them, like `make clean`.
+  clean: false
   ## Path to inkscape.  Default searches PATH.
   inkscape: 'inkscape'
   ## Default overflow behavior is 'visible' unless --no-overflow specified;
@@ -1756,6 +1758,16 @@ skipDef = new Set [
   'title'
 ]
 
+deleteFile = (filename) ->
+  try
+    fs.unlinkSync filename
+  catch err
+    if err.code == 'ENOENT'
+      return false
+    else
+      throw err
+  return true
+
 class Render extends HasSettings
   constructor: (@drawing, @settings) ->
     super()
@@ -2203,7 +2215,10 @@ class Render extends HasSettings
     ## Default filename is the input filename with extension replaced by .svg.
     ## Returns generated .svg filename (even if it didn't changed).
     filename ?= @drawing.generateFilename '.svg'
-    unless @shouldGenerate filename, @mappings, @styles
+    if @getSetting 'clean'
+      console.log '->', filename,
+        if deleteFile filename then '(ALREADY CLEANED)' else '(CLEANED)'
+    else unless @shouldGenerate filename, @mappings, @styles
       console.log '->', filename, '(SKIPPED)'
     else if maybeWrite filename, @makeSVG()
       console.log '->', filename
@@ -2222,8 +2237,11 @@ class Render extends HasSettings
       @getOutputDir('.pdf') ? @getOutputDir('.png') ? @getOutputDir('.svg')
     )?
       relativeDir = path.relative path.parse(filename).dir, outputDir
-    unless @shouldGenerate filename, @mappings
-      console.log '->', filename, '(SKIPPED)'
+    if @getSetting 'clean'
+      console.log ' &', filename,
+        if deleteFile filename then '(ALREADY CLEANED)' else '(CLEANED)'
+    else unless @shouldGenerate filename, @mappings
+      console.log ' &', filename, '(SKIPPED)'
     else if maybeWrite filename, @makeTeX filename, relativeDir
       console.log ' &', filename
     else
@@ -2425,6 +2443,7 @@ Optional arguments:
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR
   --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
+  --clean               Delete SVG/TeX/PDF/PNG files that would be generated
   -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
   --maketile GLOB       Custom Maketile file or glob pattern
@@ -2480,6 +2499,9 @@ convert = (filenames, settings) ->
                   (if data.skip then ' (SKIPPED)' else '')
       console.log data.stdout if data.stdout
       console.log data.stderr if data.stderr
+    .on 'cleaned', (data) =>
+      console.log "   #{data.input} -> #{data.output} (" +
+                  (if data.skip then 'ALREADY ' else '') + 'CLEANED)'
     .on 'error', (error) =>
       if error.input?
         console.log "!! #{error.input} -> #{error.output} FAILED"
@@ -2661,6 +2683,8 @@ class Driver extends HasSettings
         when '--ot', '--output-tex'
           i++
           @settings.outputDirExt['.svg_tex'] = args[i]
+        when '--clean'
+          @settings.clean = true
         when '-i', '--inkscape'
           i++
           @settings.inkscape = args[i]

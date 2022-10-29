@@ -51,7 +51,7 @@
     "prettify-xml": "1.2.0",
     "semver": "7.3.8",
     "stylus": "0.59.0",
-    "svgink": "0.3.0",
+    "svgink": "0.4.0",
     "xlsx": "0.18.5"
   },
   "devDependencies": {

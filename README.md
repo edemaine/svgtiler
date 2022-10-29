@@ -1015,6 +1015,7 @@ Optional arguments:
   --op DIR / --output-pdf DIR   Write all .pdf files to directory DIR
   --oP DIR / --output-png DIR   Write all .png files to directory DIR
   --ot DIR / --output-tex DIR   Write all .svg_tex files to directory DIR
+  --clean               Delete SVG/TeX/PDF/PNG files that would be generated
   -i PATH / --inkscape PATH     Specify PATH to Inkscape binary
   -j N / --jobs N       Run up to N Inkscape jobs in parallel
   --maketile GLOB       Custom Maketile file or glob pattern
