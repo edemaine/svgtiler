@@ -16,6 +16,8 @@
 
 ( inline.coffee )
 
+( needversion.coffee )
+
 ( set.coffee set.asc )
 
 ## Test )'s ability to reset share object

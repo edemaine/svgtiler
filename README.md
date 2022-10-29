@@ -890,10 +890,11 @@ On a web browser, you can include a `<script>` tag that points to
 though not all features are available or fully functional in this mode.
 While the full API is still in flux, the following subset should be stable:
 
-* `new Mapping({map, init, preprocess, postprocess})`: Create a mapping
-  the same as a file `export`ing `map`/`init`/`preprocess`/`postprocess`
-  (all of which are optional).  In particular, `map` can be an object,
-  `Map`, or function mapping keys to SVG content, just like
+* `new svgtiler.Mapping({map, init, preprocess, postprocess})`:
+  Create a mapping the same as a file `export`ing
+  `map`/`init`/`preprocess`/`postprocess` (all of which are optional).
+  In particular, `map` can be an object, `Map`, or
+  function mapping keys to SVG content, just like
   [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
 * `svgtiler.require(filename, [settings], [dirname])` loads the specified file
   as if it was on the `svgtiler` command line, producing a
@@ -904,7 +905,7 @@ While the full API is still in flux, the following subset should be stable:
   For example, `svgtiler.require('./map.coffee')` is equivalent to
   `new Mapping(require('./map.coffee'))`.
   [Node only]
-* `renderDOM(elts, options)`: Convert drawings embedded in the DOM
+* `svgtiler.renderDOM(elts, options)`: Convert drawings embedded in the DOM
   via elements matching `elts` (which can be a query selector string like
   `'.svgtiler'`, or a DOM element, or an iterable of DOM elements).
   [Web only]
@@ -921,7 +922,12 @@ While the full API is still in flux, the following subset should be stable:
     can specify `data-keep-class="true"` (or `options` can specify
     `keepClass: true`) for the rendered SVG to keep the same `class` attribute
     as the drawing element.
-* `version`: SVG Tiler version number as a string, or `'(web)'` in the browser.
+* `svgtiler.version`: SVG Tiler version number as a string,
+  or `'(web)'` in the browser.
+* `svgtiler.needVersion(constraints)`: Require a specified
+  [range of version numbers](https://github.com/npm/node-semver#ranges)
+  (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
+  `svgtiler.needVersion('>=3.0 <3.1')`.
 
 ## Examples
 

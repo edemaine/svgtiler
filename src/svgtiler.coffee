@@ -2827,6 +2827,13 @@ class Driver extends HasSettings
 main = (args...) -> new Driver().main args...
 run = (args...) -> new Driver().run args...
 
+needVersion = (constraints) ->
+  return if metadata.version == '(web)'
+  if require('semver/functions/satisfies') metadata.version, constraints
+    true
+  else
+    throw new SVGTilerError "SVG Tiler version #{metadata.version} does not satisfy #{constraints}"
+
 svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
@@ -2847,7 +2854,7 @@ svgtiler = Object.assign run, {
   glob, isGlob, match, filter, require: inputRequire,
   defaultSettings, getSettings, cloneSettings, getSetting, getOutputDir,
   share: globalShare
-  version: metadata.version
+  needVersion, version: metadata.version
 }
 module?.exports = svgtiler
 window?.svgtiler = svgtiler
