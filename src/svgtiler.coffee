@@ -1368,7 +1368,7 @@ class Mapping extends Input
           console.warn "Unsupported data type #{typeof value} in looking up Maketile rule '#{key}'"
           value = undefined
       value
-    recurse @module?.make ? @module?.default
+    recurse @exports?.make ? @exports?.default
     executed
   doInit: ->
     if @settings.verbose and @init?
@@ -1428,10 +1428,10 @@ class JSMapping extends Mapping
       #  }
       #  console.log code
       pirates?.settings = @settings
-      #@module = runWithMapping @, -> require filename
-      @module = require filename
+      #@exports = runWithMapping @, -> require filename
+      @exports = require filename
       @walkDeps filename
-      #console.log filename, @module
+      #console.log filename, @exports
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually and simulate module.
@@ -1440,7 +1440,7 @@ class JSMapping extends Mapping
         filename: @filename
       }
       #console.log code
-      @module = {}
+      @exports = {}
       ## Mimick NodeJS module's __filename and __dirname variables
       ## [https://nodejs.org/api/modules.html#modules_the_module_scope]
       _filename = path.resolve @filename
@@ -1451,11 +1451,11 @@ class JSMapping extends Mapping
       func = new Function \
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
       #runWithMapping @, ->
-      func @module, _filename, _dirname, svgtiler,
+      func @exports, _filename, _dirname, svgtiler,
         (if code.includes 'preact' then require 'preact')
     if @settings.verbose
-      console.log "# Module #{@filename} exported {#{Object.keys(@module).join ', '}}"
-    super (@module.map ? @module.default), @constructor.optsFrom @module
+      console.log "# Module #{@filename} exported {#{Object.keys(@exports).join ', '}}"
+    super (@exports.map ? @exports.default), @constructor.optsFrom @exports
   walkDeps: (filename) ->
     deps = new Set
     recurse = (modname) =>
