@@ -646,6 +646,8 @@ emptyContainers = new Set [
   'symbol'
 ]
 
+preactRenderToDom = null
+
 class SVGContent extends HasSettings
   ###
   Base helper for parsing SVG as specified in SVG Tiler:
@@ -680,17 +682,21 @@ class SVGContent extends HasSettings
       @svg =
         (window?.preactRenderToString?.default ?
          require('preact-render-to-string')) @value
-      if (preactRenderToDom = window?.preactRenderToDom?.default ?
-                              require 'preact-render-to-dom')?
-        if xmldom?
-          @dom = new preactRenderToDom.RenderToXMLDom {xmldom,
-            svg: true
-            skipNS: true
-          }
-          .render @value
+      if preactRenderToDom == null
+        if window?
+          preactRenderToDom = window?.preactRenderToDom?.RenderToDom
         else
-          @dom = new preactRenderToDom.RenderToDom document, svg: true
-          .render @value
+          preactRenderToDom = require 'preact-render-to-dom'
+        if preactRenderToDom?
+          if xmldom?
+            preactRenderToDom = new preactRenderToDom.RenderToXMLDom {xmldom,
+              svg: true
+              skipNS: true
+            }
+          else
+            preactRenderToDom = new preactRenderToDom.RenderToDom {svg: true}
+      if preactRenderToDom?
+        @dom = preactRenderToDom.render @value
         @postprocessDOM()
     else if typeof @value == 'string'
       if @value.trim() == ''  ## Blank SVG treated as 0x0 symbol
