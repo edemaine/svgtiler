@@ -683,9 +683,10 @@ class SVGContent extends HasSettings
       if (preactRenderToDom = window?.preactRenderToDom?.default ?
                               require 'preact-render-to-dom')?
         if xmldom?
-          @dom = new preactRenderToDom.RenderToXMLDom xmldom,
+          @dom = new preactRenderToDom.RenderToXMLDom {xmldom,
             svg: true
             skipNS: true
+          }
           .render @value
         else
           @dom = new preactRenderToDom.RenderToDom document, svg: true
