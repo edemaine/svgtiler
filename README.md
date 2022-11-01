@@ -333,14 +333,7 @@ The `Context` object has the following properties and methods:
 * `context.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
 * `context.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the drawing input format does allow multiple sheets.
-* `context.drawing.margins` is an object specifying the `left`, `right`,
-  `top`, and `bottom` margins automatically removed, unless you use
-  `--margin` command-line option.  This lets you adjust global parity
-  according to the margins, for example.
-* `context.drawing.unevenLengths` is an array of original row lengths
-  before rows were made to be the same length, unless you use the
-  `--uneven` command-line option.
-  Note that these lengths do not include margins (which get removed first).
+* `context.drawing` is an instance of `Drawing` (see below).
 * You can also add extra data to the main `context` object given to the
   function, and it will be shared among all calls to all mapping/tile
   functions within the same drawing (but not between separate drawings).
@@ -392,6 +385,30 @@ or tile definition functions.  Only the final color will end up being
 rendered, as a single background `<rect>` beneath the whole drawing's
 bounding box.  You can also set a global default background color via the
 `--bg`/`--background` command-line option.
+
+`Drawing` objects (available via `context.drawing` in mapping functions
+or `render.drawing` in `preprocess` and `postprocess` callbacks) have
+the following useful attributes:
+
+* `drawing.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
+* `drawing.subname` is the name of the sheet within the spreadsheet drawing
+  input, or `undefined` if the drawing input format does allow multiple sheets.
+* `drawing.keys` is an array of array of keys, with one array per row.
+* `drawing.get(j, i)` gets the key at row `i`, column `j`
+  (note reversed order), without any special processing.
+* `drawing.at(j, i)` gets the key at row `i`, column `j`
+  (note reversed order), with negative numbers counting back from the end.
+* `drawing.set(j, i, key)` sets the key at row `i`, column `j`
+  (note reversed order, without any special processing) to `key`,
+  adding rows or columns as necessary.
+* `drawing.margins` is an object specifying the `left`, `right`,
+  `top`, and `bottom` margins automatically removed, unless you use
+  `--margin` command-line option.  This lets you adjust global parity
+  according to the margins, for example.
+* `drawing.unevenLengths` is an array of original row lengths
+  before rows were made to be the same length, unless you use the
+  `--uneven` command-line option.
+  Note that these lengths do not include margins (which get removed first).
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
 .js and .coffee files can access `__dirname` and `__filename`,
