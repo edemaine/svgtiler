@@ -333,6 +333,14 @@ The `Context` object has the following properties and methods:
 * `context.filename` is the name of the drawing file (e.g. `"input.xlsx"`).
 * `context.subname` is the name of the sheet within the spreadsheet drawing input,
   or `undefined` if the drawing input format does allow multiple sheets.
+* `context.drawing.margins` is an object specifying the `left`, `right`,
+  `top`, and `bottom` margins automatically removed, unless you use
+  `--margin` command-line option.  This lets you adjust global parity
+  according to the margins, for example.
+* `context.drawing.unevenLengths` is an array of original row lengths
+  before rows were made to be the same length, unless you use the
+  `--uneven` command-line option.
+  Note that these lengths do not include margins (which get removed first).
 * You can also add extra data to the main `context` object given to the
   function, and it will be shared among all calls to all mapping/tile
   functions within the same drawing (but not between separate drawings).

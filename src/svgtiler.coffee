@@ -1621,26 +1621,36 @@ class AutoDrawing extends Drawing
           for cell in row
             String cell
     unless @getSetting 'keepMargins'
+      @margins =
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
       ## Top margin
       while data.length > 0 and allBlank data[0]
+        @margins.top++
         data.shift()
       ## Bottom margin
       while data.length > 0 and allBlank data[data.length-1]
+        @margins.bottom++
         data.pop()
       if data.length > 0
         ## Left margin
         while allBlank (row[0] for row in data)
+          @margins.left++
           for row in data
             row.shift()
         ## Right margin
-        j = Math.max ...(row.length for row in data)
+        j = (Math.max 0, ...(row.length for row in data)) - 1
         while j >= 0 and allBlank (row[j] for row in data)
+          @margins.right++
           for row in data
             if j < row.length
               row.pop()
           j--
     unless @getSetting 'keepUneven'
-      width = Math.max 0, ...(row.length for row in data)
+      @unevenLengths = (row.length for row in data)
+      width = Math.max 0, ...@unevenLengths
       for row in data
         while row.length < width
           row.push ''

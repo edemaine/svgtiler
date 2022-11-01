@@ -20,10 +20,10 @@
     <line y1="-5" y2="5" stroke="purple" stroke-width="4"/>
   </symbol>
   <symbol id="O" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
-    <circle r="5" stroke="black" stroke-width="2" fill="white"/>
+    <circle r="5" stroke="black" stroke-width="2" fill="black"/>
   </symbol>
   <symbol id="O_v1" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
-    <circle r="5" stroke="black" stroke-width="2" fill="black"/>
+    <circle r="5" stroke="black" stroke-width="2" fill="white"/>
   </symbol>
   <symbol id="_2E_v2" viewBox="-5 -5 10 10" width="10" height="10" overflow="visible">
     <circle r="2" fill="purple"/>

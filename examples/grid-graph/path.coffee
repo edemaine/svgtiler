@@ -8,8 +8,9 @@ arrowSize = 2.5
 viewBox = "#{-size/2} #{-size/2} #{size} #{size}"
 
 parity = null
-export init = ->
-  parity = (share.flipParity ? 0) * 2
+export preprocess = ({drawing}) ->
+  parity = (2 * (share.flipParity ? 0) +
+            drawing.margins.top + drawing.margins.left) % 4
 
 blank = <symbol viewBox={viewBox} boundingBox="0 0 0 0"/>
 
