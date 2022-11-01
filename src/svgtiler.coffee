@@ -904,12 +904,14 @@ class SVGContent extends HasSettings
     #  (@emptyWithId or not @dom.hasAttribute 'id') and
     #  emptyContainers.has @dom.tagName
     recursiveEmpty = (node, allowId) ->
+      return not node.data if node.nodeType == node.TEXT_NODE
       return false unless emptyContainers.has node.tagName
       return false unless allowId or not node.hasAttribute 'id'
       for child in node.childNodes
         return false unless recursiveEmpty child
       true
     @isEmpty = recursiveEmpty @dom, @emptyWithId
+    return
   useDOM: ->
     @makeDOM()
     ## Clone if content is static, to enable later re-use
@@ -2218,7 +2220,7 @@ class Render extends HasSettings
             tx = parseNum(text.getAttribute('x')) ? 0
             ty = parseNum(text.getAttribute('y')) ? 0
             content = (
-              for child in text.childNodes when child.nodeType == 3 # TEXT_NODE
+              for child in text.childNodes when child.nodeType == child.TEXT_NODE
                 child.data
             ).join ''
             anchor = attributeOrStyle text, 'text-anchor'
