@@ -939,7 +939,7 @@ class SVGWrapped extends SVGContent
           symbol.setAttribute attribute.name, attribute.value
       for child in (node for node in @dom.childNodes)
         symbol.appendChild child
-      @dom.parentNode?.replaceChild @dom, symbol
+      @dom.parentNode?.replaceChild symbol, @dom
     else
       ## Allow top-level object to specify <symbol> data.
       ## `z-index` and `boundingBox` should already be extracted.
