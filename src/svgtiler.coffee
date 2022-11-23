@@ -1753,7 +1753,8 @@ class SVGFile extends DummyInput
 class Tile
   ###
   `Tile` represents a rendered tile, which consists of
-  * the input `key` (usually a `String`) and coordinates (`i` and `j`);
+  * the input `key` (usually a `String`)
+  * coordinates: row `i`, column `j`, and layer `k`;
   * an `SVGSymbol` (`symbol`); and
   * a layout (`xMin`, `yMin`, `xMax`, `yMax`, `width`, `height`).
   We also store `zIndex` and `isEmpty` (from the symbol).
