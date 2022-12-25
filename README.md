@@ -913,7 +913,8 @@ On NodeJS, you can `npm install svgtiler` and `require('svgtiler')`.
 On a web browser, you can include a `<script>` tag that points to
 `lib/svgtiler.js`, and the interface is available via `window.svgtiler`,
 though not all features are available or fully functional in this mode.
-While the full API is still in flux, the following subset should be stable:
+While the full API is still in flux and the best comments are in
+[svgtiler.coffee](src/svgtiler.coffee), here is a subset:
 
 * `new svgtiler.Mapping({map, init, preprocess, postprocess})`:
   Create a mapping the same as a file `export`ing
@@ -921,6 +922,12 @@ While the full API is still in flux, the following subset should be stable:
   In particular, `map` can be an object, `Map`, or
   function mapping keys to SVG content, just like
   [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
+* `new svgtiler.Drawing(keys)`: Create a drawing with the specified `keys`,
+  which is an `Array` of `Array` of `String`s (or other objects),
+  where `keys[i][j]` represents the key in the cell at row `i` and column `j`.
+* `new svgtiler.Style(css)`: Create CSS styling with the specified `css`
+  content (a `String`).  Or use `new svgtiler.StylusStyle(styl)` to parse the 
+  string as Stylus.
 * `svgtiler.require(filename, [settings], [dirname])` loads the specified file
   as if it was on the `svgtiler` command line, producing a
   `Mapping`, `Drawing`, `Drawings`, `Style`, `Args`, or `SVGFile`
@@ -935,8 +942,11 @@ While the full API is still in flux, the following subset should be stable:
   `'.svgtiler'`, or a DOM element, or an iterable of DOM elements).
   [Web only]
   * Put your mappings in `options.mappings`, which can be a `Mapping` object,
-    a valid argument to `new Mapping`, an Array of the above, or
-    a `Mappings` object (a special type of Array).
+    a valid argument to `new Mapping`, an `Array` of the above, or
+    a `Mappings` object (a special type of `Array`).
+  * Put additional CSS styling in `options.styles`, which can be a `Style`
+    object, a valid argument to `new Style`, an `Array` of the above, or
+    a `Styles` object (a special type of `Array`).
   * Each drawing can have a `data-filename` attribute to define its name and
     extension, which determines its format; or you can set `options` to an
     object with specifying a default `filename`.
@@ -947,12 +957,18 @@ While the full API is still in flux, the following subset should be stable:
     can specify `data-keep-class="true"` (or `options` can specify
     `keepClass: true`) for the rendered SVG to keep the same `class` attribute
     as the drawing element.
+* `svgtiler.getRender()`: Returns the current `Render` object for the current
+  rendering job, which in particular has `drawing`, `mappings`, and `styles`
+  attributes.
+* `svgtiler.getContext()`: Returns the current `Context` object for the
+  currently rendering tile.
 * `svgtiler.version`: SVG Tiler version number as a string,
   or `'(web)'` in the browser.
 * `svgtiler.needVersion(constraints)`: Require a specified
   [range of version numbers](https://github.com/npm/node-semver#ranges)
   (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
   `svgtiler.needVersion('>=3.0 <3.1')`.
+  Put this in your `Maketile.js` or `Maketile.coffee`.
 
 ## Examples
 

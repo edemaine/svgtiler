@@ -1572,7 +1572,7 @@ writeOrTouch = (filename, data) ->
 class Drawing extends Input
   ###
   Base Drawing class uses a data format of an Array of Array of keys,
-  where `data[i][j]` represents the key in row `i` and column `j`,
+  where `@keys[i][j]` represents the key in row `i` and column `j`,
   without any preprocessing.  This is meant for direct API use,
   whereas AutoDrawing provides preprocessing for data from mapping files.
   In this class and subclasses, `@keys` stores the Array of Array of keys.
