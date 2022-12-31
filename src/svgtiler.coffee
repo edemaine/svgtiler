@@ -2367,6 +2367,10 @@ class Context
     @key? and @key.includes ...args
   match: (...args) ->
     @key? and @key.match ...args
+  startsWith: (...args) ->
+    @key? and @key.startsWith ...args
+  endsWith: (...args) ->
+    @key? and @key.endsWith ...args
   row: (di = 0) ->
     i = @i + di
     for key, j in @drawing.keys[i] ? []

@@ -299,6 +299,8 @@ The `Context` object has the following properties and methods:
 * `context.includes(substring)` computes whether `context.key` contains the
   given `substring` (a shortcut for `context.key.includes(substring)` in
   ECMAScript 2015, but handling the case when `context.key` is `undefined`).
+* `context.startsWith(substring)` and `context.endsWith(substring)` are
+  similar shortcuts, but failing when `context.key` is `undefined`.
 * `context.match(regex)` matches `context.key` against the given regular
   expression (a shortcut for `context.key.match(regex)`,
   but handling the case when `context.key` is `undefined`).
