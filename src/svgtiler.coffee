@@ -1009,8 +1009,9 @@ class SVGSymbol extends SVGWrapped
     unless @height?
       warnings.push 'height'
       @height = 0
-    if warnings.length > 0
-      console.warn "Failed to detect #{warnings.join ' and '} of SVG for #{@name}"
+    if warnings.length
+      @sizeWarning = ->
+        console.warn "Failed to detect #{warnings.join ' and '} of SVG for #{@name}"
 
     ## Optionally extract <text> nodes for LaTeX output
     if @getSetting 'texText'
@@ -1772,6 +1773,7 @@ class Tile
   ###
   constructor: (opts) ->
     @[key] = value for key, value of opts if opts?
+    @symbol?.sizeWarning?() if @k == 0
 
 ## Do not need to wrap the following elements in <defs>.
 skipDef = new Set [
