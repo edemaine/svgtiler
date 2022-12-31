@@ -356,10 +356,13 @@ the following functions:
 * `export preprocess` to schedule calling `preprocess(render)`
   when preparing to rendering each drawing, e.g.,
   to initialize drawing-specific data or globally examine the drawing.
-  The `render` argument (and `this`) is set to a `Render` instance,
+  The `render` argument (and `this`) is set to a [`Render`](#render-class)
+  instance,
   which in particular has `drawing`, `mappings`, and `styles` attributes.
   You can even modify the drawing's `keys` at this stage,
   by modifying `render.drawing.keys`.
+  Alternatively, loop over the cells using `render.forEach((context) => ...)`
+  and use `context.set(newKey)`.
   You can also add SVG content via `render.add` or `svgtiler.add`,
   e.g., add metadata like `svgtiler.add(<title>My drawing</title>)`;
   or set a default background color via `render.background(color)` or
@@ -969,6 +972,44 @@ While the full API is still in flux and the best comments are in
   (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
   `svgtiler.needVersion('>=3.0 <3.1')`.
   Put this in your `Maketile.js` or `Maketile.coffee`.
+
+### Render Class
+
+An `svgtiler.Render` object represents a rendering job: converting a
+drawing with mappings and styles into an SVG and possibly other formats.
+It is passed as the single argument (and `this`) to any user-defined
+`preprocess` and `postprocess` functions exported from mapping files.
+You can also get the currently rendering `Render` object
+(e.g. during `preprocess` or `postprocess` stages) via `svgtiler.getRender()`.
+
+A `Render` object has the following properties:
+
+* `drawing`: `Drawing` object of what's being rendered.
+* `mappings`: `Mappings` object containing all the applicable `Mapping`s.
+* `styles`: `Style` object containing all the included `Style`s.
+* `xMin`, `xMax`, `yMin`, `yMax`: Current bounding box of rendered content.
+
+A `Render` object has the following methods:
+
+* `add(content)`: Add SVG content to the rendering.
+  Equivalent to `svgtiler.add(content)`.
+* `id(prefix)`: Generate a unique-to-this-render `id` starting with `prefix`.
+  The current algorithm uses `prefix`, then `prefix_v0`, then `prefix_v1`, etc.
+  This can be useful for assigning an `id` to some SVG content, and then
+  referring to it in the same rendering (e.g. duplicating via `<use>`).
+  Normally you'd use `svgtiler.id(prefix)` which is equivalent to
+  `currentRender().id(prefix)` within a rendering context, and generates
+  globally unique ids outside of a rendering context.
+* `def(tag)`: Adds SVG content to `<defs>` in the output
+  (except when the tag doesn't need to be wrapped in `<defs>`, such as
+  `<marker>`, `<filter>`, `<gradient>`), and assigns it a unique ID.
+  Returns an `SVGContent` object `def` with property `def.id` containing a
+  unique `id` string, and helper methods `def.url()` and `def.hash()`
+  generating `url(#id)` (as you'd use markers or gradients) and `#id`
+  (as you'd use in `<use>`) respectively.
+  Normally you'd use `svgtiler.def(tag)` which is equivalent to
+  `currentRender().def(tag)` within a rendering context, and generates
+  globally defs outside of a rendering context.
 
 ## Examples
 
