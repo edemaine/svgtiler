@@ -1021,10 +1021,10 @@ figures.  Open an issue or pull request to add yours!
 ## Installation
 
 After [installing Node](https://nodejs.org/en/download/),
-you can install this tool via
+you can install (or update) this tool via
 
 ```sh
-npm install -g svgtiler
+npm install -g svgtiler@latest
 ```
 
 SVG Tiler requires Node v14+.
