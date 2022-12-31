@@ -1885,6 +1885,8 @@ class Render extends HasSettings
         for j in [0...row.length]
           currentContext.move j, i
           callback.call currentContext, currentContext
+  context: (i, j) ->
+    new Context @, i, j
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.

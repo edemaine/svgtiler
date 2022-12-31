@@ -998,6 +998,8 @@ A `Render` object has the following methods:
   including `i` (row number), `j` (column number), and `key` attributes.
   This is a convenient way to iterate through a drawing, while being able
   to use all the context methods like `neighbor` and `set`.
+* `context(i, j)`: Create new `Context` object at specified coordinates.
+  Equivalent to `new svgtiler.Context(render, i, j)`.
 * `add(content)`: Add SVG content to the rendering.
   Equivalent to `svgtiler.add(content)`.
 * `id(prefix)`: Generate a unique-to-this-render `id` starting with `prefix`.
