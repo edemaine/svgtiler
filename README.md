@@ -991,6 +991,11 @@ A `Render` object has the following properties:
 
 A `Render` object has the following methods:
 
+* `forEach(callback)`: Calls `callback(context)` once per cell of the drawing,
+  with `context` set to a `Context` object (also passed as `this`)
+  including `i` (row number), `j` (column number), and `key` attributes.
+  This is a convenient way to iterate through a drawing, while being able
+  to use all the context methods like `neighbor` and `set`.
 * `add(content)`: Add SVG content to the rendering.
   Equivalent to `svgtiler.add(content)`.
 * `id(prefix)`: Generate a unique-to-this-render `id` starting with `prefix`.

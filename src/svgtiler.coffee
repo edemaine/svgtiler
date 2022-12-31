@@ -1879,6 +1879,12 @@ class Render extends HasSettings
       @height = @yMax - @yMin
     else
       @height = 0
+  forEach: (callback) ->
+    runWithContext (new Context @), =>
+      for row, i in @drawing.keys
+        for j in [0...row.length]
+          currentContext.move j, i
+          callback.call currentContext, currentContext
   makeDOM: -> runWithRender @, => runWithContext (new Context @), =>
     ###
     Main rendering engine, returning an xmldom object for the whole document.
