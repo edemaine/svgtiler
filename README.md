@@ -293,15 +293,15 @@ Instead of passing the `Context` object to other functions, they can access
 the currently active `Context` via `svgtiler.getContext()`.
 The `Context` object has the following properties and methods:
 
-* `context.key` is the tile name, or `null` if the `Context` is out of bounds
-  of the drawing.  (This can't happen in the initial call, but can happen
-  when you call `context.neighbor`.)
+* `context.key` is the tile name, or `undefined` if the `Context` is out of
+  bounds of the drawing.  (This can't happen in the initial call,
+  but can happen when you call `context.neighbor`.)
 * `context.includes(substring)` computes whether `context.key` contains the
-  given `substring` (a shortcut for `this.key.includes(substring)` in
-  ECMAScript 2015, but handling the case when `this.key` is `null`).
+  given `substring` (a shortcut for `context.key.includes(substring)` in
+  ECMAScript 2015, but handling the case when `context.key` is `undefined`).
 * `context.match(regex)` matches `context.key` against the given regular
   expression (a shortcut for `context.key.match(regex)`,
-  but handling the case when `context.key` is `null`).
+  but handling the case when `context.key` is `undefined`).
 * `context.i` is the row number of the cell of this tile (starting at 0).
 * `context.j` is the column number of the cell of this tile (starting at 0).
 * `context.neighbor(dj, di)` returns a new `Context` for row `context.i + di`
@@ -309,7 +309,7 @@ The `Context` object has the following properties and methods:
   (Note the reversal of coordinates, so that the order passed to `neighbor`
   corresponds to *x* then *y* coordinate.)
   If there is no tile at that position, you will still get a `Context` object
-  but its `key` value will be `null` and `includes()` and `match()`
+  but its `key` value will be `undefined` and `includes()` and `match()`
   will always return `false`.
 * `context.at(j, i)` returns a new `Context` for row `j` and column `i`
   (absolute coordinates).
