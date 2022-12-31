@@ -1,7 +1,7 @@
 {
   "name": "svgtiler",
   "description": "Tool for drawing diagrams on a grid, combining grids of SVGs into a big SVG figure",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/edemaine/svgtiler.git"
