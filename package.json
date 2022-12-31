@@ -46,7 +46,7 @@
     "pirates": "4.0.5",
     "preact": "10.11.2",
     "preact-html-converter": "0.4.2",
-    "preact-render-to-dom": "0.1.0",
+    "preact-render-to-dom": "0.1.1",
     "preact-render-to-string": "5.2.6",
     "prettify-xml": "1.2.0",
     "semver": "7.3.8",

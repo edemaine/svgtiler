@@ -9,6 +9,8 @@
 ( escape.txt escape.csv )
 ( css-escape.css css-escape.txt css-escape.asc )
 
+( fragment.coffee fragment.asc )
+
 ( glob.coffee )
 
 ( mapping.coffee mapping.ssv )

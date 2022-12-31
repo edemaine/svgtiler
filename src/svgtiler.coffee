@@ -676,17 +676,15 @@ class SVGContent extends HasSettings
     return @svg if @svg?
     ## Set `@svg` to SVG string for duplication detection.
     if isPreact @value
-      ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings.
-      ## Serialization + parsing shouldn't be necessary, but this lets us
-      ## deal with one parsed format (xmldom).
+      ## Render Preact virtual dom nodes (e.g. from JSX notation) into strings
+      ## and directly into DOM.
       @svg =
         (window?.preactRenderToString?.default ?
          require('preact-render-to-string')) @value
       if preactRenderToDom == null
-        if window?
-          preactRenderToDom = window?.preactRenderToDom?.RenderToDom
-        else
-          preactRenderToDom = require 'preact-render-to-dom'
+        try
+          preactRenderToDom = window?.preactRenderToDom?.RenderToDom ?
+            require 'preact-render-to-dom'
         if preactRenderToDom?
           if xmldom?
             preactRenderToDom = new preactRenderToDom.RenderToXMLDom {xmldom,
@@ -699,8 +697,8 @@ class SVGContent extends HasSettings
         @dom = preactRenderToDom.render @value
         @postprocessDOM()
     else if typeof @value == 'string'
-      if @value.trim() == ''  ## Blank SVG treated as 0x0 symbol
-        @svg = '<symbol viewBox="0 0 0 0"/>'
+      if @value.trim() == ''  ## Blank SVG mapped to empty <symbol>
+        @svg = '<symbol/>'    ## This will get width/height 0 in SVGSymbol
       else unless @value.includes '<'  ## No <'s -> interpret as filename
         filename = @value
         filename = path.join @settings.dirname, filename if @settings?.dirname?
@@ -768,15 +766,16 @@ class SVGContent extends HasSettings
         console.error "SVG parse #{level} in #{@name}: #{msg}"
     .parseFromString svg, 'image/svg+xml'
     .documentElement
-    ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     @postprocessDOM()
     @dom
   postprocessDOM: ->
+    ## Remove from the symbol any top-level xmlns=SVGNS or xmlns:xlink,
     ## in the original parsed content or possibly added above,
     ## to avoid conflict with these attributes in the top-level <svg>.
-    @dom.removeAttribute 'xmlns'
+    ## `removeAttribute` won't be defined in the case @dom is DocumentFragment.
+    @dom.removeAttribute? 'xmlns'
     unless @getSetting 'useHref'
-      @dom.removeAttribute 'xmlns:xlink'
+      @dom.removeAttribute? 'xmlns:xlink'
 
     ## Wrap in <symbol> if appropriate,
     ## before we add width/height/etc. attributes.
@@ -847,6 +846,19 @@ class SVGContent extends HasSettings
       else
         true
 
+    ## Determine whether the symbol is "empty",
+    ## meaning it has no useful content so can be safely omitted.
+    recursiveEmpty = (node, allowId) ->
+      return not node.data if node.nodeType == node.TEXT_NODE
+      return false unless node.nodeType == node.DOCUMENT_FRAGMENT_NODE or
+                          emptyContainers.has node.tagName
+      ## `hasAttribute` won't be defined in the case node is DocumentFragment
+      return false unless allowId or not node.hasAttribute? 'id'
+      for child in node.childNodes
+        return false unless recursiveEmpty child
+      true
+    @isEmpty = recursiveEmpty @dom, @emptyWithId
+
     ## Determine `viewBox`, `width`, and `height` attributes.
     @viewBox = parseBox @dom.getAttribute 'viewBox'
     @width = parseDim @origWidth = @dom.getAttribute 'width'
@@ -863,7 +875,11 @@ class SVGContent extends HasSettings
     ## Absent viewBox set to automatic bounding box if requested
     ## (e.g. in `SVGSymbol`).
     if not @viewBox? and @autoViewBox
-      if (@viewBox = svgBBox @dom)?
+      ## Treat empty content (e.g. empty fragment) as 0x0.
+      if @isEmpty
+        @viewBox = [0, 0, 0, 0]
+        @dom.setAttribute 'viewBox', @viewBox.join ' '
+      else if (@viewBox = svgBBox @dom)?
         @dom.setAttribute 'viewBox', @viewBox.join ' '
     ## Absent width/height inherited from viewBox if latter is present,
     ## in `SVGSymbol` which sets `@autoWidthHeight`.
@@ -903,14 +919,6 @@ class SVGContent extends HasSettings
     #@isEmpty = @dom.childNodes.length == 0 and
     #  (@emptyWithId or not @dom.hasAttribute 'id') and
     #  emptyContainers.has @dom.tagName
-    recursiveEmpty = (node, allowId) ->
-      return not node.data if node.nodeType == node.TEXT_NODE
-      return false unless emptyContainers.has node.tagName
-      return false unless allowId or not node.hasAttribute 'id'
-      for child in node.childNodes
-        return false unless recursiveEmpty child
-      true
-    @isEmpty = recursiveEmpty @dom, @emptyWithId
     return
   useDOM: ->
     @makeDOM()
@@ -948,7 +956,8 @@ class SVGWrapped extends SVGContent
       for attribute in ['viewBox', 'width', 'height', 'overflow']
         continue if attribute in ['width', 'height'] and
                     @dom.tagName not in ['g']
-        if @dom.hasAttribute attribute
+        ## `hasAttribute` won't be defined in the case @dom is DocumentFragment
+        if @dom.hasAttribute? attribute
           symbol.setAttribute attribute, @dom.getAttribute attribute
           @dom.removeAttribute attribute
       parent = @dom.parentNode
@@ -988,7 +997,7 @@ class SVGSymbol extends SVGWrapped
     @autoHeight = isAuto @origHeight
 
     ## Remove `width="auto"` and `height="auto"` attributes
-    ## (or whatever `SVGTop` set them to).
+    ## (or whatever `SVGContent` set them to).
     @dom.removeAttribute 'width' if @autoWidth
     @dom.removeAttribute 'height' if @autoHeight
 
