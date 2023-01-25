@@ -950,10 +950,10 @@ class SVGWrapped extends SVGContent
       @dom.parentNode?.replaceChild symbol, @dom
     else
       ## Allow top-level object to specify <symbol> data.
-      ## `z-index` and `boundingBox` should already be extracted.
-      ## `width` and `height` have another meaning in e.g. <rect>s,
-      ## so just transfer for tags where they are meaningless.
-      for attribute in ['viewBox', 'width', 'height', 'overflow']
+      for attribute in ['viewBox', 'boundingBox', 'z-index', 'overflow',
+                        'width', 'height']
+        ## `width` and `height` have another meaning in e.g. <rect>s,
+        ## so just transfer for tags where they are meaningless.
         continue if attribute in ['width', 'height'] and
                     @dom.tagName not in ['g']
         ## `hasAttribute` won't be defined in the case @dom is DocumentFragment
