@@ -461,7 +461,7 @@ findRefs = (root) =>
     return unless node.attributes?
     for attr in node.attributes
       if attr.name in ['href', 'xlink:href'] and
-              (value = attr.value.trim()).startsWith '#'
+         (value = attr.value.trim()).startsWith '#'
         refs.push {id: value[1..].trim(), node, attr: attr.name}
       else
         while (match = refRegExp.exec attr.value)?
@@ -2077,7 +2077,12 @@ class Render extends HasSettings
               @defs.push def
           node.setAttribute attr, node.getAttribute(attr).replace "##{id}",
             "##{newId}"
+    ## Search <symbol>s created for tiles
     findGlobalDefs @dom
+    ## Search layer content, including from `svgtiler.add`
+    for key, layer of @layers
+      for node in layer
+        findGlobalDefs node
 
     ## Render all <defs> so far and check for additional <defs> used by them.
     ## `for def in @defs` but allowing @defs to change in length
