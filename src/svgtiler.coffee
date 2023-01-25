@@ -2921,7 +2921,8 @@ needVersion = (constraints) ->
   if require('semver/functions/satisfies') metadata.version, constraints
     true
   else
-    throw new SVGTilerError "SVG Tiler version #{metadata.version} does not satisfy #{constraints}"
+    throw new SVGTilerError "SVG Tiler version #{metadata.version} does not satisfy #{constraints}
+      \nPlease upgrade SVG Tiler via: npm install -g svgtiler@latest\n"
 
 svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
