@@ -870,7 +870,7 @@ class SVGContent extends HasSettings
       @dom.setAttribute 'height', @height = @defaultHeight
     ## Absent viewBox becomes 0 0 <width> <height> if latter are present
     ## (but only internal to SVG Tiler, DOM remains unchanged).
-    if @width? and @height? and not @viewBox?
+    if @width? and @height? and not @viewBox? and @autoViewBox
       @viewBox = [0, 0, @width, @height]
     ## Absent viewBox set to automatic bounding box if requested
     ## (e.g. in `SVGSymbol`).
