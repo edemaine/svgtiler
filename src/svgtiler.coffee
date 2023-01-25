@@ -2032,10 +2032,10 @@ class Render extends HasSettings
             dx = (symbol.boundingBox[0] - symbol.viewBox[0]) * scaleX
             dy = (symbol.boundingBox[1] - symbol.viewBox[1]) * scaleY
             @expandBox [
-              x + dx
-              y + dy
-              symbol.boundingBox[2] * scaleX
-              symbol.boundingBox[3] * scaleY
+              x + dx if symbol.boundingBox[0]?
+              y + dy if symbol.boundingBox[1]?
+              symbol.boundingBox[2] * scaleX if symbol.boundingBox[2]?
+              symbol.boundingBox[3] * scaleY if symbol.boundingBox[3]?
             ]
           else
             @expandBox [tile.xMin, tile.yMin, tile.width, tile.height]
