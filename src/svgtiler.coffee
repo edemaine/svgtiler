@@ -2818,6 +2818,9 @@ class Driver extends HasSettings
                 console.log '*', file, '(cached)'
                 input = inputCache.get file
                 input.settings = @settings
+                ## Reset filename and dirname in case we're in a new directory
+                input.settings.filename = file
+                input.settings.dirname = path.dirname file
               else
                 ## Check for directory
                 if exists instanceof fs.Stats
