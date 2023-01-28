@@ -922,6 +922,9 @@ class SVGContent extends HasSettings
     return
   useDOM: ->
     @makeDOM()
+    ## `@idOverride` sets `id` attribute just in the used DOM,
+    ## without changing the `@id` property of the `SVGContent` object.
+    @dom.setAttribute 'id', @idOverride if @idOverride?
     ## Clone if content is static, to enable later re-use
     if @isStatic
       @dom.cloneNode true
@@ -2073,7 +2076,10 @@ class Render extends HasSettings
             else
               globalIdMap.set id, newId = @id desireId
               usedIds.add newId
-              def.setId newId
+              ## Don't call `def.setId` which breaks `id` for global def
+              ## potentially used in a future Render; instead, override id
+              ## just for this DOM.
+              def.idOverride = newId
               @defs.push def
           node.setAttribute attr, node.getAttribute(attr).replace "##{id}",
             "##{newId}"
@@ -2100,7 +2106,7 @@ class Render extends HasSettings
     defsWrapper = null
     for {def, dom} in defDoms
       ## Omit unused <defs> unless forced.
-      continue unless def.isForced or usedIds.has def.id
+      continue unless def.isForced or usedIds.has dom.getAttribute 'id'
       ## Wrap in <defs> if needed.
       if skipDef.has dom.tagName
         @dom.insertBefore dom, firstSymbol
