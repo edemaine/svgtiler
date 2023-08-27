@@ -25,8 +25,8 @@ export init = ->
 
   else
     unevenLengths = @drawing.unevenLengths
-    console.assert unevenLengths?.length == 3 and unevenLengths[0] == 2 and
-      unevenLengths[1] == 1 and unevenLengths[2] == 0, 'unevenLengths'
+    console.assert unevenLengths?.length == 3 and unevenLengths[0] == 3 and
+      unevenLengths[1] == 2 and unevenLengths[2] == 1, 'unevenLengths'
 
     console.assert 'd' == @at(0, 1).key == @at(-3, 1).key == @at(0, -2).key == @at(-3, -2).key, 'd'
     console.assert 'e' == @at(1, 1).key == @at(-2, 1).key == @at(1, -2).key == @at(-2, -2).key, 'e'
