@@ -6,6 +6,7 @@ export init = ->
 
   tiles =
     '': <symbol viewBox="0 0 16 16"/>
+    blank: <symbol viewBox="0 0 16 16"/>
 
     # Environment
     # These are <symbol>s instead of filename strings to enable building below.
@@ -31,9 +32,15 @@ export init = ->
     luigi_large_right: <symbol viewBox="0 0 16 16" z-index="2"><image y="-15" xlink:href="luigi_large_right.png"/></symbol>
 
     # Enemies
-    goomba: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href={"goomba_#{palette}".png}/></symbol>
+    goomba: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="goomba_#{palette}.png"/></symbol>
     spiny_left: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_left.png"/></symbol>
     spiny_right: <symbol viewBox="0 0 16 16" z-index="1"><image y="1" xlink:href="spiny_right.png"/></symbol>
+
+    # Items
+    "1up": <symbol viewBox="0 0 16 16"><image xlink:href="1up_#{palette}.png"/></symbol>
+    flower: <symbol viewBox="0 0 16 16"><image xlink:href="flower.png"/></symbol>
+    mushroom: <symbol viewBox="0 0 16 16"><image xlink:href="mushroom.png"/></symbol>
+    star: <symbol viewBox="0 0 16 16"><image xlink:href="star.png"/></symbol>
 
 export preprocess = ->
   svgtiler.background(
@@ -49,25 +56,30 @@ export map = (key) ->
   "a,b" expands to the equivalent of a beneath b
   "a+x+y" expands to a shifted by (x, y)
   For negative offsets, use "-" in place of "+"
+  Add "*6" for six offset copies, starting with 0 (for fire bars)
   ###
   for subkey in key.split ','
     subkey = subkey.trim()
-    if match = /^(.*?)([+-]\d+)([+-]\d+)?$/.exec subkey
+    if match = /^(.*?)([+-]\d+)([+-]\d+)?(\*\d+)?$/.exec subkey
       subkey = match[1]
-      offsetX = parseInt match[2]
-      offsetY = parseInt (match[3] ? '0')
+      offsetX = parseInt match[2], 10
+      offsetY = if match[3] then parseInt match[3], 10 else 0
+      range = if match[4] then [0...parseInt match[4][1..], 10] else [1]
     else
       offsetX = offsetY = 0
+      range = null
     tile = tiles[subkey]
     unless tile?
       console.warn "Unrecognized tile key: #{subkey}"
       continue
-    if offsetX or offsetY
+    if offsetX or offsetY or (range? and (range.length != 1 or range[0] != 1))
       ## Translate tile's children by wrapping in a <g transform>
       <symbol {...tile.props}>
-        <g transform={"translate(#{offsetX},#{offsetY})"}>
-          {tile.props.children}
-        </g>
+        {for mult in range
+          <g transform={"translate(#{mult * offsetX},#{mult * offsetY})"}>
+            {tile.props.children}
+          </g>
+        }
       </symbol>
     else
       tile

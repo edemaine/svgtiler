@@ -3,7 +3,7 @@ palettes = ['castle', 'overworld', 'underground', 'underwater']
 ## Define individual palette rules and a default rule that builds them all.
 export make = (palette) ->
   if palette
-    svgtiler "-f -s palette=#{palette} -O *_#{palette} mario.coffee door.tsv"
+    svgtiler "-f -s palette=#{palette} -O *_#{palette} mario.coffee *.tsv"
   else
     svgtiler palettes
 
