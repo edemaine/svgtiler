@@ -38,7 +38,7 @@
     "babel-plugin-auto-import": "1.1.0",
     "babel-plugin-module-deps": "0.1.1",
     "coffeescript": "2.7.0",
-    "csv-parse": "5.3.1",
+    "csv-parse": "5.5.0",
     "glob": "8.0.3",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.2",
@@ -49,10 +49,10 @@
     "preact-render-to-dom": "0.1.1",
     "preact-render-to-string": "5.2.6",
     "prettify-xml": "1.2.0",
-    "semver": "7.3.8",
+    "semver": "7.5.4",
     "stylus": "0.59.0",
     "svgink": "0.4.0",
-    "xlsx": "0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz"
   },
   "devDependencies": {
     "vnu-jar": "22.9.29"
