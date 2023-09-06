@@ -32,6 +32,15 @@ One of the introductory square puzzles from the video game
 | [![squares unsolved puzzle](squares_unsolved.svg)](squares_unsolved.svg) | [![squares solved puzzle](squares_solved.svg)](squares_solved.svg) |
 | [TSV input](squares_unsolved.tsv), [SVG output](squares_unsolved.svg) | [TSV input](squares_solved.tsv), [SVG output](squares_solved.svg) |
 
+### Stars
+
+One of the Treehouse star/sun puzzles from the video game.
+
+| Unsolved | Solved |
+|:---:|:---:|
+| [![stars unsolved puzzle](stars_unsolved.svg)](stars_unsolved.svg) | [![stars solved puzzle](stars_solved.svg)](stars_solved.svg) |
+| [TSV input](stars_unsolved.tsv), [SVG output](stars_unsolved.svg) | [TSV input](stars_solved.tsv), [SVG output](stars_solved.svg) |
+
 ### Triangles
 
 A simple triangles puzzle (not from the actual video game).
