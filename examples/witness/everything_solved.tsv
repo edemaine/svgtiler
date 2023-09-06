@@ -1,0 +1,9 @@
+start	-	.	-	.	-	.	-	.	finish
+|s		|		|	r*	|	ra	|	
+.hs	-s	.s	-	.s	-s	.s	-	.	finish
+|	rq	|s	bq	|s	df	|s	r*	|	
+start	-s	.s	-	.s	-	.s	-	.s	finish
+|s		|b		|s	m	|s	r*	|hs	
+start	-	.s	-s	.s	-	.s	-	.s	
+|s		|s	d	|	!m	|s	3	|s	
+start	-s	.s	-	.	-	.s	-s	.s	

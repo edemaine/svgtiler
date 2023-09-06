@@ -1,1 +1,1 @@
--f witness.coffee *.ssv *.asc
+-f witness.coffee *.ssv *.tsv *.asc

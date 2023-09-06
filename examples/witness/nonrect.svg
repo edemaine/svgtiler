@@ -7,7 +7,7 @@
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
   </symbol>
   <symbol id="_2D" viewBox="10 -10 80 20" width="80" height="20" overflow="visible">
-    <line x1="5" x2="95" y1="0" y2="0" stroke-width="20" stroke="black"/>
+    <line x1="9.5" x2="90.5" y1="0" y2="0" stroke-width="20" stroke="black"/>
   </symbol>
   <symbol id="_2E_v1" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
@@ -18,7 +18,9 @@
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
   </symbol>
   <symbol id="_7C" viewBox="-10 10 20 80" width="20" height="80" overflow="visible">
-    <line y1="5" y2="95" x1="0" x2="0" stroke-width="20" stroke="black"/>
+    <line y1="9.5" y2="90.5" x1="0" x2="0" stroke-width="20" stroke="black"/>
+  </symbol>
+  <symbol id="_blank" viewBox="0 0 80 80" width="80" height="80" overflow="visible">
   </symbol>
   <symbol id="_2E_v3" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
@@ -30,16 +32,34 @@
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
   </symbol>
+  <symbol id="_blank_v1" viewBox="0 0 20 80" width="20" height="80" overflow="visible">
+  </symbol>
+  <symbol id="_blank_v2" viewBox="0 0 20 20" width="20" height="20" overflow="visible">
+  </symbol>
+  <symbol id="_blank_v3" viewBox="0 0 80 20" width="80" height="20" overflow="visible">
+  </symbol>
   <use xlink:href="#_2E" x="0" y="0"/>
   <use xlink:href="#_2E_v1" x="100" y="0"/>
   <use xlink:href="#_2E_v1" x="200" y="0"/>
   <use xlink:href="#_2E_v2" x="300" y="0"/>
+  <use xlink:href="#_blank" x="20" y="20"/>
+  <use xlink:href="#_blank" x="120" y="20"/>
+  <use xlink:href="#_blank" x="220" y="20"/>
   <use xlink:href="#_2E_v3" x="0" y="100"/>
   <use xlink:href="#_2E_v1" x="100" y="100"/>
   <use xlink:href="#_2E_v1" x="200" y="100"/>
   <use xlink:href="#_2E_v4" x="300" y="100"/>
+  <use xlink:href="#_blank_v1" x="0" y="120"/>
+  <use xlink:href="#_blank" x="20" y="120"/>
+  <use xlink:href="#_blank" x="120" y="120"/>
+  <use xlink:href="#_blank" x="220" y="120"/>
+  <use xlink:href="#_blank_v1" x="300" y="120"/>
+  <use xlink:href="#_blank_v2" x="0" y="200"/>
+  <use xlink:href="#_blank_v3" x="20" y="200"/>
   <use xlink:href="#_2E_v3" x="100" y="200"/>
   <use xlink:href="#_2E_v4" x="200" y="200"/>
+  <use xlink:href="#_blank_v3" x="220" y="200"/>
+  <use xlink:href="#_blank_v2" x="300" y="200"/>
   <use xlink:href="#_2D" x="20" y="0"/>
   <use xlink:href="#_2D" x="120" y="0"/>
   <use xlink:href="#_2D" x="220" y="0"/>
