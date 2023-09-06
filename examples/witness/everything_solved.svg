@@ -144,6 +144,7 @@
     <rect x="-10" y="-10" width="10" height="20" fill="violet"/>
     <rect x="-10" y="-10" width="20" height="10" fill="violet"/>
   </symbol>
+  <rect x="-15" y="-15" width="455" height="450" fill="white"/>
   <use xlink:href="#finish" x="420" y="0"/>
   <use xlink:href="#finish" x="420" y="100"/>
   <use xlink:href="#finish_v1" x="420" y="200"/>

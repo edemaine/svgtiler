@@ -1,5 +1,0 @@
-start -  .s    -s .s
-|     rq |s    bq |s
-.s    -s start -  start
-|s    bq |     "" |s
-start -  .     -  .s

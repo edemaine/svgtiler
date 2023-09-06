@@ -32,6 +32,7 @@
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
   </symbol>
+  <rect x="0" y="0" width="220" height="220" fill="white"/>
   <use xlink:href="#_2E" x="0" y="0"/>
   <use xlink:href="#_2E_v1" x="100" y="0"/>
   <use xlink:href="#_2E_v2" x="200" y="0"/>

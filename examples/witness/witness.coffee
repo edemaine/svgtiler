@@ -14,6 +14,8 @@ gridColor = 'black'
 #pathColor = 'mediumpurple'
 pathColor = 'violet'
 
+export preprocess = -> svgtiler.background 'white'
+
 lineColor = (solution) ->
   if solution
     pathColor
@@ -34,7 +36,7 @@ width = (self, shrinkExtremes) ->
     ## Don't use full width if there's nothing to our right
     20
   else if shrinkExtremes and [0..self.j].every((dj) ->
-            self.column(dj).every (cell) -> cell.key in ['', 'finish'])
+            self.column(dj).every (cell) -> cell.key in ['', 'finish', 'finishs'])
     ## Shrink columns that just have finish in them and nothing left of them.
     20
   else
@@ -51,7 +53,7 @@ height = (self, shrinkExtremes) ->
     ## Don't use full height if there's nothing below
     20
   else if shrinkExtremes and [0..self.i].every((di) ->
-            self.row(di).every (cell) -> cell.key in ['', 'finish'])
+            self.row(di).every (cell) -> cell.key in ['', 'finish', 'finishs'])
     ## Shrink rows that just have finish in them and nothing above them.
     20
   else

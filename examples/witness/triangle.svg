@@ -75,6 +75,7 @@
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
   </symbol>
+  <rect x="0" y="0" width="220" height="220" fill="white"/>
   <use xlink:href="#_2E" x="200" y="0"/>
   <use xlink:href="#_33" x="20" y="20"/>
   <use xlink:href="#_32" x="120" y="20"/>
