@@ -48,7 +48,7 @@ A simple triangles puzzle (not from the actual video game).
 | Unsolved | Solved |
 |:---:|:---:|
 | [![triangles unsolved puzzle](triangles_unsolved.svg)](triangles_unsolved.svg) | [![triangles solved puzzle](triangles_solved.svg)](triangles_solved.svg) |
-| [TSV input](triangles_unsolved.tsv), [SVG output](triangles_unsolved.svg) | [TSV input](triangles_solved.tsv), [SVG output](triangles_solved.svg) |
+| [SSV input](triangles_unsolved.ssv), [SVG output](triangles_unsolved.svg) | [SSV input](triangles_solved.ssv), [SVG output](triangles_solved.svg) |
 
 ### Just Grids
 
