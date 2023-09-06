@@ -927,12 +927,21 @@ While the full API is still in flux and the best comments are in
   In particular, `map` can be an object, `Map`, or
   function mapping keys to SVG content, just like
   [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
-* `new svgtiler.Drawing(keys)`: Create a drawing with the specified `keys`,
+* `new svgtiler.Drawing(keys)`: Create a
+  [drawing](#drawing-class) with the specified `keys`,
   which is an `Array` of `Array` of `String`s (or other objects),
   where `keys[i][j]` represents the key in the cell at row `i` and column `j`.
 * `new svgtiler.Style(css)`: Create CSS styling with the specified `css`
   content (a `String`).  Or use `new svgtiler.StylusStyle(styl)` to parse the 
   string as Stylus.
+* `new svgtiler.Render(drawing, [settings])`: Create a
+  [rendering job](#render-class) for converting the specified `drawing` to SVG.
+  * Put your mappings in `settings.mappings`, which can be a `Mapping` object,
+    a valid argument to `new Mapping`, an `Array` of the above, or
+    a `Mappings` object (a special type of `Array`).
+  * Put additional CSS styling in `settings.styles`, which can be a `Style`
+    object, a valid argument to `new Style`, an `Array` of the above, or
+    a `Styles` object (a special type of `Array`).
 * `svgtiler.require(filename, [settings], [dirname])` loads the specified file
   as if it was on the `svgtiler` command line, producing a
   `Mapping`, `Drawing`, `Drawings`, `Style`, `Args`, or `SVGFile`
@@ -942,24 +951,24 @@ While the full API is still in flux and the best comments are in
   For example, `svgtiler.require('./map.coffee')` is equivalent to
   `new Mapping(require('./map.coffee'))`.
   [Node only]
-* `svgtiler.renderDOM(elts, options)`: Convert drawings embedded in the DOM
+* `svgtiler.renderDOM(elts, settings)`: Convert drawings embedded in the DOM
   via elements matching `elts` (which can be a query selector string like
   `'.svgtiler'`, or a DOM element, or an iterable of DOM elements).
   [Web only]
-  * Put your mappings in `options.mappings`, which can be a `Mapping` object,
+  * Put your mappings in `settings.mappings`, which can be a `Mapping` object,
     a valid argument to `new Mapping`, an `Array` of the above, or
     a `Mappings` object (a special type of `Array`).
-  * Put additional CSS styling in `options.styles`, which can be a `Style`
+  * Put additional CSS styling in `settings.styles`, which can be a `Style`
     object, a valid argument to `new Style`, an `Array` of the above, or
     a `Styles` object (a special type of `Array`).
   * Each drawing can have a `data-filename` attribute to define its name and
-    extension, which determines its format; or you can set `options` to an
-    object with specifying a default `filename`.
-    The default filename is `drawing.asc`, which implies ASCII art.
+    extension, which determines its format; or you can set `settings` to an
+    object specifying a default `filename`.
+    The default filename is `"drawing.asc"`, which implies ASCII art.
   * By default, the rendered SVG replaces the original drawing element, but
-    the element can specify `data-keep-parent="true"` (or `options` can specify
+    the element can specify `data-keep-parent="true"` (or `settings` can specify
     `keepParent: true`) to make it a sole child element instead; or the element
-    can specify `data-keep-class="true"` (or `options` can specify
+    can specify `data-keep-class="true"` (or `settings` can specify
     `keepClass: true`) for the rendered SVG to keep the same `class` attribute
     as the drawing element.
 * `svgtiler.getRender()`: Returns the current `Render` object for the current
@@ -974,6 +983,33 @@ While the full API is still in flux and the best comments are in
   (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
   `svgtiler.needVersion('>=3.0 <3.1')`.
   Put this in your `Maketile.js` or `Maketile.coffee`.
+
+### Drawing Class
+
+An `svgtiler.Drawing` object represents a drawing as a table of keys.
+Typically, each key is a string, although this is not required.
+(For example, `preprocess` steps might want to convert strings
+into other objects.)
+
+A `Drawing` object has the following properties:
+
+* `keys`: `Array` of `Array` of keys (`String`s or other objects),
+  where `keys[i][j]` represents the key in the cell at row `i` and column `j`.
+
+A `Drawing` object has the following methods:
+
+* `get(j, i)`: Get the key in the cell in row `i` and column `j`.
+  Note that the order is flipped, to correspond to `x`/`y` order.
+  Returns `undefined` if out of bounds (or the key is `undefined`).
+* `at(j, i)`: Like `get`, but treat negative numbers as relative to the
+  bottom/right edge of the drawing, similar to
+  [`Array.prototype.at`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at).
+  For example, `at(-1, -1)` accesses the bottom-right cell.
+* `set(j, i, key)`: Set the `key` in the cell in row `i` and column `j`.
+* `renderDOM(settings)`: Render drawing to SVG DOM (native in browser,
+  [xmldom](https://github.com/xmldom/xmldom) in Node).
+  Append the returned DOM to the document to render it.
+  Shorthand for `new Render(drawing, settings).makeDOM()`.
 
 ### Render Class
 
@@ -1019,6 +1055,11 @@ A `Render` object has the following methods:
   Normally you'd use `svgtiler.def(tag)` which is equivalent to
   `currentRender().def(tag)` within a rendering context, and generates
   globally defs outside of a rendering context.
+* `background(color)`: Set the background color for this render.
+  (Can later be overwritten during the rendering process.)
+* `makeDOM()`: Render drawing to SVG DOM (native in browser,
+  [xmldom](https://github.com/xmldom/xmldom) in Node).
+  Append the returned DOM to the document to render it.
 
 ## Examples
 
