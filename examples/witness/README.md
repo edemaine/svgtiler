@@ -32,6 +32,15 @@ One of the introductory square puzzles from the video game
 | [![squares unsolved puzzle](squares_unsolved.svg)](squares_unsolved.svg) | [![squares solved puzzle](squares_solved.svg)](squares_solved.svg) |
 | [TSV input](squares_unsolved.tsv), [SVG output](squares_unsolved.svg) | [TSV input](squares_solved.tsv), [SVG output](squares_solved.svg) |
 
+### Triangles
+
+A simple triangles puzzle (not from the actual video game).
+
+| Unsolved | Solved |
+|:---:|:---:|
+| [![triangles unsolved puzzle](triangles_unsolved.svg)](triangles_unsolved.svg) | [![triangles solved puzzle](triangles_solved.svg)](triangles_solved.svg) |
+| [TSV input](triangles_unsolved.tsv), [SVG output](triangles_unsolved.svg) | [TSV input](triangles_solved.tsv), [SVG output](triangles_solved.svg) |
+
 ### Just Grids
 
 Simple tests of the grid functionality, including nonrectangular.

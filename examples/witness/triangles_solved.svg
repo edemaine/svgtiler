@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-15 0 255 220" width="255" height="220" xmlns="http://www.w3.org/2000/svg">
   <symbol id="_2Es" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
     <circle cx="0" cy="0" r="10" fill="black"/>
     <rect x="0" y="-10" width="10" height="20" fill="black"/>
@@ -26,6 +26,8 @@
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="0" width="20" height="10" fill="black"/>
   </symbol>
+  <symbol id="_blank" viewBox="0 0 20 20" width="20" height="20" overflow="visible">
+  </symbol>
   <symbol id="_7Cs" viewBox="-10 10 20 80" width="20" height="80" overflow="visible">
     <line y1="9.5" y2="90.5" x1="0" x2="0" stroke-width="20" stroke="violet"/>
   </symbol>
@@ -41,23 +43,27 @@
   <symbol id="_7C" viewBox="-10 10 20 80" width="20" height="80" overflow="visible">
     <line y1="9.5" y2="90.5" x1="0" x2="0" stroke-width="20" stroke="black"/>
   </symbol>
-  <symbol id="_2Es_v2" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
-    <rect x="-10" y="-10" width="20" height="20" fill="black"/>
-    <circle cx="0" cy="0" r="10" fill="violet"/>
-    <rect x="-10" y="-10" width="20" height="10" fill="violet"/>
+  <symbol id="_blank_v1" viewBox="0 0 20 80" width="20" height="80" overflow="visible">
   </symbol>
-  <symbol id="_2Es_v3" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
+  <symbol id="starts" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
+    <circle cx="0" cy="0" r="25" fill="violet"/>
+  </symbol>
+  <symbol id="_2Es_v2" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
     <circle cx="0" cy="0" r="10" fill="violet"/>
     <rect x="0" y="-10" width="10" height="20" fill="violet"/>
     <rect x="-10" y="-10" width="20" height="10" fill="violet"/>
   </symbol>
-  <symbol id="_2Es_v4" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
+  <symbol id="_2Es_v3" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
     <rect x="-10" y="-10" width="20" height="20" fill="black"/>
     <circle cx="0" cy="0" r="10" fill="violet"/>
     <rect x="-10" y="-10" width="10" height="20" fill="violet"/>
+    <rect x="0" y="-10" width="10" height="20" fill="violet"/>
   </symbol>
-  <symbol id="_blank" viewBox="0 0 80 80" width="80" height="80" overflow="visible">
+  <symbol id="finish" viewBox="-10 -10 20 20" width="20" height="20" overflow="visible">
+    <line x1="-20" x2="0" stroke-width="20" stroke="violet" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="_blank_v2" viewBox="0 0 80 80" width="80" height="80" overflow="visible">
   </symbol>
   <symbol id="_31" viewBox="-40 -40 80 80" width="80" height="80" overflow="visible">
     <polygon fill="darkorange" stroke="none" points="0,-6.9282 8,6.9282 -8,6.9282" transform="translate(0,0)"/>
@@ -75,15 +81,20 @@
     <rect x="-10" y="-10" width="10" height="20" fill="black"/>
     <rect x="-10" y="-10" width="20" height="10" fill="black"/>
   </symbol>
-  <rect x="0" y="0" width="220" height="220" fill="white"/>
+  <rect x="-15" y="0" width="255" height="220" fill="white"/>
+  <use xlink:href="#finish" x="220" y="100"/>
   <use xlink:href="#_2E" x="200" y="0"/>
+  <use xlink:href="#_blank" x="220" y="0"/>
   <use xlink:href="#_33" x="20" y="20"/>
   <use xlink:href="#_32" x="120" y="20"/>
-  <use xlink:href="#_blank" x="20" y="120"/>
+  <use xlink:href="#_blank_v1" x="220" y="20"/>
+  <use xlink:href="#_blank_v2" x="20" y="120"/>
   <use xlink:href="#_31" x="120" y="120"/>
+  <use xlink:href="#_blank_v1" x="220" y="120"/>
   <use xlink:href="#_2E_v1" x="0" y="200"/>
   <use xlink:href="#_2E_v2" x="100" y="200"/>
   <use xlink:href="#_2E_v3" x="200" y="200"/>
+  <use xlink:href="#_blank" x="220" y="200"/>
   <use xlink:href="#_2D" x="120" y="0"/>
   <use xlink:href="#_7C" x="200" y="20"/>
   <use xlink:href="#_2D" x="20" y="100"/>
@@ -92,11 +103,11 @@
   <use xlink:href="#_7C" x="200" y="120"/>
   <use xlink:href="#_2D" x="20" y="200"/>
   <use xlink:href="#_2D" x="120" y="200"/>
+  <use xlink:href="#starts" x="0" y="100"/>
   <use xlink:href="#_2Es" x="0" y="0"/>
   <use xlink:href="#_2Es_v1" x="100" y="0"/>
-  <use xlink:href="#_2Es_v2" x="0" y="100"/>
-  <use xlink:href="#_2Es_v3" x="100" y="100"/>
-  <use xlink:href="#_2Es_v4" x="200" y="100"/>
+  <use xlink:href="#_2Es_v2" x="100" y="100"/>
+  <use xlink:href="#_2Es_v3" x="200" y="100"/>
   <use xlink:href="#_2Ds" x="20" y="0"/>
   <use xlink:href="#_7Cs" x="0" y="20"/>
   <use xlink:href="#_7Cs" x="100" y="20"/>
