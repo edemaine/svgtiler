@@ -29,32 +29,32 @@
     "test": "make test"
   },
   "dependencies": {
-    "@babel/core": "7.19.6",
-    "@babel/generator": "7.20.0",
-    "@babel/plugin-transform-modules-commonjs": "7.19.6",
-    "@babel/plugin-transform-react-jsx": "7.19.0",
-    "@babel/register": "7.18.9",
-    "@xmldom/xmldom": "0.8.6",
+    "@babel/core": "7.22.17",
+    "@babel/generator": "7.22.15",
+    "@babel/plugin-transform-modules-commonjs": "7.22.15",
+    "@babel/plugin-transform-react-jsx": "7.22.15",
+    "@babel/register": "7.22.15",
+    "@xmldom/xmldom": "0.8.10",
     "babel-plugin-auto-import": "1.1.0",
     "babel-plugin-module-deps": "0.1.1",
     "coffeescript": "2.7.0",
     "csv-parse": "5.5.0",
-    "glob": "8.0.3",
+    "glob": "10.3.4",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.2",
-    "minimatch": "5.1.0",
-    "pirates": "4.0.5",
-    "preact": "10.11.2",
+    "minimatch": "9.0.3",
+    "pirates": "4.0.6",
+    "preact": "10.17.1",
     "preact-html-converter": "0.4.2",
-    "preact-render-to-dom": "0.1.1",
+    "preact-render-to-dom": "0.2.1",
     "preact-render-to-string": "6.2.1",
     "prettify-xml": "1.2.0",
     "semver": "7.5.4",
-    "stylus": "0.59.0",
+    "stylus": "0.60.0",
     "svgink": "0.4.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz"
   },
   "devDependencies": {
-    "vnu-jar": "22.9.29"
+    "vnu-jar": "23.4.11"
   }
 }

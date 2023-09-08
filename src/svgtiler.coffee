@@ -2587,7 +2587,8 @@ glob = (pattern, options) ->
   ## [code from svgink]
   if process.platform == 'win32'
     pattern = pattern.replace /\\($|[^\*\+\?\!\|\@\(\)\[\]\{\}])/g, '/$1'
-  require('glob').sync pattern, options
+  require('glob').globSync pattern, options
+  .sort()
 
 isGlob = (pattern, options) ->
   require('glob').hasMagic pattern, options
