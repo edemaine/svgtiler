@@ -22,6 +22,8 @@
 
 ( set.coffee set.asc )
 
+( space.coffee space.asc )
+
 ## Test )'s ability to reset share object
 ( ( share-provider.js share-user.js ) share-undefined.js )
 ( ( -s data=Success! share-user.js ) share-undefined.js )
