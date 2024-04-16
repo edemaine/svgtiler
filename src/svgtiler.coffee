@@ -2072,7 +2072,7 @@ class Render extends HasSettings
             unless (def = globalDefs.get id)?
               throw new SVGTilerError "Referenced global ID '#{id}' in node #{node} not found"
             if (found = @cacheLookup def)?
-              newId = found.id
+              newId = found.idOverride ? found.id
             else
               globalIdMap.set id, newId = @id desireId
               usedIds.add newId
