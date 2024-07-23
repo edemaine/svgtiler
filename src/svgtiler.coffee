@@ -1738,6 +1738,12 @@ class XLSXDrawings extends Drawings
   parse: (data) ->
     xlsx = require 'xlsx'
     workbook = xlsx.read data, type: 'binary'
+    ## .ods imports seem to lack Workbook.Sheets metadata
+    unless workbook.Workbook.Sheets?
+      console.warn "Warning: Missing sheet metadata, so can't detect hidden sheets"
+      workbook.Workbook.Sheets =
+        for name in workbook.SheetNames
+          {name}
     ## https://www.npmjs.com/package/xlsx#common-spreadsheet-format
     super(
       for sheetInfo in workbook.Workbook.Sheets
