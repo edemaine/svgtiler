@@ -2261,12 +2261,20 @@ class Render extends HasSettings
                 child.data
             ).join ''
             anchor = attributeOrStyle text, 'text-anchor'
-            if /^middle\b/.test anchor
-              wrap = '\\clap{'
-            else if /^end\b/.test anchor
-              wrap = '\\llap{'
-            else #if /^start\b/.test anchor  # default
-              wrap = '\\rlap{'
+            if /^\s*middle\b/.test anchor
+              align = 'c'
+            else if /^\s*end\b/.test anchor
+              align = 'r'
+            else #if /^\s*start\b/.test anchor  # default
+              align = 'l'
+            vertical = attributeOrStyle text, 'alignment-baseline'
+            if /^\s*(middle|central)\b/.test vertical
+              align += ''
+            else if /^\s*(text-)?top\b/.test vertical
+              align += 't'
+            else #if /^\s*(baseline|auto|(text-)?bottom)\b/.test vertical  # default
+              align += 'b'
+            wrap = "\\makebox(0,0)[#{align}]{"
             # "@height -" is to flip between y down (SVG) and y up (picture)
             lines.push "    \\put(#{xMin+tx},#{@height - (yMin+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
     lines.push """

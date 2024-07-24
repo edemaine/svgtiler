@@ -797,6 +797,14 @@ via one of the following options (any one will do):
   instead of `\import{filename.svg_tex}`.
 * `\graphicspath{{path/to/file/}}` (note extra braces and trailing slash).
 
+SVG Tiler will attempt to align `<text>` elements according to their
+[`text-anchor`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
+and
+[`alignment-baseline`](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline)
+properties.
+It will not respect font specification; instead, include LaTeX commands
+(e.g. `\footnotesize` or `\sf`) in your text.
+
 ## Maketiles
 
 SVG Tiler has a simple `Makefile`-like build system for keeping track of the
