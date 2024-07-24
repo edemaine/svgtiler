@@ -503,7 +503,9 @@ multiple sheets in one file.  In this case, the output SVG files have
 filenames distinguished by an underscore followed by the sheet name.
 By default, **hidden** sheets are ignored, making it easy to "deprecate" old
 drafts, but if you prefer, you can process hidden sheets via `--hidden`.
-Currently, hidden sheet detection does not work in .ods/.fods files.
+Currently, hidden sheet detection only works in .xls* files; see
+File Format Support for
+[SheetJS Sheet Visibility](https://docs.sheetjs.com/docs/csf/features/visibility/).
 
 ## Style Files: .css, .styl
 
