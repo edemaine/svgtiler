@@ -2270,7 +2270,7 @@ class Render extends HasSettings
             vertical = attributeOrStyle text, 'alignment-baseline'
             if /^\s*(middle|central)\b/.test vertical
               align += ''
-            else if /^\s*(text-)?top\b/.test vertical
+            else if /^\s*(hanging|(text-)?top)\b/.test vertical
               align += 't'
             else #if /^\s*(baseline|auto|(text-)?bottom)\b/.test vertical  # default
               align += 'b'
