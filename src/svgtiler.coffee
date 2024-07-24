@@ -2264,9 +2264,9 @@ class Render extends HasSettings
             if /^middle\b/.test anchor
               wrap = '\\clap{'
             else if /^end\b/.test anchor
-              wrap = '\\rlap{'
-            else #if /^start\b/.test anchor  # default
               wrap = '\\llap{'
+            else #if /^start\b/.test anchor  # default
+              wrap = '\\rlap{'
             # "@height -" is to flip between y down (SVG) and y up (picture)
             lines.push "    \\put(#{xMin+tx},#{@height - (yMin+ty)}){\\color{#{attributeOrStyle(text, 'fill') or 'black'}}#{wrap}#{content}#{wrap and '}'}}%"
     lines.push """
