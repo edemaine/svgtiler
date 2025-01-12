@@ -41,6 +41,44 @@
 | underground | ![](door_underground.png) | ![](door_underground.svg) |
 | underwater  | ![](door_underwater.png)  | ![](door_underwater.svg)  |
 
+## Crossover Gadget:
+
+**Input:** [Tab-separated drawing](crossover.tsv) for crossover gadget from the paper
+"[Super Mario Bros. is Harder/Easier than We Thought](https://erikdemaine.org/papers/Mario_FUN2016/)"
+(Figure 5 on page 11):
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |
+| mario_small_right+4 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |  |  |  | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |  |  |  |  |  | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised | raised | raised | raised | raised |  |  |  |  |  |  |  | raised | raised | raised | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised |
+| raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised |
+| raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised |
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| raised | raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised | raised |
+| raised | raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised | raised |
+| raised | raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised | raised |
+| raised | raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised | raised |
+| raised |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | raised |
+| raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised | raised |
+
+**Output:**
+
+| Palette     | PNG                            | SVG                            |
+| ----------- | ------------------------------ | ------------------------------ |
+| castle      | ![](crossover_castle.png)      | ![](crossover_castle.svg)      |
+| overworld   | ![](crossover_overworld.png)   | ![](crossover_overworld.svg)   |
+| underground | ![](crossover_underground.png) | ![](crossover_underground.svg) |
+| underwater  | ![](crossover_underwater.png)  | ![](crossover_underwater.svg)  |
+
 ## Clause Gadget:
 
 **Input:** [Tab-separated drawing](clause.tsv) for clause gadget from the paper
