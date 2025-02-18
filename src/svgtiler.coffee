@@ -250,8 +250,9 @@ XLINKNS = 'http://www.w3.org/1999/xlink'
 
 splitIntoLines = (data) ->
   data
-  .replace /\r\n/g, '\n'
-  .replace /\r/g, '\n'
+  .replace /\r\n/g, '\n' # Windows EOL -> \n
+  .replace /\r/g, '\n'   # Mac EOL -> \n
+  .replace /\n$/, ''     # ignore newline on last line
   .split '\n'
 whitespace = /[\s\uFEFF\xA0]+/  ## based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
 

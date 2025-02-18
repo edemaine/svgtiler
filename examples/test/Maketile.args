@@ -16,6 +16,12 @@
 ( mapping.coffee mapping.ssv )
 ( mappings.coffee -O mappings mapping.ssv )
 
+## Run 'margin' example with and without --uneven and --margin option
+( margin.coffee margin.asc )
+( --uneven margin.coffee margin.asc )
+( --margin --uneven margin.coffee margin.asc )
+( --margin margin.coffee margin.asc )
+
 ( inline.coffee )
 
 ( needversion.coffee )

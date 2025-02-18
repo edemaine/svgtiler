@@ -5,8 +5,8 @@ export init = ->
 
 ->
   margins = @drawing.margins
-  console.assert 1 == margins.top and
-    2 == margins.bottom == margins.left == margins.right, 'margins'
+  console.assert 1 == margins.top and 1 == margins.bottom and
+    2 == margins.left == margins.right, 'margins'
 
   console.assert undefined == @at(0, -4).key == @at(0, -5).key, 'row -1'
   console.assert 'a' == @at(0, 0).key == @at(-3, 0).key == @at(0, -3).key == @at(-3, -3).key, 'a'
