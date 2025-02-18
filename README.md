@@ -18,7 +18,7 @@ see [more examples below](#examples).
 - [Main Concepts](#main-concepts)
 - [Usage](#usage)
 - [Mapping Files: .txt, .js, .coffee, .jsx, .cjsx](#mapping-files-txt-js-coffee-jsx-cjsx)
-- [Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods](#drawing-files-asc-ssv-csv-tsv-xlsx-xls-ods)
+- [Drawing Files: .asc, .ssv, .csv, .tsv, .psv, .xlsx, .xls, .ods](#drawing-files-asc-ssv-csv-tsv-psv-xlsx-xls-ods)
 - [Style Files: .css, .styl](#style-files-css-styl)
 - [Layout Algorithm](#layout-algorithm)
 - [z-index: Stacking Order of Tiles](#z-index-stacking-order-of-tiles)
@@ -455,7 +455,7 @@ to import local modules or files relative to the mapping file.
   which you can include in a JSX template via `{image}`.
   Or if you want to inline/manipulate the SVG string, use `image.svg`.
 
-## Drawing Files: .asc, .ssv, .csv, .tsv, .xlsx, .xls, .ods
+## Drawing Files: .asc, .ssv, .csv, .tsv, .psv, .xlsx, .xls, .ods
 
 The **.asc format** for drawing files represents traditional ASCII art:
 each non-newline character represents a one-character tile name.
@@ -476,7 +476,7 @@ In this case, a single "character" is defined as a full "Unicode grapheme"
 such as 👍🏽.
 See [an example with Unicode](examples/unicode).
 
-The **.ssv, .csv, and .tsv formats** use
+The **.ssv, .csv, .tsv, and .psv formats** use
 [delimiter-separated values (DSV)](https://en.wikipedia.org/wiki/Delimiter-separated_values)
 to specify an array of tile names.  In particular,
 [.csv (comma-separated)](https://en.wikipedia.org/wiki/Comma-separated_values)
@@ -484,12 +484,14 @@ and
 [.tsv (tab-separated)](https://en.wikipedia.org/wiki/Tab-separated_values)
 formats are exactly those exported by spreadsheet software such as
 Google Drive, OpenOffice, or Excel, enabling you to draw in that software.
+The .psv format uses the pipe character `|` as the delimiter,
+similar to Markdown tables.
 The .ssv format is similar, but where the delimiter between tile names
 is arbitrary whitespace.
 (Contrast this behavior with .csv which treats every comma as a delimiter.)
 This format is nice to work with in a text editor, allowing you to line up
 the columns by padding tile names with extra spaces.
-All three formats support quoting according to the usual DSV rules:
+All four formats support quoting according to the usual DSV rules:
 any tile name (in particular, if it has a delimiter or double quote in it)
 can be put in double quotes, and double quotes can be produced in the
 tile name by putting `""` (two double quotes) within the quoted string.
@@ -1193,9 +1195,10 @@ Filename arguments:  (mappings and styles before relevant drawings!)
   *.cjsx       CoffeeScript mapping file (including JSX notation)
                Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'
   *.asc        ASCII drawing (one character per symbol)
-  *.ssv        Space-delimiter drawing (one word per symbol)
-  *.csv        Comma-separated drawing (spreadsheet export)
-  *.tsv        Tab-separated drawing (spreadsheet export)
+  *.ssv        Space-delimiter drawing (one word per tile: a  b)
+  *.csv        Comma-separated drawing (spreadsheet export: a,b)
+  *.tsv        Tab-separated drawing (spreadsheet export: a<TAB>b)
+  *.psv        Pipe-separated drawing (spreadsheet export: a|b)
   *.xlsx       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.xlsm       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)
   *.xlsb       Spreadsheet drawing(s) (Excel/OpenDocument/Lotus/dBASE)

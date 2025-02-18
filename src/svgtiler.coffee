@@ -1705,19 +1705,23 @@ class DSVDrawing extends AutoDrawing
       relax_column_count: true
 
 class SSVDrawing extends DSVDrawing
-  @title: "Space-delimiter drawing (one word per tile)"
+  @title: "Space-delimiter drawing (one word per tile: a  b)"
   @delimiter: ' '
   parse: (data) ->
     ## Coallesce non-newline whitespace into single space
     super data.replace /[ \t\f\v]+/g, ' '
 
 class CSVDrawing extends DSVDrawing
-  @title: "Comma-separated drawing (spreadsheet export)"
+  @title: "Comma-separated drawing (spreadsheet export: a,b)"
   @delimiter: ','
 
 class TSVDrawing extends DSVDrawing
-  @title: "Tab-separated drawing (spreadsheet export)"
+  @title: "Tab-separated drawing (spreadsheet export: a<TAB>b)"
   @delimiter: '\t'
+
+class PSVDrawing extends DSVDrawing
+  @title: "Pipe-separated drawing (spreadsheet export: a|b)"
+  @delimiter: '|'
 
 class Drawings extends Input
   parse: (datas) ->
@@ -2434,6 +2438,7 @@ extensionMap =
   '.ssv': SSVDrawing
   '.csv': CSVDrawing
   '.tsv': TSVDrawing
+  '.psv': PSVDrawing
   ## Parsable by xlsx package:
   '.xlsx': XLSXDrawings  ## Excel 2007+ XML Format
   '.xlsm': XLSXDrawings  ## Excel 2007+ Macro XML Format
@@ -2951,7 +2956,7 @@ svgtiler = Object.assign run, {
   Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
   static: wrapStatic,
   Drawing, AutoDrawing, ASCIIDrawing,
-  DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing,
+  DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing, PSVDrawing,
   Drawings, XLSXDrawings,
   Style, CSSStyle, StylusStyle, Styles,
   Args, ParsedArgs, SVGFile,
