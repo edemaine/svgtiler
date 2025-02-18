@@ -11,7 +11,7 @@ see [more examples below](#examples).
 
 | [Super Mario Bros.](examples/mario) | [The Witness](examples/witness) | [Chess](examples/chess) |
 | --- | --- | --- |
-| [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/solved-grid.svg)](examples/witness) | [![Immortal Game chessboard](examples/chess/board-immortal.svg)](examples/chess)
+| [![Super Mario Bros. custom level](examples/mario/door_overworld.png)](examples/mario) | [![The Witness custom level](examples/witness/everything_solved.svg)](examples/witness) | [![Immortal Game chessboard](examples/chess/board-immortal.svg)](examples/chess)
 
 ## Table of Contents
 
