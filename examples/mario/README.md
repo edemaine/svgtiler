@@ -3,8 +3,8 @@
 ## Mapping Input:
 
 * [CoffeeScript mapping file](mario.coffee)
-* [JSON file](palette.coffee) to define which "palette" to use
-  ("castle", "overworld", "underground", or "underwater")
+* Command-line argument `--share palette=...` defines which "palette" to use
+  (`castle`, `overworld`, `underground`, or `underwater`)
 * Sprites thanks to [The Spriters Resource](https://www.spriters-resource.com/nes/supermariobros/):
 
   | Palette     | Sprites   |
