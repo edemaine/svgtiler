@@ -767,6 +767,13 @@ class SVGContent extends HasSettings
         console.error "SVG parse #{level} in #{@name}: #{msg}"
     .parseFromString svg, 'image/svg+xml'
     .documentElement
+    # Web parser creates <parsererror> inside <html><body>
+    if error = @dom.querySelector? 'parsererror'
+      msg = error.innerHTML
+      .replace /<h3[^<>]*>[^]*?<\/h3>/g, ''
+      .replace /<\/?div[^<>]*>/g, ''
+      @dom = error.nextSibling
+      console.error "SVG parse error in #{@name}: #{msg}"
     @postprocessDOM()
     @dom
   postprocessDOM: ->
