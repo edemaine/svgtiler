@@ -318,7 +318,7 @@ extractBoundingBox = (xml) ->
   box = xml.getAttribute('boundingBox') or xml.getAttribute('overflowBox')
   xml.removeAttribute 'boundingBox'
   xml.removeAttribute 'overflowBox'
-  if box.toLowerCase().trim() == 'none'
+  if box?.toLowerCase().trim() == 'none'
     [null, null, null, null]
   else
     parseBox box, true
