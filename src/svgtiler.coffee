@@ -21,6 +21,16 @@ else
   graphemeSplitter = splitGraphemes: (x) -> x.split ''
   metadata = version: '(web)'
 
+## Combine a directory and filename, handling more cases than path module.
+## Like path.join, keep using relative filenames if both are relative.
+## Like path.resolve, correctly handle absolute filenames (ignore dirname).
+## Also allow for null dirname (ignored) or null filename (returned).
+resolve = (dirname, filename) =>
+  if not dirname? or not filename? or path.isAbsolute filename
+    filename
+  else
+    path.join dirname, filename
+
 ## Register `require` hooks of Babel and CoffeeScript,
 ## so that imported/required modules are similarly processed.
 unless window?
@@ -701,8 +711,7 @@ class SVGContent extends HasSettings
       if @value.trim() == ''  ## Blank SVG mapped to empty <symbol>
         @svg = '<symbol/>'    ## This will get width/height 0 in SVGSymbol
       else unless @value.includes '<'  ## No <'s -> interpret as filename
-        filename = @value
-        filename = path.join @settings.dirname, filename if @settings?.dirname?
+        filename = resolve @settings?.dirname, @value
         extension = extensionOf filename
         ## <image> tag documentation: "Conforming SVG viewers need to
         ## support at least PNG, JPEG and SVG format files."
@@ -811,9 +820,7 @@ class SVGContent extends HasSettings
           node.setAttribute 'style', style + 'image-rendering:pixelated'
         ## Read file for width/height detection and/or inlining
         {href, key} = getHref node
-        filename = href
-        if @settings?.dirname? and filename
-          filename = path.join @settings.dirname, filename
+        filename = resolve @settings.dirname, href
         if filename? and not /^data:|file:|[a-z]+:\/\//.test filename # skip URLs
           filedata = null
           try
@@ -2606,7 +2613,7 @@ convert = (filenames, settings) ->
     processor.convertTo filenames, settings.formats
 
 inputRequire = (filename, settings = getSettings(), dirname) ->
-  filename = path.join dirname, filename if dirname?
+  filename = resolve dirname, filename
   Input.recognize filename, undefined, settings
 
 glob = (pattern, options) ->
