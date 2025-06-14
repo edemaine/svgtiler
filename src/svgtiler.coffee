@@ -2586,6 +2586,7 @@ Optional arguments:
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   --use-href            Use href attribute instead of xlink:href attribute
   --use-data            Add data-{key,i,j,k} attributes to <use> elements
+  --inline-symbols      Use inline symbols in SVG output
   (                     Remember settings, mappings, styles, and share values
   )                     Restore last remembered settings/mappings/styles/share
 
@@ -2835,6 +2836,8 @@ class Driver extends HasSettings
           @settings.useHref = true
         when '--use-data'
           @settings.useData = true
+        when '--inline-symbols'
+          @settings.inlineSymbols = true
         when '-j', '--jobs'
           i++
           arg = parseInt args[i], 10
