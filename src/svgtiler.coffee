@@ -222,6 +222,10 @@ defaultSettings =
   ## Major state
   mappings: null  # should be valid argument to new Mappings
   styles: null    # should be valid argument to new Styles
+  ## Avoid using <symbol>/<use> elements, and inline all content directly.
+  ## This makes the output SVG more compatible with some systems, and easier
+  ## to animate.
+  inlineSymbols: false
 
 cloneSettings = (settings, addArrays) ->
   settings = {...settings}
@@ -954,6 +958,11 @@ class SVGWrapped extends SVGContent
   Parser will enforce that the content is wrapped in this element.
   ###
   wrap: ->
+    ## If inlining, don't wrap in a symbol; just return the DOM content directly.
+    if @getSetting 'inlineSymbols'
+      @dom.setAttribute 'id', @id if @id?
+      return @dom
+
     ## Wrap XML in <wrapper>.
     symbol = @dom.ownerDocument.createElementNS SVGNS, @wrapper
     ## Force `id` to be first attribute.
@@ -2036,26 +2045,45 @@ class Render extends HasSettings
           tile.yMax = y + tile.height
           unless tile.isEmpty
             @layers[tile.zIndex] ?= []
-            @layers[tile.zIndex].push use = doc.createElementNS SVGNS, 'use'
-            use.setAttribute @hrefAttr(), '#' + symbol.id
-            use.setAttribute 'x', x
-            use.setAttribute 'y', y
-            ## Symbols generally set their own width and height,
-            ## so only need to set these on <use> when they are 'auto'.
-            ## SVG's scaling of tile is relative to viewBox (including possible
-            ## `zeroSizeReplacement`), so use viewBox to define width and
-            ## height attributes:
-            if symbol.autoWidth
-              use.setAttribute 'width',
-                (symbol.viewBox?[2] ? symbol.width) * scaleX
-            if symbol.autoHeight
-              use.setAttribute 'height',
-                (symbol.viewBox?[3] ? symbol.height) * scaleY
-            if @settings.useData
-              use.setAttribute 'data-key', tile.key
-              use.setAttribute 'data-i', i
-              use.setAttribute 'data-j', j
-              use.setAttribute 'data-k', k if tiles.length > 1
+            if @settings.inlineSymbols
+              ## Inline the symbol's DOM directly
+              inlinedElement = symbol.dom.cloneNode true
+              inlinedElement.setAttribute 'x', x
+              inlinedElement.setAttribute 'y', y
+              if symbol.autoWidth
+                inlinedElement.setAttribute 'width',
+                  (symbol.viewBox?[2] ? symbol.width) * scaleX
+              if symbol.autoHeight
+                inlinedElement.setAttribute 'height',
+                  (symbol.viewBox?[3] ? symbol.height) * scaleY
+              if @settings.useData
+                inlinedElement.setAttribute 'data-key', tile.key
+                inlinedElement.setAttribute 'data-i', i
+                inlinedElement.setAttribute 'data-j', j
+                inlinedElement.setAttribute 'data-k', k if tiles.length > 1
+              @layers[tile.zIndex].push inlinedElement
+            else
+              ## Use <use> element as before
+              @layers[tile.zIndex].push use = doc.createElementNS SVGNS, 'use'
+              use.setAttribute @hrefAttr(), '#' + symbol.id
+              use.setAttribute 'x', x
+              use.setAttribute 'y', y
+              ## Symbols generally set their own width and height,
+              ## so only need to set these on <use> when they are 'auto'.
+              ## SVG's scaling of tile is relative to viewBox (including possible
+              ## `zeroSizeReplacement`), so use viewBox to define width and
+              ## height attributes:
+              if symbol.autoWidth
+                use.setAttribute 'width',
+                  (symbol.viewBox?[2] ? symbol.width) * scaleX
+              if symbol.autoHeight
+                use.setAttribute 'height',
+                  (symbol.viewBox?[3] ? symbol.height) * scaleY
+              if @settings.useData
+                use.setAttribute 'data-key', tile.key
+                use.setAttribute 'data-i', i
+                use.setAttribute 'data-j', j
+                use.setAttribute 'data-k', k if tiles.length > 1
           if symbol.boundingBox?
             dx = (symbol.boundingBox[0] - symbol.viewBox[0]) * scaleX
             dy = (symbol.boundingBox[1] - symbol.viewBox[1]) * scaleY
@@ -2118,27 +2146,28 @@ class Render extends HasSettings
     ## Render all <defs> so far and check for additional <defs> used by them.
     ## `for def in @defs` but allowing @defs to change in length
     ## from additional global <defs> encountered along the way.
-    i = 0
-    defDoms =
-      while i < @defs.length
-        def = @defs[i++]
-        dom = def.useDOM()
-        ## Look for more global <defs> used by this def.
-        findGlobalDefs dom
-        {def, dom}
-    ## Add <defs> to DOM if they're used or forced.
-    firstSymbol = @dom.firstChild
-    defsWrapper = null
-    for {def, dom} in defDoms
-      ## Omit unused <defs> unless forced.
-      continue unless def.isForced or usedIds.has dom.getAttribute 'id'
-      ## Wrap in <defs> if needed.
-      if skipDef.has dom.tagName
-        @dom.insertBefore dom, firstSymbol
-      else
-        defsWrapper ?= doc.createElementNS SVGNS, 'defs'
-        defsWrapper.appendChild dom
-    @dom.insertBefore defsWrapper, @dom.firstChild if defsWrapper?
+    unless @settings.inlineSymbols
+      i = 0
+      defDoms =
+        while i < @defs.length
+          def = @defs[i++]
+          dom = def.useDOM()
+          ## Look for more global <defs> used by this def.
+          findGlobalDefs dom
+          {def, dom}
+      ## Add <defs> to DOM if they're used or forced.
+      firstSymbol = @dom.firstChild
+      defsWrapper = null
+      for {def, dom} in defDoms
+        ## Omit unused <defs> unless forced.
+        continue unless def.isForced or usedIds.has dom.getAttribute 'id'
+        ## Wrap in <defs> if needed.
+        if skipDef.has dom.tagName
+          @dom.insertBefore dom, firstSymbol
+        else
+          defsWrapper ?= doc.createElementNS SVGNS, 'defs'
+          defsWrapper.appendChild dom
+      @dom.insertBefore defsWrapper, @dom.firstChild if defsWrapper?
 
     ## Factor out duplicate inline <image>s into separate <symbol>s.
     inlineImages = new Map
@@ -2155,6 +2184,11 @@ class Render extends HasSettings
       node.removeAttribute 'data-width'
       height = node.getAttribute 'data-height'
       node.removeAttribute 'data-height'
+      
+      if @settings.inlineSymbols
+        # When inlining symbols, keep images as is
+        return true
+      
       # Transfer x/y/width/height to <use> element, for more re-usability.
       node.parentNode.replaceChild (use = doc.createElementNS SVGNS, 'use'),
         node
@@ -2557,6 +2591,7 @@ Optional arguments:
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   --use-href            Use href attribute instead of xlink:href attribute
   --use-data            Add data-{key,i,j,k} attributes to <use> elements
+  --inline-symbols      Use inline symbols in SVG output
   (                     Remember settings, mappings, styles, and share values
   )                     Restore last remembered settings/mappings/styles/share
 
@@ -2806,6 +2841,8 @@ class Driver extends HasSettings
           @settings.useHref = true
         when '--use-data'
           @settings.useData = true
+        when '--inline-symbols'
+          @settings.inlineSymbols = true
         when '-j', '--jobs'
           i++
           arg = parseInt args[i], 10
