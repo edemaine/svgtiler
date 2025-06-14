@@ -2184,6 +2184,11 @@ class Render extends HasSettings
       node.removeAttribute 'data-width'
       height = node.getAttribute 'data-height'
       node.removeAttribute 'data-height'
+      
+      if @settings.inlineSymbols
+        # When inlining symbols, keep images as is
+        return true
+      
       # Transfer x/y/width/height to <use> element, for more re-usability.
       node.parentNode.replaceChild (use = doc.createElementNS SVGNS, 'use'),
         node
