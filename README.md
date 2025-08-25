@@ -222,7 +222,7 @@ or return value of a function) should be specified as one of the following:
 
 1. SVG written directly in
    [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax, such as
-   `<symbol viewBox=`0 0 ${width} ${height}`>{parity ? child1 : child2}</symbol>`;
+   ``<symbol viewBox=`0 0 ${width} ${height}`>{parity ? child1 : child2}</symbol>``;
    or its [CoffeeScript analog](https://coffeescript.org/#jsx), such as
    `<symbol viewBox="0 0 #{width} #{height}">{if parity then child1 else child2}</symbol>`.
    (See e.g. [the polyomino example](examples/polyomino).)
@@ -1067,7 +1067,7 @@ A `Render` object has the following methods:
   (as you'd use in `<use>`) respectively.
   Normally you'd use `svgtiler.def(tag)` which is equivalent to
   `currentRender().def(tag)` within a rendering context, and generates
-  globally defs outside of a rendering context.
+  global defs outside of a rendering context.
 * `background(color)`: Set the background color for this render.
   (Can later be overwritten during the rendering process.)
 * `makeDOM()`: Render drawing to SVG DOM (native in browser,
