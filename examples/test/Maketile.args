@@ -33,3 +33,6 @@
 ## Test )'s ability to reset share object
 ( ( share-provider.js share-user.js ) share-undefined.js )
 ( ( -s data=Success! share-user.js ) share-undefined.js )
+
+## Must come after css-escape and margin
+( nesting.coffee nesting.asc )

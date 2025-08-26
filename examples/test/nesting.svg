@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 440 250" width="440" height="250" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="x" viewBox="0 0 20 20" width="20" height="20" overflow="visible">
+    <style>/* &lt;foo&gt; is not valid */
+      g &gt; rect { fill: purple }
+    </style>
+    <symbol id="css-escape_x" viewBox="0 0 10 10" width="10" height="10" overflow="visible">
+      <g>
+        <rect width="10" height="10"/>
+      </g>
+    </symbol>
+    <symbol id="css-escape_o" viewBox="0 0 10 10" width="10" height="10" overflow="visible">
+      <rect width="10" height="10"/>
+    </symbol>
+    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#css-escape_x" x="0" y="0"/>
+    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#css-escape_o" x="10" y="0"/>
+    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#css-escape_o" x="0" y="10"/>
+    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#css-escape_x" x="10" y="10"/>
+  </symbol>
+  <symbol id="o" viewBox="0 0 200 250" width="200" height="250" overflow="visible">
+    <symbol id="margin__blank" viewBox="0 0 50 50" width="50" height="50" overflow="visible">
+      <rect width="50" height="50" fill="purple"/>
+    </symbol>
+    <symbol id="margin__20" viewBox="0 0 50 50" width="50" height="50" overflow="visible">
+      <rect width="50" height="50" fill="red"/>
+    </symbol>
+    <symbol id="margin_x" viewBox="0 0 50 50" width="50" height="50" overflow="visible">
+      <rect width="50" height="50" fill="blue"/>
+    </symbol>
+    <use xlink:href="#margin__blank" x="0" y="0"/>
+    <use xlink:href="#margin__blank" x="50" y="0"/>
+    <use xlink:href="#margin__blank" x="100" y="0"/>
+    <use xlink:href="#margin__blank" x="150" y="0"/>
+    <use xlink:href="#margin__20" x="0" y="50"/>
+    <use xlink:href="#margin__blank" x="50" y="50"/>
+    <use xlink:href="#margin__blank" x="100" y="50"/>
+    <use xlink:href="#margin__blank" x="150" y="50"/>
+    <use xlink:href="#margin__20" x="0" y="100"/>
+    <use xlink:href="#margin__20" x="50" y="100"/>
+    <use xlink:href="#margin__blank" x="100" y="100"/>
+    <use xlink:href="#margin__blank" x="150" y="100"/>
+    <use xlink:href="#margin__20" x="0" y="150"/>
+    <use xlink:href="#margin__20" x="50" y="150"/>
+    <use xlink:href="#margin__20" x="100" y="150"/>
+    <use xlink:href="#margin__blank" x="150" y="150"/>
+    <use xlink:href="#margin_x" x="0" y="200"/>
+    <use xlink:href="#margin_x" x="50" y="200"/>
+    <use xlink:href="#margin_x" x="100" y="200"/>
+    <use xlink:href="#margin_x" x="150" y="200"/>
+  </symbol>
+  <use xlink:href="#x" x="0" y="0"/>
+  <use xlink:href="#o" x="20" y="0"/>
+  <use xlink:href="#x" x="220" y="0"/>
+  <use xlink:href="#o" x="240" y="0"/>
+</svg>

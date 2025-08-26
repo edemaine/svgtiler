@@ -234,6 +234,8 @@ or return value of a function) should be specified as one of the following:
    to make a modified copy (or before modification).
 3. A string of raw SVG code (detected by the presence of a `<` character).
 4. A filename with `.svg` extension containing SVG code that gets inlined.
+   Any `id`s and `href`s get prefixed with a unique prefix to avoid
+   `id` collisions, e.g., between multiple included `.svg` files.
 5. A filename with `.png`, `.jpg`, `.jpeg`, or `.gif` extension containing an
    image, which will get [processed](#image-processing) as an `<image>`.
 6. An empty string, short for the empty symbol `<symbol viewBox="0 0 0 0"/>`.
@@ -444,8 +446,12 @@ to import local modules or files relative to the mapping file.
   lets you override certain attributes or add children; for example,
   `preact.cloneElement(svg, {class: 'foo'}, <rect width="5" height="5"/>, svg.props.children)`
   adds a `class` attribute and prepends a `<rect>` child.
+  Any `id`s and `href`s in the SVG file get prefixed with a unique prefix to
+  avoid `id` collisions, e.g., between multiple included `.svg` files.
   Alternatively, use `svg.svg` (the `svg` attribute of the returned object)
-  to get the SVG string (with comments removed).
+  to get the SVG string (with comments removed and `id`s/`href`s prefixed
+  to avoid `id` collisions),
+  or `svg.raw` to get the raw SVG string (without any processing).
   Note that the `.svg` file can even have JSX notation in it, such as
   `<svg width={share.width} height={share.height}>`, but `svg.svg` will not
   interpret it specially.

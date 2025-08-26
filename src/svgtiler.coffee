@@ -463,7 +463,7 @@ refRegExp = ///
   # url() without quotes
   \b url \s* \( \s* \# ([^()]*) \)
   # url() with quotes, or src() which requires quotes
-| \b (?: url | src) \s* \( \s* (['"]) \s* \# ([^'"]*) \2 \s* \)
+| \b (?: url | src) \s* \( \s* (['"]) \s* \# (.*?) \2 \s* \)
 ///g
 findRefs = (root) =>
   ## Returns an array of id-based references to other elements in the SVG.
@@ -496,12 +496,15 @@ unless window?
   pirates.settings = defaultSettings
   pirates.addHook (code, filename) ->
     if '.svg' == extensionOf filename
+      raw = code
       code = removeSVGComments code
+      code = prefixSVGIds code, prefixForFilename filename
       domCode = require('@babel/core').transform "module.exports = #{code}",
         {...babelConfig, filename}
       """
       #{domCode.code}
       module.exports.svg = #{JSON.stringify code};
+      module.exports.raw = #{JSON.stringify raw};
       """
     else
       href = hrefAttr pirates.settings
@@ -557,6 +560,54 @@ removeSVGComments = (svg) ->
   ## Remove SVG/XML comments such as <?xml...?> and <!DOCTYPE>
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
+
+prefixSVGIds = (svg, prefix) ->
+  ## Prefix all id, href, xlink:href for scoping external SVG
+  idMap = new Map
+  svg = svg.replace /(?<![\w:-])((?:xml:)?id\s*=\s*)(["'])(.*?)(\2)/g,
+    (attr, pre, quote, id, post) =>
+      if idMap.has id
+        console.warn "SVG #{prefix} has duplicate id: #{id}"
+      else
+        idMap.set id, "#{prefix}_#{id}"
+      "#{pre}#{quote}#{idMap.get id}#{quote}"
+  if idMap.size  # some ids to remap
+    svg = svg.replace /(?<![\w:-])((?:xlink:)?href\s*=\s*)(["'])(.*?)(\2)/g,
+      (attr, pre, quote, href, post) =>
+        href = href.trim()
+        if href.startsWith '#'
+          if (newId = idMap.get href[1..])?
+            href = "##{newId}"
+          else
+            console.warn "SVG #{prefix} has reference to unknown id: #{id}"
+        else
+          while (match = refRegExp.exec attr.value)?
+            oldId = match[1] or match[3]
+            if (newId = idMap.get oldId)?
+              href = href.replace "##{oldId}", "##{newId}"
+            else
+              console.warn "SVG #{prefix} has reference to unknown id: #{oldId}"
+        "#{pre}#{quote}#{href}#{quote}"
+  svg
+
+## Construct unique prefix for IDs from a given filename
+prefixForFile = new Map
+prefixCount = new Map
+prefixForFilename = (filename) ->
+  return prefixForFile.get filename if prefixForFile.has filename
+  prefix = path.basename filename
+  prefix = prefix[0...-path.extname(prefix).length]
+  # Strip characters that need escaping (see escapeId)
+  .replace /^[^a-zA-Z]+|[^\w.-]/g, ''
+  if prefixCount.has prefix
+    while prefixCount.has prefix
+      count = prefixCount.get prefix
+      prefixCount.set prefix, count + 1
+      prefix = "#{prefix}#{count}"
+  else
+    prefixCount.set prefix, 0
+  prefixForFile.set filename, prefix
+  prefix
 
 #currentMapping = null
 currentRender = null
@@ -725,6 +776,7 @@ class SVGContent extends HasSettings
             @filename = filename
             @settings = {...@settings, dirname: path.dirname filename}
             @svg = loadSVG @filename, @settings
+            @svg = prefixSVGIds @svg, prefixForFilename filename
           else
             throw new SVGTilerError "Unrecognized extension in filename '#{@value}' for #{@name}"
       else
@@ -2189,6 +2241,18 @@ class Render extends HasSettings
     @dom.setAttribute 'width', @width
     @dom.setAttribute 'height', @height
     #@dom.setAttribute 'preserveAspectRatio', 'xMinYMin meet'
+
+    ## Warn about duplicate ids
+    idSet = new Set
+    domRecurse @dom, (node) =>
+      return unless node.attributes?
+      if (id = node.getAttribute 'id')
+        if idSet.has id
+          console.warn "Duplicate id in output SVG: #{id}"
+        else
+          idSet.add id
+      true
+
     @dom
   makeSVG: ->
     out = new XMLSerializer().serializeToString @makeDOM()
