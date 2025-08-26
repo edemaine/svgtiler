@@ -1128,6 +1128,8 @@ figures.  Open an issue or pull request to add yours!
   [GitHub repo with SVG Tiler inputs](https://github.com/edemaine/yin-yang-svgtiler);
   the [associated talk](https://github.com/edemaine/talk-yin-yang)
   directly embeds SVG Tiler into reveal.js slides via the API
+* &ldquo;[Push-1 is PSPACE-complete, and the automated verification of
+  motion planning gadgets](https://arxiv.org/abs/2508.17602)&rdquo;
 
 ## Installation
 
