@@ -208,6 +208,11 @@ defaultSettings =
   ## `href` behaves better in web browsers, but `xlink:href` is more
   ## compatible with older SVG drawing programs.
   useHref: window?
+  ## Wrap <symbol> tags inside <defs>. Workaround for a bug in Inkscape,
+  ## which duplicates <symbol>s inside of <symbol>s unless the inner symbols
+  ## are wrapped in <def>s. So use this when nesting, until bug is fixed.
+  ## https://gitlab.com/inkscape/inbox/-/issues/12642
+  useDefs: false
   ## Add `data-key`/`data-i`/`data-j`/`data-k` attributes to <use> elements,
   ## which specify the drawing key and location (row i, column j, layer k).
   useData: window?
@@ -1999,6 +2004,11 @@ class Render extends HasSettings
       @dom.appendChild styleTag = doc.createElementNS SVGNS, 'style'
       styleTag.textContent = style.css
 
+    ## --use-defs wraps all <symbol>s inside <def>s
+    useDefs = @getSetting 'useDefs'
+    defsWrapper = if useDefs then doc.createElementNS SVGNS, 'defs'
+    container = if useDefs then defsWrapper else @dom
+
     ## Render all tiles in the drawing.
     missing = new Set
     errored = new Set
@@ -2032,7 +2042,7 @@ class Render extends HasSettings
                 symbol.setId '_empty'
               else
                 ## Include new non-empty <symbol> in SVG
-                @dom.appendChild symbol.useDOM()
+                container.appendChild symbol.useDOM()
             new Tile {i, j, k, key, symbol,
               isEmpty: symbol.isEmpty
               zIndex: symbol.zIndex
@@ -2161,7 +2171,7 @@ class Render extends HasSettings
           node.setAttribute attr, node.getAttribute(attr).replace "##{id}",
             "##{newId}"
     ## Search <symbol>s created for tiles
-    findGlobalDefs @dom
+    findGlobalDefs container
     ## Search layer content, including from `svgtiler.add`
     for key, layer of @layers
       for node in layer
@@ -2179,17 +2189,20 @@ class Render extends HasSettings
         findGlobalDefs dom
         {def, dom}
     ## Add <defs> to DOM if they're used or forced.
-    firstSymbol = @dom.firstChild
-    defsWrapper = null
+    firstSymbol = container.firstChild
     for {def, dom} in defDoms
       ## Omit unused <defs> unless forced.
       continue unless def.isForced or usedIds.has dom.getAttribute 'id'
       ## Wrap in <defs> if needed.
-      if skipDef.has dom.tagName
+      if not useDefs and skipDef.has dom.tagName
         @dom.insertBefore dom, firstSymbol
       else
         defsWrapper ?= doc.createElementNS SVGNS, 'defs'
-        defsWrapper.appendChild dom
+        if useDefs
+          defsWrapper.insertBefore dom, firstSymbol
+        else
+          defsWrapper.appendChild dom
+    # Note: If @dom.firstChild is null, insertBefore degenerates to append
     @dom.insertBefore defsWrapper, @dom.firstChild if defsWrapper?
 
     ## Factor out duplicate inline <image>s into separate <symbol>s.
@@ -2221,7 +2234,7 @@ class Render extends HasSettings
       attributes = attributes.join ' '
       unless (id = inlineImages.get attributes)?
         inlineImages.set attributes, id = @id filename
-        @dom.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
+        container.appendChild symbol = doc.createElementNS SVGNS, 'symbol'
         symbol.setAttribute 'id', id
         # If we don't have width/height set from data-width/height fields,
         # we take the first used width/height as the defining height.
@@ -2232,7 +2245,7 @@ class Render extends HasSettings
       use.setAttribute @hrefAttr(), '#' + id
       false
 
-    ## Sort by layer
+    ## Sort <use>s by layer
     layerOrder = (layer for layer of @layers).sort (x, y) -> x-y
     for layer in layerOrder
       for node in @layers[layer]
@@ -2620,6 +2633,7 @@ Optional arguments:
   --no-overflow         Don't default <symbol> overflow to "visible"
   --no-sanitize         Don't sanitize PDF output by blanking out /CreationDate
   --use-href            Use href attribute instead of xlink:href attribute
+  --use-defs            Wrap <symbol>s in <def>s (for Inkscape bug with nesting)
   --use-data            Add data-{key,i,j,k} attributes to <use> elements
   (                     Remember settings, mappings, styles, and share values
   )                     Restore last remembered settings/mappings/styles/share
@@ -2868,6 +2882,8 @@ class Driver extends HasSettings
           @settings.inlineImages = false
         when '--use-href'
           @settings.useHref = true
+        when '--use-defs'
+          @settings.useDefs = true
         when '--use-data'
           @settings.useData = true
         when '-j', '--jobs'

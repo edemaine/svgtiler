@@ -35,4 +35,5 @@
 ( ( -s data=Success! share-user.js ) share-undefined.js )
 
 ## Must come after css-escape and margin
-( nesting.coffee nesting.asc )
+## We're demoing <defs> wrapper from --use-defs, but really the children need it
+( --use-defs nesting.coffee nesting.asc )
