@@ -148,13 +148,24 @@ into SVG drawings.
 ## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
 
 In general, mapping files provide a partial mapping from tile names
-(which are generally strings) to SVG content.  Most often, your SVG
-content should consist of a `<symbol>` or `<svg>` tag at the top level,
+(which are generally strings) to SVG content or other image files.
+You can draw SVG content with a vector drawing program like
+[Inkscape](https://inkscape.org/), or write SVG code manually
+(which gives the most control and is my preferred method).
+If you'd like to learn SVG, check out
+[Josh Comeau's friendly introduction](https://www.joshwcomeau.com/svg/friendly-introduction-to-svg/)
+(also [Theo Browne's video](https://youtu.be/mN--sGH97dY)).
+
+Generally, the SVG content for a tile should consist of
+a `<symbol>` or `<svg>` tag at the top level,
 with `width` and `height` attributes (for a coordinate system of
 [0, width] &times; [0, height]) or with a `viewBox` attribute
 (for a more general coordinate system e.g. starting at negative values).
 You can sometimes get away with less;
 see [Autosizing Tiles](#autosizing-tiles).
+Unlike standard SVG, a tile of zero width or height does not prevent the
+symbol from rendering; SVG Tiler uses zero for [layout](#layout-algorithm),
+but tweaks the output width/height so that the symbol actually renders.
 
 In the **.txt format** for mapping files, each line consists of a tile name
 (either having no spaces, or consisting entirely of a single space),
