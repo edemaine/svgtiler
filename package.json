@@ -39,7 +39,7 @@
     "babel-plugin-module-deps": "0.1.1",
     "coffeescript": "2.7.0",
     "csv-parse": "5.5.0",
-    "glob": "10.3.4",
+    "glob": "10.5.0",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.2",
     "minimatch": "9.0.3",
