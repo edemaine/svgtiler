@@ -42,7 +42,7 @@
     "glob": "10.3.4",
     "grapheme-splitter": "1.0.4",
     "image-size": "1.0.2",
-    "minimatch": "9.0.3",
+    "minimatch": "9.0.7",
     "pirates": "4.0.6",
     "preact": "10.17.1",
     "preact-html-converter": "0.4.2",
