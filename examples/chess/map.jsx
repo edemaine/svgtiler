@@ -1,8 +1,10 @@
 const size = 45;  // width and height of svg files
 
 // checkerboard backgrounds
-const light = null;
-const dark = <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>;
+// const light = null;
+// const dark = <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>;
+const light = <rect width={size} height={size} fill="#ffce9e"/>;
+const dark = <rect width={size} height={size} fill="#d18b47"/>;
 
 function read(filename) {
   const dom = require(filename);

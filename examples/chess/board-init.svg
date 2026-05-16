@@ -2,6 +2,9 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 360 360" width="360" height="360" xmlns="http://www.w3.org/2000/svg">
   <symbol id="r" width="45" height="45" overflow="visible">
+    <rect width="45" height="45" fill="#ffce9e"/>
+  </symbol>
+  <symbol id="r_v1" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:#000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.3)">
       <path d="M 9,39 L 36,39 L 36,36 L 9,36 L 9,39 z " style="stroke-linecap:butt;"/>
       <path d="M 12.5,32 L 14,29.5 L 31,29.5 L 32.5,32 L 12.5,32 z " style="stroke-linecap:butt;"/>
@@ -17,7 +20,7 @@
     </g>
   </symbol>
   <symbol id="n" width="45" height="45" overflow="visible">
-    <path stroke="#000" d="M 7.5,0 L 0,7.5 M 15,0 L 0,15 M 22.5,0 L 0,22.5 M 30,0 L 0,30 M 37.5,0 L 0,37.5 M 45,0 L 0,45 M 45,7.5 L 7.5,45 M 45,15 L 15,45 M 45,22.5 L 22.5,45 M 45,30 L 30,45 M 45,37.5 L 37.5,45"/>
+    <rect width="45" height="45" fill="#d18b47"/>
   </symbol>
   <symbol id="n_v1" width="45" height="45" overflow="visible">
     <g style="opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.3)">
@@ -129,46 +132,78 @@
   </symbol>
   <rect x="0" y="0" width="360" height="360" fill="white"/>
   <title>Chess diagram board-init.asc</title>
+  <use xlink:href="#r" x="0" y="0"/>
   <use xlink:href="#n" x="45" y="0"/>
+  <use xlink:href="#r" x="90" y="0"/>
   <use xlink:href="#n" x="135" y="0"/>
+  <use xlink:href="#r" x="180" y="0"/>
   <use xlink:href="#n" x="225" y="0"/>
+  <use xlink:href="#r" x="270" y="0"/>
   <use xlink:href="#n" x="315" y="0"/>
   <use xlink:href="#n" x="0" y="45"/>
+  <use xlink:href="#r" x="45" y="45"/>
   <use xlink:href="#n" x="90" y="45"/>
+  <use xlink:href="#r" x="135" y="45"/>
   <use xlink:href="#n" x="180" y="45"/>
+  <use xlink:href="#r" x="225" y="45"/>
   <use xlink:href="#n" x="270" y="45"/>
+  <use xlink:href="#r" x="315" y="45"/>
+  <use xlink:href="#r" x="0" y="90"/>
   <use xlink:href="#n" x="45" y="90"/>
+  <use xlink:href="#r" x="90" y="90"/>
   <use xlink:href="#n" x="135" y="90"/>
+  <use xlink:href="#r" x="180" y="90"/>
   <use xlink:href="#n" x="225" y="90"/>
+  <use xlink:href="#r" x="270" y="90"/>
   <use xlink:href="#n" x="315" y="90"/>
   <use xlink:href="#n" x="0" y="135"/>
+  <use xlink:href="#r" x="45" y="135"/>
   <use xlink:href="#n" x="90" y="135"/>
+  <use xlink:href="#r" x="135" y="135"/>
   <use xlink:href="#n" x="180" y="135"/>
+  <use xlink:href="#r" x="225" y="135"/>
   <use xlink:href="#n" x="270" y="135"/>
+  <use xlink:href="#r" x="315" y="135"/>
+  <use xlink:href="#r" x="0" y="180"/>
   <use xlink:href="#n" x="45" y="180"/>
+  <use xlink:href="#r" x="90" y="180"/>
   <use xlink:href="#n" x="135" y="180"/>
+  <use xlink:href="#r" x="180" y="180"/>
   <use xlink:href="#n" x="225" y="180"/>
+  <use xlink:href="#r" x="270" y="180"/>
   <use xlink:href="#n" x="315" y="180"/>
   <use xlink:href="#n" x="0" y="225"/>
+  <use xlink:href="#r" x="45" y="225"/>
   <use xlink:href="#n" x="90" y="225"/>
+  <use xlink:href="#r" x="135" y="225"/>
   <use xlink:href="#n" x="180" y="225"/>
+  <use xlink:href="#r" x="225" y="225"/>
   <use xlink:href="#n" x="270" y="225"/>
+  <use xlink:href="#r" x="315" y="225"/>
+  <use xlink:href="#r" x="0" y="270"/>
   <use xlink:href="#n" x="45" y="270"/>
+  <use xlink:href="#r" x="90" y="270"/>
   <use xlink:href="#n" x="135" y="270"/>
+  <use xlink:href="#r" x="180" y="270"/>
   <use xlink:href="#n" x="225" y="270"/>
+  <use xlink:href="#r" x="270" y="270"/>
   <use xlink:href="#n" x="315" y="270"/>
   <use xlink:href="#n" x="0" y="315"/>
+  <use xlink:href="#r" x="45" y="315"/>
   <use xlink:href="#n" x="90" y="315"/>
+  <use xlink:href="#r" x="135" y="315"/>
   <use xlink:href="#n" x="180" y="315"/>
+  <use xlink:href="#r" x="225" y="315"/>
   <use xlink:href="#n" x="270" y="315"/>
-  <use xlink:href="#r" x="0" y="0"/>
+  <use xlink:href="#r" x="315" y="315"/>
+  <use xlink:href="#r_v1" x="0" y="0"/>
   <use xlink:href="#n_v1" x="45" y="0"/>
   <use xlink:href="#b" x="90" y="0"/>
   <use xlink:href="#q" x="135" y="0"/>
   <use xlink:href="#k" x="180" y="0"/>
   <use xlink:href="#b" x="225" y="0"/>
   <use xlink:href="#n_v1" x="270" y="0"/>
-  <use xlink:href="#r" x="315" y="0"/>
+  <use xlink:href="#r_v1" x="315" y="0"/>
   <use xlink:href="#p" x="0" y="45"/>
   <use xlink:href="#p" x="45" y="45"/>
   <use xlink:href="#p" x="90" y="45"/>
