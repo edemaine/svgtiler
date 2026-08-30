@@ -45,7 +45,6 @@
     "minimatch": "9.0.3",
     "pirates": "4.0.6",
     "preact": "10.17.1",
-    "preact-html-converter": "0.4.2",
     "preact-render-to-dom": "0.2.1",
     "preact-render-to-string": "6.2.1",
     "prettify-xml": "1.2.0",

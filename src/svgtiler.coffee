@@ -504,7 +504,8 @@ unless window?
       raw = code
       code = removeSVGComments code
       code = prefixSVGIds code, prefixForFilename filename
-      domCode = require('@babel/core').transform "module.exports = #{code}",
+      jsxCode = escapeSVGStyleBraces code
+      domCode = require('@babel/core').transform "module.exports = #{jsxCode}",
         {...babelConfig, filename}
       """
       #{domCode.code}
@@ -565,6 +566,12 @@ removeSVGComments = (svg) ->
   ## Remove SVG/XML comments such as <?xml...?> and <!DOCTYPE>
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
+
+escapeSVGStyleBraces = (svg) ->
+  svg.replace /(<style\b[^>]*>)([^<]*)(<\/style\s*>)/g,
+    (all, open, css, close) ->
+      return all if /^\s*\{[^]*\}\s*$/.test css  # leave JSX alone
+      "#{open}#{css.replace /[{}]/g, (c) -> "&##{c.charCodeAt 0};"}#{close}"
 
 prefixSVGIds = (svg, prefix) ->
   ## Prefix all id, href, xlink:href for scoping external SVG

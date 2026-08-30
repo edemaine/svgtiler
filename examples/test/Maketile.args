@@ -22,13 +22,15 @@
 ( --margin --uneven margin.coffee margin.asc )
 ( --margin margin.coffee margin.asc )
 
+( import-style.coffee -O import-style x.asc )
+
 ( inline.coffee )
 
 ( needversion.coffee )
 
 ( set.coffee set.asc )
 
-( space.coffee space.asc )
+( space.coffee -O space x.asc )
 
 ## Test )'s ability to reset share object
 ( ( share-provider.js share-user.js ) share-undefined.js )
