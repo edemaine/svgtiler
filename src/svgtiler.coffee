@@ -574,6 +574,17 @@ escapeSVGStyleBraces = (svg) ->
       return all if /^\s*\{[^]*\}\s*$/.test css  ## leave JSX alone
       "#{open}#{css.replace /[{}]/g, (c) -> "&##{c.charCodeAt 0};"}#{close}"
 
+## Decode CSS escapes for matching selector IDs against XML `id` values.
+## Hex escapes consume one optional following whitespace character:
+## https://www.w3.org/TR/css-syntax-3/#consume-escaped-code-point
+unescapeCSS = (text) =>
+  text.replace /\\(?:([0-9a-f]{1,6})(?:\r\n|[\t\r\n\f ])?|([^\r\n\f]))/gi,
+    (escape, hex, char) =>
+      return char unless hex?
+      code = parseInt hex, 16
+      code = 0xfffd if code == 0 or 0xd800 <= code <= 0xdfff or code > 0x10ffff
+      String.fromCodePoint code
+
 tagRegExp = /<[\w:-]+(?:[^<>"']|"[^"]*"|'[^']*')*>/g
 prefixSVGIds = (svg, prefix) ->
   ## Prefix IDs and their references for scoping external SVG.
@@ -616,11 +627,14 @@ prefixSVGIds = (svg, prefix) ->
         "#{pre}#{quote}#{href}#{quote}"
   ## Update `url(#id)` links and `#id` selectors in CSS in `<style>` tags.
   .replace styleRegExp, (all, open, css, close) =>
+    cssPrefix = prefix.replace /\./g, '\\.'
     css = css
     .replace refRegExp, prefixRef
     .replace /([^{}]+)(?=\{)/g, (selector) =>
-      selector.replace /#([\w-]+)/g, (ref, oldId) =>
-        if (newId = idMap.get oldId)? then "##{newId}" else ref
+      selector.replace /#((?:\\(?:[0-9a-f]{1,6}(?:\r\n|[\t\r\n\f ])?|[^\r\n\f])|[-\w\u0080-\uffff])+)/gi,
+        (ref, cssId) =>
+          ref = "##{cssPrefix}_#{cssId}" if idMap.has unescapeCSS cssId
+          ref
     "#{open}#{css}#{close}"
 
 ## Construct unique prefix for IDs from a given filename
