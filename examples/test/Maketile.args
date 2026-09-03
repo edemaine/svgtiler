@@ -22,7 +22,7 @@
 ( --margin --uneven margin.coffee margin.asc )
 ( --margin margin.coffee margin.asc )
 
-( import-style.coffee -O import-style x.asc )
+( import.coffee -O import x.asc )
 
 ( inline.coffee )
 

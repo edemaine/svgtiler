@@ -567,40 +567,61 @@ removeSVGComments = (svg) ->
   ## (spec: https://www.w3.org/TR/2008/REC-xml-20081126/#NT-prolog)
   svg.replace /<\?[^]*?\?>|<![^-][^]*?>|<!--[^]*?-->/g, ''
 
+styleRegExp = /(<style\b[^>]*>)([^<]*)(<\/style\s*>)/g
 escapeSVGStyleBraces = (svg) ->
-  svg.replace /(<style\b[^>]*>)([^<]*)(<\/style\s*>)/g,
+  svg.replace styleRegExp,
     (all, open, css, close) ->
-      return all if /^\s*\{[^]*\}\s*$/.test css  # leave JSX alone
+      return all if /^\s*\{[^]*\}\s*$/.test css  ## leave JSX alone
       "#{open}#{css.replace /[{}]/g, (c) -> "&##{c.charCodeAt 0};"}#{close}"
 
+tagRegExp = /<[\w:-]+(?:[^<>"']|"[^"]*"|'[^']*')*>/g
 prefixSVGIds = (svg, prefix) ->
-  ## Prefix all id, href, xlink:href for scoping external SVG
+  ## Prefix IDs and their references for scoping external SVG.
   idMap = new Map
-  svg = svg.replace /(?<![\w:-])((?:xml:)?id\s*=\s*)(["'])(.*?)(\2)/g,
-    (attr, pre, quote, id, post) =>
-      if idMap.has id
-        console.warn "SVG #{prefix} has duplicate id: #{id}"
-      else
-        idMap.set id, "#{prefix}_#{id}"
-      "#{pre}#{quote}#{idMap.get id}#{quote}"
-  if idMap.size  # some ids to remap
-    svg = svg.replace /(?<![\w:-])((?:xlink:)?href\s*=\s*)(["'])(.*?)(\2)/g,
+  ## Prefix `id` and `xml:id` attributes and record their mappings.
+  svg = svg.replace tagRegExp, (tag) =>
+    tag.replace /(?<![\w:-])((?:xml:)?id\s*=\s*)(["'])(.*?)(\2)/g,
+      (attr, pre, quote, id, post) =>
+        if idMap.has id
+          console.warn "SVG #{prefix} has duplicate id: #{id}"
+        else
+          idMap.set id, "#{prefix}_#{id}"
+        "#{pre}#{quote}#{idMap.get id}#{quote}"
+  return svg unless idMap.size  # no IDs to remap
+
+  ## `refRegExp` replacer to update one `url()` or `src()` ID reference.
+  prefixRef = (ref, id1, quote, id2) =>
+    oldId = (id1 or id2).trim()
+    if (newId = idMap.get oldId)?
+      ref.replace "##{oldId}", "##{newId}"
+    else
+      console.warn "SVG #{prefix} has reference to unknown id: #{oldId}"
+      ref
+
+  ## Update `url(#id)` links in tag attributes, and
+  ## `href="#id"` and `xlink:href="#id"` tag attributes.
+  svg
+  .replace tagRegExp, (tag) =>
+    tag
+    .replace refRegExp, prefixRef
+    .replace /(?<![\w:-])((?:xlink:)?href\s*=\s*)(["'])(.*?)(\2)/g,
       (attr, pre, quote, href, post) =>
         href = href.trim()
         if href.startsWith '#'
-          if (newId = idMap.get href[1..])?
+          oldId = href[1..]
+          if (newId = idMap.get oldId)?
             href = "##{newId}"
           else
-            console.warn "SVG #{prefix} has reference to unknown id: #{id}"
-        else
-          while (match = refRegExp.exec attr.value)?
-            oldId = match[1] or match[3]
-            if (newId = idMap.get oldId)?
-              href = href.replace "##{oldId}", "##{newId}"
-            else
-              console.warn "SVG #{prefix} has reference to unknown id: #{oldId}"
+            console.warn "SVG #{prefix} has reference to unknown id: #{oldId}"
         "#{pre}#{quote}#{href}#{quote}"
-  svg
+  ## Update `url(#id)` links and `#id` selectors in CSS in `<style>` tags.
+  .replace styleRegExp, (all, open, css, close) =>
+    css = css
+    .replace refRegExp, prefixRef
+    .replace /([^{}]+)(?=\{)/g, (selector) =>
+      selector.replace /#([\w-]+)/g, (ref, oldId) =>
+        if (newId = idMap.get oldId)? then "##{newId}" else ref
+    "#{open}#{css}#{close}"
 
 ## Construct unique prefix for IDs from a given filename
 prefixForFile = new Map
