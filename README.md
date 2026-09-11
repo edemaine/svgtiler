@@ -950,7 +950,8 @@ SVG Tiler provides an API for rendering SVG directly from your JavaScript code.
 On NodeJS, you can `npm install svgtiler` and `require('svgtiler')`.
 On a web browser, you can include a `<script>` tag that points to
 `lib/svgtiler.js`, and the interface is available via `window.svgtiler`,
-though not all features are available or fully functional in this mode.
+though not all features are available or fully functional in this mode;
+see [Web Browsers](#web-browsers).
 While the full API is still in flux and the best comments are in
 [svgtiler.coffee](src/svgtiler.coffee), here is a subset:
 
@@ -1016,6 +1017,43 @@ While the full API is still in flux and the best comments are in
   (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
   `svgtiler.needVersion('>=3.0 <3.1')`.
   Put this in your `Maketile.js`, `Maketile.civet`, or `Maketile.coffee`.
+
+### Web Browsers
+
+Load `lib/svgtiler.js` with a classic `<script>` tag to expose `window.svgtiler`.
+For mappings already defined as JavaScript objects or functions, use
+`new svgtiler.Mapping(...)` without a compiler.
+To compile mapping or style source strings, also load the relevant browser
+compiler before using SVG Tiler:
+
+* **Civet:** Load `dist/browser.js` or `dist/browser.min.js` from
+  `@danielx/civet` to expose `window.Civet`.
+  See [Civet's browser instructions](https://civet.dev/getting-started).
+* **CoffeeScript:** Load `lib/coffeescript-browser-compiler-legacy/coffeescript.js`
+  from `coffeescript` to expose `window.CoffeeScript`.
+  The modern browser build uses ESM instead; assign its default export to
+  `window.CoffeeScript` if using that build.
+* **Stylus:** Load `dist/stylus-renderer.min.js` from the separate
+  [Stylus browser bundle](https://github.com/openstyles/stylus-lang-bundle)
+  to expose `window.StylusRenderer`.
+
+Browser code mappings do not run through Babel, so **JSX is not supported**,
+nor are `import`/`export` statements or Node's `require`.
+Use SVG strings and explicitly assign `exports.map` or `exports.default`;
+a final bare object or function is not automatically exported.
+For example, after loading the Civet compiler:
+
+```js
+const mapping = new svgtiler.CivetMapping(
+  'exports.map = (color) -> `<circle r="10" fill="${color}"/>`',
+  {filename: 'map.civet'});
+svgtiler.renderDOM('.drawing', {mappings: mapping});
+```
+
+Use `new svgtiler.CoffeeMapping(source, {filename: 'map.coffee'})` or
+`new svgtiler.JSMapping(source, {filename: 'map.js'})` similarly.
+For Stylus, use `new svgtiler.StylusStyle(source, {filename: 'style.styl'})`
+and pass the result in `settings.styles`.
 
 ### Drawing Class
 

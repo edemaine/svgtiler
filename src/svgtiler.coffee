@@ -15,6 +15,7 @@ else
   domImplementation = document.implementation
   XMLSerializer = window.XMLSerializer # escape CoffeeScript scope
   path =
+    resolve: (x) -> x
     basename: (x) -> /[^/]*$/.exec(x)[0]
     extname: (x) -> /\.[^/]+$/.exec(x)[0]
     dirname: (x) -> /[^]*\/|/.exec(x)[0]
@@ -163,15 +164,6 @@ unless window?
   CoffeeScript.FILE_EXTENSIONS = ['.coffee', '.cjsx']
   CoffeeScript.register()
 
-  ## Compile Civet to JavaScript before passing it through our Babel plugins.
-  ## The inline map lets Babel compose its source map with Civet's.
-  compileCivet = (code, filename) ->
-    require('@danielx/civet').compile code,
-      filename: filename
-      js: true
-      sync: true
-      inlineMap: true
-
   ## Register Civet separately from Babel's JavaScript extensions so that
   ## Civet first compiles to JavaScript, then receives all our Babel plugins.
   require('pirates').addHook (code, filename) ->
@@ -181,6 +173,15 @@ unless window?
   ,
     exts: ['.civet']
     ignoreNodeModules: false  # also compile installed mapping packages
+
+## Compile Civet to JavaScript before passing it through our Babel plugins.
+## The inline map lets Babel compose its source map with Civet's.
+compileCivet = (code, filename) ->
+  (window?.Civet ? require('@danielx/civet')).compile code,
+    filename: filename
+    js: true
+    sync: true
+    inlineMap: true
 
 defaultSettings =
   ## Log otherwise invisible actions to aid with debugging.
@@ -1273,7 +1274,8 @@ class StylusStyle extends Style
   ## Style in Stylus format.
   @title: "Stylus style file (https://stylus-lang.com/)"
   parse: (stylus) ->
-    styl = require('stylus') stylus,
+    ## Browser global: https://github.com/openstyles/stylus-lang-bundle
+    styl = new (window?.StylusRenderer ? require('stylus')) stylus,
       filename: @filename
     super styl.render()
 
@@ -1598,10 +1600,13 @@ class JSMapping extends Mapping
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually and simulate module.
-      {code} = require('@babel/core').transform data, {
-        ...babelConfig
-        filename: @filename
-      }
+      if require?
+        {code} = require('@babel/core').transform data, {
+          ...babelConfig
+          filename: @filename
+        }
+      else
+        code = data
       #console.log code
       @exports = {}
       ## Mimick NodeJS module's __filename and __dirname variables
@@ -1615,7 +1620,7 @@ class JSMapping extends Mapping
         'exports', '__filename', '__dirname', 'svgtiler', 'preact', code
       #runWithMapping @, ->
       func @exports, _filename, _dirname, svgtiler,
-        (if code.includes 'preact' then require 'preact')
+        (if code.includes('preact') and require? then require 'preact')
     if @getSetting 'verbose'
       console.log "# Module #{@filename} exported {#{Object.keys(@exports).join ', '}}"
     super @exports
@@ -1649,7 +1654,7 @@ class CoffeeMapping extends JSMapping
     else
       ## But if file has been explicitly loaded (e.g. in browser),
       ## compile manually.
-      super require('coffeescript').compile data,
+      super (window?.CoffeeScript ? require('coffeescript')).compile data,
         bare: true
         inlineMap: true
         filename: @filename
