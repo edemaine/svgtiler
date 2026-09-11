@@ -1,2 +1,2 @@
-export init = ->
+export function init()
   share.flipParity = 1

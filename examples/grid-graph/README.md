@@ -6,7 +6,7 @@ where edges usually connect all vertices at distance 1.
 However, to enable drawing specific paths (e.g. Hamiltonian paths/cycles),
 the edges are explicit in the ASCII input.
 
-* [Mapping file](path.coffee)
+* [Mapping file](path.civet)
 
 ## Fig. 2.7 from [Itai, Papadimitriou, and Szwarcfiter 1982](https://doi.org/10.1137/0211056)
 
@@ -17,7 +17,7 @@ the edges are explicit in the ASCII input.
 
 ## Fig. 2.8 from [Itai, Papadimitriou, and Szwarcfiter 1982](https://doi.org/10.1137/0211056)
 
-* These examples use [flip_parity.js](flip_parity.js) to flip the parity of
+* These examples use [flip_parity.civet](flip_parity.civet) to flip the parity of
 the vertex coloring, to match the figure in the paper.
 
 ### Hamiltonian cycle

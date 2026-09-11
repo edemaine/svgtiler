@@ -17,7 +17,7 @@ see [more examples below](#examples).
 
 - [Main Concepts](#main-concepts)
 - [Usage](#usage)
-- [Mapping Files: .txt, .js, .coffee, .jsx, .cjsx](#mapping-files-txt-js-coffee-jsx-cjsx)
+- [Mapping Files: .txt, .js, .jsx, .civet, .coffee, .cjsx](#mapping-files-txt-js-jsx-civet-coffee-cjsx)
 - [Drawing Files: .asc, .ssv, .csv, .tsv, .psv, .xlsx, .xls, .ods](#drawing-files-asc-ssv-csv-tsv-psv-xlsx-xls-ods)
 - [Style Files: .css, .styl](#style-files-css-styl)
 - [Layout Algorithm](#layout-algorithm)
@@ -30,7 +30,7 @@ see [more examples below](#examples).
 - [LaTeX Text](#latex-text)
 - [Maketiles](#maketiles)
   - [Maketile.args](#maketileargs)
-  - [Maketile.coffee/js](#maketilecoffeejs)
+  - [Maketile.civet/.coffee/.js](#maketilecivetcoffeejs)
   - [Directories](#directories)
 - [API](#api)
 - [Examples](#examples)
@@ -49,7 +49,7 @@ To use SVG Tiler, you combine at least two types of files
 1. A **mapping file** specifies how to map tile names (strings) to
    SVG content (either embedded in the same file or in separate files).
    Mapping files can be specified in a simple ASCII format, or
-   as a dynamic mapping defined by JavaScript or CoffeeScript code.
+   as a dynamic mapping defined by JavaScript, Civet, or CoffeeScript code.
 
 2. A **drawing file** specifies a grid of tile names (strings) which,
    combined with one or more mapping files to define the SVG associated
@@ -145,7 +145,7 @@ Alternatively, you can use the [SVG Tiler API](#api) to render SVG from your
 own JavaScript code, e.g., converting ASCII art embedded within a webpage
 into SVG drawings.
 
-## Mapping Files: .txt, .js, .coffee, .jsx, .cjsx
+## Mapping Files: .txt, .js, .jsx, .civet, .coffee, .cjsx
 
 In general, mapping files provide a partial mapping from tile names
 (which are generally strings) to SVG content or other image files.
@@ -189,8 +189,10 @@ O O.svg
  blank.svg
 ```
 
-In the **.js / .coffee / .jsx / .cjsx formats**, the file consists of
-JavaScript / CoffeeScript code that gets loaded as a NodeJS module.
+In the **.js / .jsx / .civet / .coffee / .cjsx formats**,
+the file consists of JavaScript / [Civet](https://civet.dev/) /
+[CoffeeScript](https://coffeescript.org) code
+that gets loaded as a NodeJS module.
 The code specifies a `mapping` in one of a few ways:
 
 1. `export map = mapping` or `export default mapping`
@@ -354,7 +356,7 @@ The `Context` object has the following properties and methods:
   functions within the same drawing (but not between separate drawings).
   This can be useful for drawing-specific state.
 
-The top-level code of your .js or .coffee mapping file can also export
+The top-level code of your .js, .civet, or .coffee mapping file can also export
 the following functions:
 
 * `export init` to schedule calling `init(mapping)` whenever
@@ -429,7 +431,7 @@ the following useful attributes:
   Note that these lengths do not include margins (which get removed first).
 
 Like other [NodeJS modules](https://nodejs.org/api/modules.html),
-.js and .coffee files can access `__dirname` and `__filename`,
+.js, .civet, and .coffee files can access `__dirname` and `__filename`,
 e.g., to use paths relative to the mapping file.
 In addition to the preloaded module `preact`,
 they have access to the SVG Tiler API via `svgtiler`, and
@@ -444,7 +446,7 @@ of `share`, as in [the Mario example](examples/mario):
 You can also use `import ... from './filename'` or `require('./filename')`
 to import local modules or files relative to the mapping file.
 
-* In particular, you can share .js/.coffee code or .json config files
+* In particular, you can share .js/.civet/.coffee code or .json config files
   among mapping files.
 * If you `import`/`require` a filename with `.svg` extension, you obtain a
   Preact Virtual DOM object `svg` representing the SVG file, which you can
@@ -552,8 +554,8 @@ See the [animation example](examples/anim) for sample usage of a .css or
 .styl file.
 
 If you'd rather generate a `<style>` tag dynamically depending on the
-drawing content, you can do so in a .js or .coffee mapping file by calling
-`svgtiler.add` during a `preprocess` or `postprocess` export.
+drawing content, you can do so in a .js, .civet, or .coffee mapping file by
+calling `svgtiler.add` during a `preprocess` or `postprocess` export.
 
 ## Layout Algorithm
 
@@ -701,7 +703,7 @@ with automatic width and height, so that it is easy to spot.
 SVG Tiler also lists any unrecognized tiles at the end of its output.
 
 If evaluating a tile raises an exception (usually from code in your
-.js/.coffee mapping files), the tile renders as a red-on-yellow triangle
+.js/.civet/.coffee mapping files), the tile renders as a red-on-yellow triangle
 with an exclamation mark (like the Unicode warning sign ⚠️).
 SVG Tiler also Tiler outputs the error and stack trace, and
 lists any erroring tiles at the end of its output.
@@ -854,11 +856,12 @@ and you put quotes around filenames with spaces or other special characters.
 You can also write the arguments over multiple lines
 (with no need to end lines with `\`).
 
-### Maketile.coffee/.js
+### Maketile.civet/.coffee/.js
 
-The more sophisticated system is to write a `Maketile.coffee` or
-`Maketile.js` file.  This system offers the entire CoffeeScript or
-JavaScript programming language to express complex build rules.
+The more sophisticated system is to write a `Maketile.civet`,
+`Maketile.coffee`, or `Maketile.js` file.  This system offers the entire
+Civet, CoffeeScript, or JavaScript programming language to express complex
+build rules.
 The file can provide build rules in one of a few ways:
 
 1. `export make = ...` (ESM) or `exports.make = ...` (CommonJS)
@@ -936,7 +939,7 @@ subdirectory or your paper's main directory.  In this case, you can trigger
 the `Maketile` within the `figures` directory by running `svgtiler figures`.
 You can use this shorthand also when defining `Maketile`s,
 to recurse into subdirectories.
-For example, [examples/Maketile.coffee](examples/Maketile.coffee)
+For example, [examples/Maketile.civet](examples/Maketile.civet)
 loops over all the subdirectories within `examples` and runs their `Maketile`s.
 You can thus trigger building all examples in this repository by typing
 `svgtiler examples` at the root directory of a checkout.
@@ -956,7 +959,7 @@ While the full API is still in flux and the best comments are in
   `map`/`init`/`preprocess`/`postprocess` (all of which are optional).
   In particular, `map` can be an object, `Map`, or
   function mapping keys to SVG content, just like
-  [a JavaScript mapping file](#mapping-files-txt-js-coffee-jsx-cjsx).
+  [a code mapping file](#mapping-files-txt-js-jsx-civet-coffee-cjsx).
 * `new svgtiler.Drawing(keys)`: Create a
   [drawing](#drawing-class) with the specified `keys`,
   which is an `Array` of `Array` of `String`s (or other objects),
@@ -1012,7 +1015,7 @@ While the full API is still in flux and the best comments are in
   [range of version numbers](https://github.com/npm/node-semver#ranges)
   (or throw an error), e.g. `svgtiler.needVersion('3.x')` or
   `svgtiler.needVersion('>=3.0 <3.1')`.
-  Put this in your `Maketile.js` or `Maketile.coffee`.
+  Put this in your `Maketile.js`, `Maketile.civet`, or `Maketile.coffee`.
 
 ### Drawing Class
 
@@ -1151,7 +1154,7 @@ you can install (or update) this tool via
 npm install -g svgtiler@latest
 ```
 
-SVG Tiler requires Node v14+.
+SVG Tiler requires Node v18.12+.
 
 ## Command-Line Usage
 
@@ -1208,12 +1211,11 @@ Filename arguments:  (mappings and styles before relevant drawings!)
                Each line is <symbol-name><space><raw SVG or filename.svg>
   *.js         JavaScript mapping file (including JSX notation)
                Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}
+               or a function mapping similarly e.g. (key) => 'dot.svg'
   *.jsx        JavaScript mapping file (including JSX notation)
-               Object mapping symbol names to SYMBOL e.g. {dot: 'dot.svg'}
+  *.civet      Civet mapping file (including JSX notation)
   *.coffee     CoffeeScript mapping file (including JSX notation)
-               Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'
   *.cjsx       CoffeeScript mapping file (including JSX notation)
-               Object mapping symbol names to SYMBOL e.g. dot: 'dot.svg'
   *.asc        ASCII drawing (one character per symbol)
   *.ssv        Space-delimiter drawing (one word per tile: a  b)
   *.csv        Comma-separated drawing (spreadsheet export: a,b)
@@ -1232,7 +1234,7 @@ Filename arguments:  (mappings and styles before relevant drawings!)
   *.styl       Stylus style file (https://stylus-lang.com/)
   *.svg        SVG file (convert to PDF/PNG without any tiling)
 
-SYMBOL specifiers:  (omit the quotes in anything except .js and .coffee files)
+SYMBOL specifiers:  (omit the quotes in anything except code mapping files)
 
   'filename.svg':   load SVG from specifies file
   'filename.png':   include PNG image from specified file

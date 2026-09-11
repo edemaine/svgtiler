@@ -16,6 +16,9 @@
     "url": "https://erikdemaine.org/"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=18.12"
+  },
   "directories": {
     "lib": "lib"
   },
@@ -34,6 +37,7 @@
     "@babel/plugin-transform-modules-commonjs": "7.22.15",
     "@babel/plugin-transform-react-jsx": "7.22.15",
     "@babel/register": "7.22.15",
+    "@danielx/civet": "0.11.16",
     "@xmldom/xmldom": "0.8.10",
     "babel-plugin-auto-import": "1.1.0",
     "babel-plugin-module-deps": "0.1.1",

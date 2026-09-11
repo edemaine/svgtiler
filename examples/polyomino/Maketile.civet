@@ -1,0 +1,10 @@
+// Supported rules: civet, cjsx, jsx, coffee
+// Default `svgtiler` behavior runs all rules.
+
+langs := ['civet', 'cjsx', 'jsx', 'coffee']
+
+(lang: string) ->
+  if lang
+    svgtiler `-f outlines.${lang} *.asc`
+  else
+    svgtiler langs

@@ -1,0 +1,10 @@
+civet: ->
+  svgtiler '-f map.civet *.asc'
+coffee: ->
+  svgtiler '-f map.coffee *.asc'
+js: ->
+  svgtiler '-f map.jsx *.asc'
+graph: ->
+  svgtiler '-f -O graph-* map.civet graph.civet *.asc'
+'': ->
+  svgtiler 'civet coffee js graph'

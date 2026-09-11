@@ -31,7 +31,7 @@ resolve = (dirname, filename) =>
   else
     path.join dirname, filename
 
-## Register `require` hooks of Babel and CoffeeScript,
+## Register `require` hooks of Babel, Civet, and CoffeeScript,
 ## so that imported/required modules are similarly processed.
 unless window?
   ###
@@ -163,6 +163,25 @@ unless window?
   CoffeeScript.FILE_EXTENSIONS = ['.coffee', '.cjsx']
   CoffeeScript.register()
 
+  ## Compile Civet to JavaScript before passing it through our Babel plugins.
+  ## The inline map lets Babel compose its source map with Civet's.
+  compileCivet = (code, filename) ->
+    require('@danielx/civet').compile code,
+      filename: filename
+      js: true
+      sync: true
+      inlineMap: true
+
+  ## Register Civet separately from Babel's JavaScript extensions so that
+  ## Civet first compiles to JavaScript, then receives all our Babel plugins.
+  require('pirates').addHook (code, filename) ->
+    {code} = require('@babel/core').transform compileCivet(code, filename),
+      {...babelConfig, filename}
+    code
+  ,
+    exts: ['.civet']
+    ignoreNodeModules: false  # also compile installed mapping packages
+
 defaultSettings =
   ## Log otherwise invisible actions to aid with debugging.
   ## Currently, 0 = none, nonzero = all, but there may be levels in future.
@@ -219,7 +238,7 @@ defaultSettings =
   ## Background rectangle fill color.
   background: null
   ## Glob pattern for Maketiles.
-  maketile: '[mM]aketile.{args,coffee,js}'
+  maketile: '[mM]aketile.{args,civet,coffee,js}'
   ## renderDOM-specific
   filename: 'drawing.asc'  # default filename when not otherwise specified
   keepParent: false
@@ -1636,6 +1655,14 @@ class CoffeeMapping extends JSMapping
         filename: @filename
         sourceFiles: [@filename]
 
+class CivetMapping extends JSMapping
+  @title: "Civet mapping file (including JSX notation)"
+  @help: "Object mapping tile names to TILE e.g. {dot: 'dot.svg'}"
+  parse: (data) ->
+    ## Normally rely on the Civet `require` hook registered above.
+    ## Compile manually when the file contents were supplied explicitly.
+    super if data? then compileCivet(data, @filename) else data
+
 class Mappings extends ArrayWrapper
   @itemClass: Mapping
   lookup: (key, context) ->
@@ -2564,6 +2591,7 @@ extensionMap =
   '.txt': ASCIIMapping
   '.js': JSMapping
   '.jsx': JSMapping
+  '.civet': CivetMapping
   '.coffee': CoffeeMapping
   '.cjsx': CoffeeMapping
   # Drawings
@@ -2690,7 +2718,7 @@ Filename arguments:  (mappings and styles before relevant drawings!)
     console.log "               #{klass.help}" if klass.help?
   console.log """
 
-TILE specifiers:  (omit the quotes in anything except .js and .coffee files)
+TILE specifiers:  (omit the quotes in anything except code mapping files)
 
   'filename.svg':   load SVG from specified file
   'filename.png':   include PNG image from specified file
@@ -3089,7 +3117,7 @@ needVersion = (constraints) ->
 
 svgtiler = Object.assign run, {
   SVGContent, SVGWrapped, SVGSymbol, unrecognizedSymbol,
-  Mapping, Mappings, ASCIIMapping, JSMapping, CoffeeMapping,
+  Mapping, Mappings, ASCIIMapping, JSMapping, CivetMapping, CoffeeMapping,
   static: wrapStatic,
   Drawing, AutoDrawing, ASCIIDrawing,
   DSVDrawing, SSVDrawing, CSVDrawing, TSVDrawing, PSVDrawing,

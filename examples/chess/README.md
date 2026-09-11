@@ -18,14 +18,15 @@
 
 ## Mapping
 
-* [CoffeeScript mapping file](map.coffee) and equivalent
-  [JavaScript mapping file](map.jsx), illustrating:
+* [Civet mapping file](map.civet) and equivalent
+  [CoffeeScript mapping file](map.coffee) and [JavaScript mapping file](map.jsx),
+  illustrating:
   * Computing the square parity to automatically shade dark squares
   * Using `require` to load and modify external SVG files
     (strip off unnecessary `<svg>` wrapper)
   * JSX notation for creating and composing symbols
   * `svgtiler.background` for rendering a background white rectangle
-* [CoffeeScript file](graph.coffee) for rendering the graph of attacks,
+* [Civet file](graph.civet) for rendering the graph of attacks,
   illustrating more advanced `export postprocess` usage.
 
 ## Piece Shapes

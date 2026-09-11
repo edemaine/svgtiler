@@ -1,0 +1,3 @@
+->
+  for example of svgtiler.glob '*/'  // match directories only
+    svgtiler [example]  // array argument isn't processed for globs etc.

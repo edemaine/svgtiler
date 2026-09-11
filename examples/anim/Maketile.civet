@@ -1,0 +1,9 @@
+// Supported rules: css (default), styl
+
+(lang: string) ->
+  lang = 'css' unless lang
+  svgtiler ```
+    -f css-anim.${lang}
+    ( shapes.coffee css-anim.csv )
+    ( ascii.coffee ascii.asc )
+  ```
