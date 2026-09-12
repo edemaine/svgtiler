@@ -2070,6 +2070,9 @@ class Render extends HasSettings
     @dom.setAttribute 'version', '1.1'
     #@dom.appendChild defs = doc.createElementNS SVGNS, 'defs'
 
+    ## Initialize cache before preprocess callbacks, which may call def().
+    @cache = new Map
+
     ## Preprocess callbacks, which may change anything about the Render job
     @mappings.doPreprocess @
 
@@ -2086,7 +2089,6 @@ class Render extends HasSettings
     ## Render all tiles in the drawing.
     missing = new Set
     errored = new Set
-    @cache = new Map
     @tiles =
       for row, i in @drawing.keys
         for key, j in row
